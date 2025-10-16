@@ -10,7 +10,7 @@ spec:
   project: default
   source:
     path: yamls/
-    repoURL: https://github.com/[GITHUB_REPO_HERE].git
+    repoURL: https://github.com/homelabv2.git
     targetRevision: HEAD
     directory:
       recurse: true

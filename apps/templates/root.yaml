@@ -12,7 +12,7 @@ spec:
   project: default
   source:
     path: apps/
-    repoURL: https://github.com/HomelabV2.git
+    repoURL: https://github.com/homelabv2.git
     targetRevision: HEAD
   syncPolicy:
     automated:
