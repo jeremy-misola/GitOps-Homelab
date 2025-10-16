@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: platform-metallb
+  name: metallb
   namespace: argocd
 spec:
   project: default
@@ -11,7 +11,7 @@ spec:
     targetRevision: 0.15.2
   destination:
     server: https://kubernetes.default.svc
-    namespace: default
+    namespace: metallb
   syncPolicy:
     automated:
       prune: true
