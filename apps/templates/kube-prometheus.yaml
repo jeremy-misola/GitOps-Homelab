@@ -11,7 +11,7 @@ spec:
     targetRevision: 78.3.0
   destination:
     server: https://kubernetes.default.svc
-    namespace: ingress-nginx
+    namespace: monitoring
   syncPolicy:
     automated:
       prune: true
