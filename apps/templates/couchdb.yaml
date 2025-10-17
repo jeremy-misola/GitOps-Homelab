@@ -13,7 +13,6 @@ spec:
       values: |
         createAdminSecret: false
         extraSecretName: "couchdb-creds"
-        adminUsername: admin
         adminPasswordKey: "couchdb-password"
         couchdbConfig:
           couchdb:
