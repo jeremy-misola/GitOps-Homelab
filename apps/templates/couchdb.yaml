@@ -10,11 +10,14 @@ spec:
     chart: couchdb
     targetRevision: 4.6.2
     helm:
-      valuesObject:
+      values: |
+        createAdminSecret: false
+        extraSecretName: "couchdb-creds"
+        adminUsername: admin
+        adminPasswordKey: "couchdb-password"
         couchdbConfig:
           couchdb:
             uuid: $(curl https://www.uuidgenerator.net/api/version4 2>/dev/null | tr -d -)
-            existingSecret: couchdb-password
   destination:
     server: https://kubernetes.default.svc
     namespace: couchdb
