@@ -9,15 +9,16 @@ spec:
     repoURL: https://apache.github.io/couchdb-helm
     chart: couchdb
     targetRevision: 4.6.2
+    helm:
+      valuesObject:
+        couchdbConfig:
+          couchdb:
+            uuid: $(curl https://www.uuidgenerator.net/api/version4 2>/dev/null | tr -d -)
+            existingSecret: couchdb-password
   destination:
     server: https://kubernetes.default.svc
     namespace: couchdb
-  helm:
-    values: |
-      couchdbConfig:
-        couchdb:
-          uuid: $(curl https://www.uuidgenerator.net/api/version4 2>/dev/null | tr -d -)
-          existingSecret: couchdb-password
+  
   syncPolicy:
     automated:
       prune: true
