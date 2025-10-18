@@ -20,7 +20,8 @@ spec:
         couchdbConfig:
           couchdb:
             uuid: $(curl https://www.uuidgenerator.net/api/version4 2>/dev/null | tr -d -)
-
+        service:
+          annotations: tailscale.com/expose: "true"
   destination:
     server: https://kubernetes.default.svc
     namespace: couchdb
