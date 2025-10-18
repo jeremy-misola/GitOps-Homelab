@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: couchdb-ingress
+  namespace: couchdb
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+spec:
+  tls:
+    - hosts:
+        - couchdb-couchdb-svc-couchdb-1.tail36492e.ts.net
+      secretName: couchdb-tls-secret
+  rules:
+    - host: couchdb-couchdb-svc-couchdb-1.tail36492e.ts.net
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: couchdb-svc-couchdb
+                port:
+                  number: 5984
