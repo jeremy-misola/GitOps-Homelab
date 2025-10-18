@@ -9,7 +9,7 @@ spec:
     name: doppler-auth-api
 
   target:
-    name: tailscale-creds
+    name: operator-oauth
 
   data:
     - secretKey: client_id
