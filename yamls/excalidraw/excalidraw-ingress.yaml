@@ -4,7 +4,7 @@ metadata:
   name: excalidraw-ingress
   namespace: excalidraw
 spec:
-  ingressClassName: tailscale
+  ingressClassName: nginx
   rules:
     - host: homeserver-excalidraw.com
       http:
