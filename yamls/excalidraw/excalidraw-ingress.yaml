@@ -1,0 +1,18 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: excalidraw-ingress
+  namespace: excalidraw
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: homeserver-excalidraw.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: excalidraw-main
+                port:
+                  number: 80
