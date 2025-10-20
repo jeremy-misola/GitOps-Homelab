@@ -14,8 +14,12 @@ spec:
         service:
           dns-tcp:
             type: LoadBalancer
+            annotations:
+              tailscale.com/expose: "true"
           dns-udp:
             type: LoadBalancer
+            annotations:
+              tailscale.com/expose: "true"
   destination:
     server: https://kubernetes.default.svc
     namespace: adguard-home
