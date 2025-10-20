@@ -1,17 +1,17 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: immich
+  name: excalidraw
   namespace: argocd
 spec:
   project: default
   source:
-    repoURL: oci://ghcr.io/bjw-s-labs/helm/app-template
-    chart: immich
-    targetRevision: 4.4.0
+    repoURL: https://pmoscode-helm.github.io/excalidraw/
+    chart: excalidraw
+    targetRevision: 0.18.0
   destination:
     server: https://kubernetes.default.svc
-    namespace: immich
+    namespace: excalidraw
   syncPolicy:
     automated:
       prune: true
