@@ -11,8 +11,7 @@ spec:
     targetRevision: 11.10.0
     helm:
       values: |
-        config:
-          <path:secret/nextcloud-creds#values.yaml>
+        $ref: "kubernetes://nextcloud-aio/secrets/nextcloud-creds#values.yaml"
   destination:
     server: https://kubernetes.default.svc
     namespace: nextcloud-aio
