@@ -7,8 +7,8 @@ spec:
   project: default
   source:
     repoURL: https://stirling-tools.github.io/Stirling-PDF-chart
-    chart: stirling-pdf
-    targetRevision: 1.3.2
+    chart: stirling-pdf-chart
+    targetRevision: 2.2.0
   destination:
     server: https://kubernetes.default.svc
     namespace: stirling-pdf
