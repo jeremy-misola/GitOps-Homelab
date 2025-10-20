@@ -9,6 +9,13 @@ spec:
     repoURL: https://k8s-at-home.com/charts/
     chart: adguard-home
     targetRevision: 5.5.2
+    helm:
+      values: |
+        service:
+          dns-tcp:
+            type: LoadBalancer
+          dns-udp:
+            type: LoadBalancer
   destination:
     server: https://kubernetes.default.svc
     namespace: adguard-home
