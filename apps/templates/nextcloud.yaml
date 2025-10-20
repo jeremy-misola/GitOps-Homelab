@@ -7,7 +7,7 @@ spec:
   project: default
   source:
     repoURL: https://nextcloud.github.io/all-in-one/
-    chart: nextcloud-aio
+    chart: nextcloud-aio-helm-chart
     targetRevision: 11.10.0
     helm:
       values: |
