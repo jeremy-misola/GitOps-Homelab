@@ -4,10 +4,12 @@ metadata:
   name: excalidraw-tailscale-ingress
   namespace: excalidraw
 spec:
-  rules:
   defaultBackend:
     service:
       name: excalidraw-main
       port:
         number: 80
+  tls:
+    - hosts:
+        - excalidraw
   ingressClassName: tailscale
