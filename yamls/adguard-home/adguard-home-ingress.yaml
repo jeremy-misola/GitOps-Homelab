@@ -16,3 +16,4 @@ spec:
                 name: adguard-home
                 port:
                   number: 3000
+
