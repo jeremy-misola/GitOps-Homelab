@@ -1,0 +1,24 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: nextcloud-aio
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://nextcloud.github.io/all-in-one/
+    chart: nextcloud-aio
+    targetRevision: 11.10.0
+    helm:
+      values: |
+        config:
+          <path:secret/nextcloud-creds#values.yaml>
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: nextcloud-aio
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
