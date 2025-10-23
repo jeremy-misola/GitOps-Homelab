@@ -1,161 +1,81 @@
-# Homelab v3
 
-A Kubernetes-based homelab infrastructure managed with ArgoCD GitOps principles. This repository contains the configuration for a self-hosted environment running various services for personal use.
+# My Kubernetes Homelab - A GitOps-Driven Personal Cloud Infrastructure
 
-## 🏗️ Architecture Overview
+This repository details my personal Kubernetes-based homelab, designed as a robust, automated, and observable platform for self-hosting various applications and services.
 
-This homelab is built on Kubernetes with the following key components:
+## Overview & Motivation
 
-- **ArgoCD**: GitOps continuous deployment tool for managing applications
-- **MetalLB**: Load balancer for bare metal Kubernetes clusters
-- **NGINX Ingress**: HTTP/HTTPS traffic routing and SSL termination
-- **Tailscale**: Secure networking and VPN access
-- **External Secrets Operator**: Secure secret management
-- **Prometheus Stack**: Monitoring and alerting infrastructure
+I built this homelab to gain hands-on expertise with cutting-edge cloud-native technologies, deepen my understanding of Kubernetes internals, and implement modern DevOps practices in a real-world scenario. This project addresses practical challenges in secure access, persistent storage, and continuous deployment for personal services, showcasing my ability to build and operate a resilient home infrastructure.
 
-## 📋 Services
+## Architectural Principles & Design
 
-### Core Infrastructure
-- **ArgoCD** (`argocd` namespace): GitOps continuous deployment
-- **MetalLB** (`metallb` namespace): Load balancer for bare metal
-- **NGINX Ingress** (`ingress-nginx` namespace): HTTP/HTTPS routing
-- **External Secrets Operator** (`external-secrets` namespace): Secret management
-- **Tailscale Operator** (`tailscale` namespace): Secure networking
+This homelab is engineered with a focus on modern cloud-native principles:
 
-### Applications
-- **Excalidraw** (`excalidraw` namespace): Collaborative whiteboarding tool
-- **Stirling PDF** (`stirling-pdf` namespace): PDF manipulation and conversion
-- **CouchDB** (`couchdb` namespace): NoSQL database
-- **Immich** (`immich` namespace): Self-hosted photo and video backup
+*   **GitOps-Centric:** The entire infrastructure and application deployments are managed declaratively through a GitOps workflow, leveraging **Argo CD**. All desired states are version-controlled in Git, enabling automated deployments, seamless rollbacks, and establishing a single source of truth for the entire environment.
+*   **App-of-Apps Pattern:** Utilizes the Argo CD "App-of-Apps" pattern for managing application lifecycles and dependencies. This provides a scalable, organized, and self-documenting approach to deploying multiple interdependent services.
+*   **Cloud-Native Tooling:** Designed around an ecosystem of industry-standard cloud-native tools to ensure resilience, scalability, and ease of management.
+*   **Modularity:** Applications and infrastructure components are logically separated using Helm charts and Kubernetes manifests, allowing for independent management and upgrades.
 
-### Monitoring
-- **Kube Prometheus Stack** (`monitoring` namespace): Prometheus, Grafana, and AlertManager
+## Core Infrastructure Components
 
-## 🚀 Getting Started
+Each component plays a critical role in the homelab's functionality and demonstrates specific technical competencies:
 
-### Prerequisites
-- Kubernetes cluster (1.20+)
-- Helm 3.x
-- ArgoCD CLI (optional)
+*   **Kubernetes (K3s/Vanilla):** The foundational container orchestration platform, providing robust resource management, scheduling, and high availability for all deployed applications.
+*   **Argo CD:** Serves as the continuous delivery tool, actively synchronizing the desired state defined in this Git repository with the actual state in the Kubernetes cluster. It automates deployments, manages application lifecycles, and enforces declarative configuration.
+*   **Helm:** Employed for packaging and deploying applications, standardizing configurations, and facilitating repeatable, version-controlled deployments across the cluster.
+*   **Tailscale & Kubernetes Operator:** Provides a secure, zero-config mesh VPN, enabling encrypted and authenticated access to homelab services from any authorized device. Its Kubernetes Operator automates the configuration and management of Tailscale within the cluster, demonstrating operator pattern knowledge.
+*   **MetalLB:** Implements a bare-metal load balancer for Kubernetes, dynamically providing external IP addresses to services within the self-hosted environment, overcoming the lack of traditional cloud provider load balancers.
+*   **External Secrets Operator (ESO) + Doppler:** Securely injects secrets from Doppler (a centralized secrets management platform) into Kubernetes. This decouples secret storage from application code, enhances security posture, and streamlines secret rotation and management.
+*   **Ingress Nginx:** Manages external HTTP/HTTPS access to services within the cluster, handling intelligent routing, load balancing, and SSL/TLS termination for internal applications.
+*   **Longhorn:** Provides distributed block storage for Kubernetes, ensuring data persistence, high availability, and snapshot capabilities for stateful applications, crucial for data integrity and disaster recovery.
 
-### Initial Setup
+## Deployed Applications & Services
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/jeremy-misola/homelabv2.git
-   cd homelabv2
-   ```
+This homelab hosts a variety of applications, demonstrating practical application of the underlying infrastructure:
 
-2. **Install ArgoCD**
-   ```bash
-   kubectl create namespace argocd
-   kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
-   ```
+*   **Kube-Prometheus Stack:** A comprehensive monitoring and alerting solution (Prometheus, Grafana, Alertmanager), providing deep insights into cluster health, resource utilization, and application performance through rich metrics and customizable dashboards. Critical for operational excellence and proactive issue resolution.
+*   **CouchDB:** A NoSQL database leveraged for secure synchronization of Obsidian notes across devices, showcasing the deployment and management of stateful applications.
+*   **AdGuard Home:** A network-wide DNS filtering and ad-blocking solution, enhancing network security and privacy for all connected devices.
+*   **Immich:** A self-hosted photo and video backup solution, demonstrating the handling of large media files, persistent storage, and complex application deployments.
+*   **Stirling-PDF:** A web-based suite of tools for PDF manipulation, deployed for utility and demonstrating a stateless application deployment.
+*   **Excalidraw:** A virtual whiteboard for sketching hand-drawn like diagrams.
+*   **Nextcloud:** A self-hosted file synchronization and sharing solution.
 
-3. **Deploy the root application**
-   ```bash
-   kubectl apply -f apps/templates/root.yaml
-   ```
+## Observability & Operational Excellence
 
-4. **Access ArgoCD UI**
-   ```bash
-   kubectl port-forward svc/argocd-server -n argocd 8080:443
-   ```
-   Navigate to `https://localhost:8080` (default credentials: admin/password)
+Proactive monitoring and robust observability are core tenets of this homelab:
 
-### Configuration
+*   **Monitoring:** The Kube-Prometheus stack collects extensive metrics from Kubernetes components, nodes, and all deployed applications. Custom Grafana dashboards provide real-time visualization of key performance indicators (CPU, memory, network I/O, application-specific metrics).
+*   **Alerting:** Alertmanager is configured to send notifications for critical events and threshold breaches, ensuring proactive incident response and maintaining service reliability.
+*   **Logging:** Centralized logging solution to aggregate and analyze logs from all pods and nodes, facilitating quicker debugging and operational insights.
 
-#### MetalLB Configuration
-Configure IP pools and L2 advertisement in `yamls/metallb/`:
-- `1-ip-pool.yaml`: Define IP address pool
-- `2-l2-advertisement.yaml`: Configure L2 advertisement
+## Networking & Security Posture
 
-#### External Secrets
-Configure secret stores and external secrets in `yamls/external-secrets/`:
-- `secret-store.yaml`: Define secret store configuration
-- Service-specific secrets (e.g., `couchdb.yaml`, `tailscale.yaml`)
+Security and controlled access are paramount in this self-hosted environment:
 
-#### Ingress Configuration
-Service-specific ingress configurations in `yamls/`:
-- `argocd/argocd-ingess.yaml`
-- `excalidraw/excalidraw-ingress.yaml`
-- `kube-prometheus/ingress.yaml`
-- `stirling-pdf/stirling-pdf-ingress.yaml`
+*   **Secure Access:** Tailscale provides an encrypted, least-privilege access model to the homelab, eliminating the need for public-facing ports or complex firewall rules and simplifying remote access.
+*   **Secrets Management:** Rigorous secrets management through External Secrets Operator and Doppler ensures sensitive data (API keys, database credentials) is never hardcoded, is securely stored, and securely injected at runtime.
+*   **Ingress Security:** SSL/TLS termination is handled at the Ingress Nginx layer, ensuring all external communication to exposed services is encrypted.
 
-## 📁 Repository Structure
+## Future Enhancements & Learning
 
-```
-homelabv3/
-├── apps/                    # ArgoCD application definitions
-│   ├── Chart.yaml          # Root Helm chart
-│   └── templates/          # Application manifests
-├── charts/                 # Custom Helm charts
-│   └── argo-cd/           # ArgoCD Helm chart
-├── yamls/                 # Additional Kubernetes manifests
-│   ├── argocd/           # ArgoCD configurations
-│   ├── excalidraw/       # Excalidraw configurations
-│   ├── external-secrets/ # Secret management
-│   ├── kube-prometheus/  # Monitoring configurations
-│   ├── metallb/          # Load balancer configurations
-│   └── stirling-pdf/     # Stirling PDF configurations
-└── README.md             # This file
-```
+This project is an ongoing journey of learning and improvement:
 
-## 🔧 Management
+*   Exploring **Crossplane** for GitOps-driven infrastructure provisioning beyond just applications.
+*   Investigating more advanced backup and disaster recovery strategies for critical data within Longhorn.
+*   Experimenting with a service mesh (e.g., Istio, Linkerd) for enhanced traffic management, security policies, and observability at the application layer.
+*   Deepening knowledge in Kubernetes security best practices and cluster hardening.
 
-### Adding New Services
-1. Create application manifest in `apps/templates/`
-2. Add any additional configurations to `yamls/`
-3. Commit and push changes
-4. ArgoCD will automatically sync the new application
+## Skills Demonstrated
 
-### Updating Services
-1. Modify the application manifest or Helm values
-2. Commit and push changes
-3. ArgoCD will detect changes and sync automatically
+This project serves as a comprehensive demonstration of the following technical skills and expertise:
 
-### Monitoring
-Access Grafana dashboard through the configured ingress to monitor:
-- Cluster health and resource usage
-- Application metrics
-- Custom dashboards and alerts
-
-## 🔒 Security
-
-- **Tailscale Integration**: Services can be exposed securely through Tailscale
-- **External Secrets**: Sensitive data managed through external secret stores
-- **RBAC**: Kubernetes role-based access control configured
-- **Network Policies**: Implemented where needed for service isolation
-
-## 📊 Monitoring & Observability
-
-The homelab includes comprehensive monitoring with:
-- **Prometheus**: Metrics collection and storage
-- **Grafana**: Visualization and dashboards
-- **AlertManager**: Alert routing and notification
-- **Service Discovery**: Automatic discovery of Kubernetes resources
-
-## 🤝 Contributing
-
-This is a personal homelab repository. If you find this useful for your own setup:
-1. Fork the repository
-2. Customize configurations for your environment
-3. Update documentation as needed
-
-## 📝 Notes
-
-- Repository URL references `homelabv2` (legacy naming)
-- All applications use automated sync policies for GitOps
-- Services are configured with appropriate resource limits and health checks
-- Regular backups recommended for persistent data
-
-## 🔗 Useful Links
-
-- [ArgoCD Documentation](https://argo-cd.readthedocs.io/)
-- [MetalLB Documentation](https://metallb.universe.tf/)
-- [External Secrets Operator](https://external-secrets.io/)
-- [Tailscale Kubernetes Operator](https://tailscale.com/kb/1215/kubernetes-operator/)
-
----
-
-*Last updated: $(date)*
+*   **Kubernetes:** Cluster administration, application deployment, resource management, custom resource definitions (CRDs), and operator pattern utilization.
+*   **GitOps:** Implementing and managing continuous delivery with Argo CD, declarative configuration, and Git-driven infrastructure management.
+*   **Networking:** Load balancing (MetalLB), secure mesh VPN (Tailscale), Ingress management (Nginx), and network security principles.
+*   **Storage:** Distributed persistent storage management (Longhorn), stateful application deployment, and data resilience.
+*   **Observability:** Implementing and utilizing Prometheus, Grafana, and Alertmanager for robust monitoring, logging, and alerting.
+*   **Security:** Secrets management (External Secrets Operator, Doppler), secure access strategies, and general security best practices.
+*   **Automation:** Infrastructure as Code (IaC) principles, automated deployments, and streamlining operational workflows.
+*   **System Design & Architecture:** Planning and implementing a scalable, resilient, and observable infrastructure.
+*   **Problem-Solving & Independent Learning:** Identifying challenges in a self-hosted environment and developing effective solutions through continuous learning and experimentation.
