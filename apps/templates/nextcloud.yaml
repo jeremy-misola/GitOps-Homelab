@@ -21,7 +21,9 @@ spec:
             secretName: nextcloud-creds
             usernameKey: usernameKey
             passwordKey: passwordKey
+
           persistence.enabled: true
+          persistence.nextcloudData.storageClass: longhorn
 
 
   destination:
