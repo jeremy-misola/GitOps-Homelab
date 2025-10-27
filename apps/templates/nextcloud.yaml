@@ -12,7 +12,8 @@ spec:
     helm:
       values: |
         nextcloud:
-          host: longhorn.tail36492e.ts.net
+          trustedDomains: ["longhorn.tail36492e.ts.net"]
+
   destination:
     server: https://kubernetes.default.svc
     namespace: nextcloud
