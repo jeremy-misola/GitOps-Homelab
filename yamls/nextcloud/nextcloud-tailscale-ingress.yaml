@@ -1,0 +1,15 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nextcloud-tailscale-ingress
+  namespace: nextcloud
+spec:
+  defaultBackend:
+    service:
+      name: nextcloud
+      port:
+        number: 8080
+  tls:
+    - hosts:
+        - excalidraw
+  ingressClassName: tailscale
