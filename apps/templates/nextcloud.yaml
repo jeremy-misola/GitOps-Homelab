@@ -16,6 +16,10 @@ spec:
           trustedDomains: 
             - "nextcloud.tail36492e.ts.net"
 
+          existingSecret:
+            enabled: true
+            secretName: nextcloud-creds
+
   destination:
     server: https://kubernetes.default.svc
     namespace: nextcloud

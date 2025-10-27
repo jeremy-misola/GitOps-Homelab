@@ -1,0 +1,21 @@
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: nextcloud-external-secret
+  namespace: nextcloud
+spec:
+  secretStoreRef:
+    kind: ClusterSecretStore
+    name: doppler-auth-api
+
+  target:
+    name: nextcloud-creds
+
+  data:
+    - secretKey: usernameKey
+      remoteRef:
+        key: NEXTCLOUD_PASSWORD
+
+    - secretKey: passwordKey
+      remoteRef:
+        key: NEXTCLOUD_USERNAME
