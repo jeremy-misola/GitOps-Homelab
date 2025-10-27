@@ -22,8 +22,8 @@ spec:
             usernameKey: usernameKey
             passwordKey: passwordKey
 
-          persistence.enabled: true
-          persistence.nextcloudData.storageClass: longhorn
+        persistence.enabled: true
+        persistence.nextcloudData.storageClass: longhorn
 
 
   destination:
