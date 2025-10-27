@@ -21,6 +21,8 @@ spec:
             secretName: nextcloud-creds
             usernameKey: usernameKey
             passwordKey: passwordKey
+          persistence.enabled: true
+
 
   destination:
     server: https://kubernetes.default.svc
