@@ -27,7 +27,7 @@ spec:
           nextcloudData:
             enabled: true
             storageClass: longhorn
-            size: 50gi
+            size: 50Gi
 
 
   destination:
