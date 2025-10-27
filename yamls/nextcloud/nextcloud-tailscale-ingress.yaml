@@ -11,5 +11,5 @@ spec:
         number: 8080
   tls:
     - hosts:
-        - excalidraw
+        - nextcloud
   ingressClassName: tailscale
