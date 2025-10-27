@@ -9,6 +9,10 @@ spec:
     repoURL: https://nextcloud.github.io/helm/
     chart: nextcloud
     targetRevision: 8.5.1
+    helm:
+      values: |
+        nextcloud:
+          host: longhorn.tail36492e.ts.net
   destination:
     server: https://kubernetes.default.svc
     namespace: nextcloud
