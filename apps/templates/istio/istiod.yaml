@@ -7,7 +7,7 @@ spec:
   project: default
   source:
     repoURL: https://istio-release.storage.googleapis.com/charts
-    chart: istio
+    chart: istiod
     targetRevision: 1.27.2
   destination:
     server: https://kubernetes.default.svc
