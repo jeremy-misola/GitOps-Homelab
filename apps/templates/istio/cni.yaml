@@ -9,6 +9,12 @@ spec:
     repoURL: https://istio-release.storage.googleapis.com/charts
     chart: cni
     targetRevision: 1.27.2
+    helm:
+      values: |
+        profile: ambient
+        global:
+          platform: k3s
+
   destination:
     server: https://kubernetes.default.svc
     namespace: istio-system
