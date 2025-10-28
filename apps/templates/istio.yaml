@@ -1,18 +1,17 @@
-
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: istio-package
+  name: root
   namespace: argocd
   finalizers:
   - resources-finalizer.argocd.argoproj.io
 spec:
   destination:
     server: https://kubernetes.default.svc
-    namespace: default
+    namespace: argocd
   project: default
   source:
-    path: apps/templates/istio
+    path: apps/istio
     repoURL: https://github.com/jeremy-misola/homelabv2.git
     targetRevision: HEAD
   syncPolicy:
