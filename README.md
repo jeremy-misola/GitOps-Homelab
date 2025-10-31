@@ -1,24 +1,22 @@
 
 # My Kubernetes Homelab - A GitOps-Driven Personal Cloud Infrastructure
 
-This repository details my personal Kubernetes-based homelab, designed as a robust, automated, and observable platform for self-hosting various applications and services.
+This repository is my personal Kubernetes-based homelab for self-hosting applications and services and learning production grade tools.
 
 ## Overview & Motivation
 
-I built this homelab to gain hands-on expertise with cutting-edge cloud-native technologies, deepen my understanding of Kubernetes internals, and implement modern DevOps practices in a real-world scenario. This project addresses practical challenges in secure access, persistent storage, and continuous deployment for personal services, showcasing my ability to build and operate a resilient home infrastructure.
+I built this homelab to gain hands-on expertise with cloud-native technologies, deepen my understanding of Kubernetes, and implement modern DevOps practices in a real-world scenario. I wanted to migrate my entire workflow to self-hosted tools while gaining experience with the very tools I will be using on the job.
 
 ## Architectural Principles & Design
 
-This homelab is engineered with a focus on modern cloud-native principles:
+This homelab is engineered with a focus on a few principles:
 
-*   **GitOps-Centric:** The entire infrastructure and application deployments are managed declaratively through a GitOps workflow, leveraging **Argo CD**. All desired states are version-controlled in Git, enabling automated deployments, seamless rollbacks, and establishing a single source of truth for the entire environment.
-*   **App-of-Apps Pattern:** Utilizes the Argo CD "App-of-Apps" pattern for managing application lifecycles and dependencies. This provides a scalable, organized, and self-documenting approach to deploying multiple interdependent services.
-*   **Cloud-Native Tooling:** Designed around an ecosystem of industry-standard cloud-native tools to ensure resilience, scalability, and ease of management.
-*   **Modularity:** Applications and infrastructure components are logically separated using Helm charts and Kubernetes manifests, allowing for independent management and upgrades.
+*   **GitOps-Centric:** The entire infrastructure and application deployments are managed declaratively through a GitOps workflow using **Argo CD**. All desired states are version-controlled in Git, enabling automated deployments, seamless rollbacks, and a single source of truth for the entire environment.
+*   **App-of-Apps Pattern:** The cluster uses the Argo CD "App-of-Apps" pattern for managing application lifecycles and dependencies. This allows a scalable and organized approach to deploying multiple interdependent services.
 
 ## Core Infrastructure Components
 
-Each component plays a critical role in the homelab's functionality and demonstrates specific technical competencies:
+Each component in this homelab was chosen for a specific reason and plays an important role in the overall functionality:
 
 *   **Kubernetes (K3s/Vanilla):** The foundational container orchestration platform, providing robust resource management, scheduling, and high availability for all deployed applications.
 *   **Argo CD:** Serves as the continuous delivery tool, actively synchronizing the desired state defined in this Git repository with the actual state in the Kubernetes cluster. It automates deployments, manages application lifecycles, and enforces declarative configuration.
@@ -28,10 +26,11 @@ Each component plays a critical role in the homelab's functionality and demonstr
 *   **External Secrets Operator (ESO) + Doppler:** Securely injects secrets from Doppler (a centralized secrets management platform) into Kubernetes. This decouples secret storage from application code, enhances security posture, and streamlines secret rotation and management.
 *   **Ingress Nginx:** Manages external HTTP/HTTPS access to services within the cluster, handling intelligent routing, load balancing, and SSL/TLS termination for internal applications.
 *   **Longhorn:** Provides distributed block storage for Kubernetes, ensuring data persistence, high availability, and snapshot capabilities for stateful applications, crucial for data integrity and disaster recovery.
+*   **Istio (In progress):** Provides a service mesh architecture to handle fine-grained communication within the cluster.
 
-## Deployed Applications & Services
+## What's Running on the Homelab?
 
-This homelab hosts a variety of applications, demonstrating practical application of the underlying infrastructure:
+Here's a look at some of the applications and services I'm currently self-hosting:
 
 *   **Kube-Prometheus Stack:** A comprehensive monitoring and alerting solution (Prometheus, Grafana, Alertmanager), providing deep insights into cluster health, resource utilization, and application performance through rich metrics and customizable dashboards. Critical for operational excellence and proactive issue resolution.
 *   **CouchDB:** A NoSQL database leveraged for secure synchronization of Obsidian notes across devices, showcasing the deployment and management of stateful applications.
@@ -57,9 +56,9 @@ Security and controlled access are paramount in this self-hosted environment:
 *   **Secrets Management:** Rigorous secrets management through External Secrets Operator and Doppler ensures sensitive data (API keys, database credentials) is never hardcoded, is securely stored, and securely injected at runtime.
 *   **Ingress Security:** SSL/TLS termination is handled at the Ingress Nginx layer, ensuring all external communication to exposed services is encrypted.
 
-## Future Enhancements & Learning
+## Future Goals
 
-This project is an ongoing journey of learning and improvement:
+This project is a continuous learning experience, and here's what I have planned next:
 
 *   Exploring **Crossplane** for GitOps-driven infrastructure provisioning beyond just applications.
 *   Investigating more advanced backup and disaster recovery strategies for critical data within Longhorn.
