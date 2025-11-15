@@ -7,9 +7,8 @@ spec:
   project: default
   source:
     repoURL: https://github.com/coder/code-server 
-    chart: code-server
-    helm:
-    targetRevision: 3.31.2
+    path: ci/helm-chart
+    targetRevision: main
   destination:
     server: https://kubernetes.default.svc
     namespace: code-server
