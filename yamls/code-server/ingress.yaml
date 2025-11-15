@@ -8,7 +8,7 @@ spec:
     service:
       name: code-server
       port:
-        number: 8443
+        number: 8080
   tls:
     - hosts:
         - code-server
