@@ -6,16 +6,10 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://nicholaswilde.github.io/helm-charts/
+    repoURL: https://github.com/coder/code-server 
     chart: code-server
     helm:
-      values: |
-        persistence:
-          config:
-            enabled: true
-            emptyDir: true
-            mountPath: /config
-    targetRevision: 1.1.1
+    targetRevision: 3.31.2
   destination:
     server: https://kubernetes.default.svc
     namespace: code-server
