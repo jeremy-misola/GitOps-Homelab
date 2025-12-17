@@ -1,0 +1,85 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: authentik
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "10"
+spec:
+  project: default
+  source:
+    repoURL: https://charts.goauthentik.io/
+    chart: authentik
+    targetRevision: 2025.10.3
+    helm:
+      values: |
+        authentik:
+          secret_key: ""
+          
+          # Disable chart-managed passwords
+          postgresql:
+            password: ""
+          redis:
+            password: ""
+
+        server:
+          env:
+            - name: AUTHENTIK_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: authentik-secrets
+                  key: AUTHENTIK_SECRET_KEY
+            - name: AUTHENTIK_POSTGRESQL__PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: authentik-secrets
+                  key: POSTGRESQL_PASSWORD
+            - name: AUTHENTIK_REDIS__PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: authentik-secrets
+                  key: REDIS_PASSWORD
+
+        worker:
+          env:
+            - name: AUTHENTIK_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: authentik-secrets
+                  key: AUTHENTIK_SECRET_KEY
+            - name: AUTHENTIK_POSTGRESQL__PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: authentik-secrets
+                  key: POSTGRESQL_PASSWORD
+            - name: AUTHENTIK_REDIS__PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: authentik-secrets
+                  key: REDIS_PASSWORD
+
+        postgresql:
+          enabled: true
+          auth:
+            existingSecret: "authentik-secrets"
+            secretKeys:
+              # Map the keys defined in your ExternalSecret
+              adminPasswordKey: "POSTGRESQL_PASSWORD"
+              userPasswordKey: "POSTGRESQL_PASSWORD"
+
+        redis:
+          enabled: true
+          auth:
+            enabled: true
+            existingSecret: "authentik-secrets"
+            existingSecretPasswordKey: "REDIS_PASSWORD"
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: authentik
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
