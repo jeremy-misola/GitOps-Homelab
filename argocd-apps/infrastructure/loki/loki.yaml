@@ -9,11 +9,11 @@ spec:
   project: default
   source:
     repoURL: https://grafana.github.io/helm-charts
-    chart: loki-stack
+    chart: loki
     targetRevision: 6.49.0
   destination:
     server: https://kubernetes.default.svc
-    namespace: loki-stack
+    namespace: loki
   syncPolicy:
     automated:
       prune: true
