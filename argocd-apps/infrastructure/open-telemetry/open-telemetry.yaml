@@ -11,6 +11,10 @@ spec:
     repoURL: https://open-telemetry.github.io/opentelemetry-helm-charts
     chart: opentelemetry-collector
     targetRevision: 0.142.0
+    helm:
+      values: |
+        image:
+          repository: ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-k8s
   destination:
     server: https://kubernetes.default.svc
     namespace: opentelemetry-operator-system
