@@ -10,7 +10,8 @@ spec:
     targetRevision: HEAD
     path: script/helm/garage
     helm:
-      releaseName: garage
+      values: |
+        releaseName: garage
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: garage

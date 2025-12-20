@@ -11,6 +11,23 @@ spec:
     repoURL: https://grafana.github.io/helm-charts
     chart: loki
     targetRevision: 6.49.0
+    helm:
+      values: |
+        loki:
+          storage:
+            type: s3
+            bucketNames:
+              chunks: loki-chunks
+              ruler: loki-ruler
+              admin: loki-admin
+            s3:
+              endpoint: garage.garage.svc.cluster.local:3900 
+              
+              region: garage           # Garage usually ignores this, but a value is required
+              secretName: "garage-loki-secrets"
+              
+              s3ForcePathStyle: true   # REQUIRED for Garage
+              insecure: true           # Set to 'true' if your Garage endpoint is http (not https)
   destination:
     server: https://kubernetes.default.svc
     namespace: loki
