@@ -8,7 +8,7 @@ spec:
   source:
     repoURL: 'https://git.deuxfleurs.fr/Deuxfleurs/garage'
     targetRevision: HEAD
-    path: scripts/helm/garage
+    path: script/helm/garage
     helm:
       releaseName: garage
   destination:
