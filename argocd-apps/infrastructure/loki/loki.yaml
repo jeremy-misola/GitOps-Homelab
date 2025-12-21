@@ -55,7 +55,7 @@ spec:
               insecure: true           # Set to 'true' if your Garage endpoint is http (not https)
   destination:
     server: https://kubernetes.default.svc
-    namespace: loki
+    namespace: monitoring
   syncPolicy:
     automated:
       prune: true
