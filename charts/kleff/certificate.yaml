@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: kleff-io-cert
+  namespace: istio-system
+spec:
+  secretName: kleff-io-tls
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  dnsNames:
+  - "kleff.io"
+  - "*.kleff.io"
