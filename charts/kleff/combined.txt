@@ -1,0 +1,913 @@
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-prod
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: misolarellinj06@gmail.com
+    privateKeySecretRef:
+      name: letsencrypt-prod
+    solvers:
+    - dns01:
+        cloudflare:
+          email: misolarellinj06@gmail.com
+          apiTokenSecretRef:
+            name: cloudflare-api-token-secret-kleff
+            key: api-token
+
+---
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-staging
+spec:
+  acme:
+    server: https://acme-staging-v02.api.letsencrypt.org/directory
+    privateKeySecretRef:
+      name: letsencrypt-staging
+    solvers:
+    - dns01:
+        cloudflare:
+          email: misolarellinj06@gmail.com
+          apiTokenSecretRef:
+            name: cloudflare-api-token-secret-kleff
+            key: api-tokenapiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kleff-deployment-backend
+  namespace: kleff-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: deployment-backend
+  template:
+    metadata:
+      labels:
+        app: deployment-backend
+      annotations:
+        sidecar.istio.io/inject: "false"
+    spec:
+      imagePullSecrets:
+        - name: acr-creds
+      serviceAccountName: deployment-backend-sa
+      containers:
+        - name: deployment-backend
+          image: kleff.azurecr.io/deployment-backend:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3000
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: deployment-backend-service
+  namespace: kleff-deployment
+spec:
+  selector:
+    app: deployment-backend
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+  type: ClusterIP
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: deployment-backend-nodeport
+  namespace: kleff-deployment
+spec:
+  type: NodePort
+  selector:
+    app: deployment-backend
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+      nodePort: 30010
+apiVersion: external-secrets.io/v1
+kind: ClusterExternalSecret
+metadata:
+  name: global-acr-creds
+spec:
+  externalSecretName: acr-creds
+  namespaceSelector:
+    matchLabels:
+      managed-by: paas-backend # This matches the label your Go code adds!
+  refreshInterval: "1h"
+  externalSecretSpec:
+    secretStoreRef:
+      name: doppler-secret-store-kleff
+      kind: ClusterSecretStore
+    target:
+      name: acr-creds
+      template:
+        engineVersion: v2
+        data:
+          .dockerconfigjson: |
+            {
+              "auths": {
+                "{{ .acr_server }}": {
+                  "username": "{{ .acr_username }}",
+                  "password": "{{ .acr_password }}",
+                  "auth": "{{ (printf "%s:%s" .acr_username .acr_password) | b64enc }}"
+                }
+              }
+            }
+        type: kubernetes.io/dockerconfigjson
+    data:
+    - secretKey: acr_server
+      remoteRef:
+        key: ACR_SERVER
+    - secretKey: acr_username
+      remoteRef:
+        key: ACR_USERNAME
+    - secretKey: acr_password
+      remoteRef:
+        key: ACR_PASSWORD1apiVersion: external-secrets.io/v1
+kind: ClusterSecretStore
+metadata:
+  name: doppler-secret-store-kleff
+  namespace: default
+spec:
+  provider:
+    doppler:
+      auth:
+        secretRef:
+          dopplerToken:
+            name: doppler-token-auth-api-kleff
+            key: dopplerToken
+            namespace: external-secretsapiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: postgres-credentials
+  namespace: kleff-deployment
+spec:
+  secretStoreRef:
+    name: doppler-secret-store-kleff
+    kind: ClusterSecretStore
+  target:
+    name: postgres-credentials
+    creationPolicy: Owner
+  data:
+  - secretKey: project_management_db_password
+    remoteRef:
+      key: PROJECT_MANAGEMENT_DB_PASSWORD
+  - secretKey: user_db_password
+    remoteRef:
+      key: USER_DB_PASSWORD
+  - secretKey: deployment_db_password
+    remoteRef:
+      key: DEPLOYMENT_DB_PASSWORDapiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: acr-creds
+  namespace: kleff-deployment
+spec:
+  secretStoreRef:
+    name: doppler-secret-store-kleff
+    kind: ClusterSecretStore
+  target:
+    name: acr-creds
+    creationPolicy: Owner
+    template:
+      engineVersion: v2
+      data:
+        .dockerconfigjson: |
+          {
+            "auths": {
+              "{{ .acr_server }}": {
+                "username": "{{ .acr_username }}",
+                "password": "{{ .acr_password }}",
+                "auth": "{{ (printf "%s:%s" .acr_username .acr_password) | b64enc }}"
+              }
+            }
+          }
+      type: kubernetes.io/dockerconfigjson
+  data:
+  - secretKey: acr_server
+    remoteRef:
+      key: ACR_SERVER
+  - secretKey: acr_username
+    remoteRef:
+      key: ACR_USERNAME
+  - secretKey: acr_password
+    remoteRef:
+      key: ACR_PASSWORD1
+
+---
+
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: acr-creds
+spec:
+  secretStoreRef:
+    name: doppler-secret-store
+    kind: ClusterSecretStore
+  target:
+    name: acr-creds
+    creationPolicy: Owner
+    template:
+      engineVersion: v2
+      data:
+        .dockerconfigjson: |
+          {
+            "auths": {
+              "{{ .acr_server }}": {
+                "username": "{{ .acr_username }}",
+                "password": "{{ .acr_password }}",
+                "auth": "{{ (printf "%s:%s" .acr_username .acr_password) | b64enc }}"
+              }
+            }
+          }
+      type: kubernetes.io/dockerconfigjson
+  data:
+  - secretKey: acr_server
+    remoteRef:
+      key: ACR_SERVER
+  - secretKey: acr_username
+    remoteRef:
+      key: ACR_USERNAME
+  - secretKey: acr_password
+    remoteRef:
+      key: ACR_PASSWORD1apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: cloudflare-kleff-secret
+  namespace: cert-manager
+spec:
+  secretStoreRef:
+    name: doppler-secret-store-kleff
+    kind: ClusterSecretStore
+  target:
+    name: cloudflare-api-token-secret-kleff
+    creationPolicy: Owner
+  data:
+  - secretKey: api-token
+    remoteRef:
+      key: CLOUDFLARE_API_TOKENapiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: authentik-secrets
+  namespace: authentik
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    name: doppler-secret-store-kleff 
+    kind: ClusterSecretStore
+  target:
+    name: authentik-secrets-store 
+    creationPolicy: Owner
+  data:
+  - secretKey: AUTHENTIK_SECRET_KEY
+    remoteRef:
+      key: AUTHENTIK_SECRET_KEY
+
+  - secretKey: POSTGRESQL_PASSWORD
+    remoteRef:
+      key: DB_PASSWORD 
+
+  - secretKey: REDIS_PASSWORD
+    remoteRef:
+      key: REDIS_PASSWORDapiVersion: v1
+kind: Service
+metadata:
+  name: project-management-db
+  namespace: kleff-deployment
+spec:
+  ports:
+  - port: 5432
+  selector:
+    app: project-management-db
+  clusterIP: None 
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: project-management-db
+  namespace: kleff-deployment
+spec:
+  serviceName: "project-management-db"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: project-management-db
+  template:
+    metadata:
+      labels:
+        app: project-management-db
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:16
+        env:
+        - name: POSTGRES_DB
+          value: mydb
+        - name: PGDATA
+          value: /var/lib/postgresql/data/pgdata
+        - name: POSTGRES_USER
+          value: postgres
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-credentials
+              key: project_management_db_password 
+        ports:
+        - containerPort: 5432
+          name: postgres
+        volumeMounts:
+        - name: db-data
+          mountPath: /var/lib/postgresql/data
+  volumeClaimTemplates:
+  - metadata:
+      name: db-data
+    spec:
+      storageClassName: longhorn 
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1GiapiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: deployment-backend-sa
+  namespace: kleff-deployment
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: deployment-backend-cluster-role
+rules:
+  # 1. Allow creating and managing Namespaces
+  - apiGroups: [""]
+    resources: ["namespaces"]
+    verbs: ["create", "get", "list", "watch", "delete"]
+
+  # 2. Allow managing Jobs in ANY namespace
+  - apiGroups: ["batch"]
+    resources: ["jobs"]
+    verbs: ["create", "get", "list", "watch", "delete"]
+
+  # 3. Allow managing Secrets
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["create", "get", "list", "watch"]
+
+  # 4. Standard Pod logging/monitoring
+  - apiGroups: [""]
+    resources: ["pods", "pods/log"]
+    verbs: ["get", "list", "watch"]
+
+  # ---------------------------------------------------------------------
+  # 5. NEW: Allow managing WebApp Custom Resources (kleff.io)
+  # ---------------------------------------------------------------------
+  - apiGroups: ["kleff.kleff.io"]
+    resources: ["webapps"]
+    verbs: ["create", "get", "list", "watch", "update", "patch", "delete"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: deployment-backend-cluster-binding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: deployment-backend-cluster-role
+subjects:
+  - kind: ServiceAccount
+    name: deployment-backend-sa
+    namespace: kleff-deploymentapiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: frontend-vs
+  namespace: kleff-deployment
+spec:
+  hosts:
+  - "kleff.io"
+  gateways:
+  - istio-system/kleff-gateway
+  http:
+  - route:
+    - destination:
+        host: kleff-frontend
+        port:
+          number: 80 
+
+---
+
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: microservices-vs
+  namespace: kleff-deployment
+spec:
+  hosts:
+  - "api.kleff.io"
+  gateways:
+  - istio-system/kleff-gateway
+  http:
+  - match:
+    - uri:
+        prefix: /api/v1/users
+    route:
+    - destination:
+        host: user-service
+        port:
+          number: 80
+
+  - match:
+    - uri:
+        prefix: /api/v1/projects
+    route:
+    - destination:
+        host: project-management-service
+        port:
+          number: 80
+
+  - match:
+    - uri:
+        prefix: /api/v1/containers
+    route:
+    - destination:
+        host: deployment-service
+        port:
+          number: 80
+  
+  - match:
+    - uri:
+        prefix: /api/v1/build
+    route:
+    - destination:
+        host: deployment-backend-service
+        port:
+          number: 80apiVersion: v1
+kind: Namespace
+metadata:
+  name: kleff-deployment
+  labels:
+    istio-injection: enabled
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-service
+  namespace: kleff-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: user-service
+  template:
+    metadata:
+      labels:
+        app: user-service
+    spec:
+      imagePullSecrets:
+      - name: acr-creds
+      containers:
+      - name: user-service
+        image: kleff.azurecr.io/user-service:latest
+        env:
+        - name: DB_HOST
+          value: user-db
+        - name: DB_PORT
+          value: "5432"
+        - name: DB_NAME
+          value: user_service
+        - name: DB_USERNAME
+          value: user_service
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-credentials
+              key: user_db_password
+        - name: SQL_INIT_MODE
+          value: never
+        - name: HIBERNATE_DDL_AUTO
+          value: update
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        imagePullPolicy: Always
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-service
+  namespace: kleff-deployment
+spec:
+  selector:
+    app: user-service
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8080
+
+
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: kleff-io-cert
+  namespace: istio-system
+spec:
+  secretName: kleff-io-tls
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  dnsNames:
+  - "kleff.io"
+  - "*.kleff.io"apiVersion: v1
+kind: Namespace
+metadata:
+  name: kleff-deployment
+  labels:
+    istio-injection: enabled
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kleff-frontend
+  namespace: kleff-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kleff-frontend
+  template:
+    metadata:
+      labels:
+        app: kleff-frontend
+      annotations:
+        sidecar.istio.io/inject: "false"
+    spec:
+      imagePullSecrets:
+      - name: acr-creds
+      containers:
+      - name: kleff-frontend
+        image: kleff.azurecr.io/frontend:latest
+        env:
+        - name: VITE_AUTH_CLIENT_ID
+          value: "8qNA2sSV88fusOocZcMj6GirTLWYygdAXnmtLUfe"
+        - name: VITE_BACKEND_URL
+          value: https://api.kleff.io
+        ports:
+        - containerPort: 3000
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        imagePullPolicy: Always
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: kleff-frontend
+  namespace: kleff-deployment
+spec:
+  selector:
+    app: kleff-frontend
+  ports:
+  - name: http
+    port: 80
+    targetPort: 3000
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: kleff-deployment
+  labels:
+    istio-injection: enabled
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: project-management-service
+  namespace: kleff-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: project-management-service
+  template:
+    metadata:
+      labels:
+        app: project-management-service
+    spec:
+      imagePullSecrets:
+      - name: acr-creds
+      containers:
+      - name: project-management-service
+        image: kleff.azurecr.io/project-management-service:latest
+        env:
+        - name: SPRING_DATASOURCE_URL
+          value: jdbc:postgresql://project-management-db:5432/mydb
+        - name: SPRING_DATASOURCE_USERNAME
+          value: postgres
+        - name: SPRING_DATASOURCE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-credentials
+              key: project_management_db_password
+        - name: SPRING_JPA_HIBERNATE_DDL_AUTO
+          value: update
+
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        imagePullPolicy: Always
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: project-management-service
+  namespace: kleff-deployment
+spec:
+  selector:
+    app: project-management-service
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8080
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-db
+  namespace: kleff-deployment
+spec:
+  ports:
+  - port: 5432
+  selector:
+    app: user-db
+  clusterIP: None 
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: user-db
+  namespace: kleff-deployment
+spec:
+  serviceName: "user-db"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: user-db
+  template:
+    metadata:
+      labels:
+        app: user-db
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:16
+        env:
+        - name: POSTGRES_DB
+          value: user_service
+        - name: PGDATA
+          value: /var/lib/postgresql/data/pgdata
+        - name: POSTGRES_USER
+          value: user_service
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-credentials
+              key: user_db_password
+        ports:
+        - containerPort: 5432
+          name: postgres
+        volumeMounts:
+        - name: db-data
+          mountPath: /var/lib/postgresql/data
+  volumeClaimTemplates:
+  - metadata:
+      name: db-data
+    spec:
+      storageClassName: longhorn 
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1GiapiVersion: v1
+kind: Namespace
+metadata:
+  name: kleff-deployment
+  labels:
+    istio-injection: enabled
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment-service
+  namespace: kleff-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: deployment-service
+  template:
+    metadata:
+      labels:
+        app: deployment-service
+    spec:
+      imagePullSecrets:
+      - name: acr-creds
+      containers:
+      - name: deployment-service
+        image: kleff.azurecr.io/deployment-service:latest
+        env:
+        - name: SPRING_DATASOURCE_URL
+          value: jdbc:postgresql://deployment-service-db:5432/mydb
+        - name: SPRING_DATASOURCE_USERNAME
+          value: postgres
+        - name: SPRING_DATASOURCE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-credentials
+              key: deployment_db_password
+        - name: SPRING_JPA_HIBERNATE_DDL_AUTO
+          value: update
+
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        imagePullPolicy: Always
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: deployment-service
+  namespace: kleff-deployment
+spec:
+  selector:
+    app: deployment-service
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8080
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: kleff-deployment
+  labels:
+    istio-injection: enabled
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kleff-clusterhealth
+  namespace: kleff-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kleff-clusterhealth
+  template:
+    metadata:
+      labels:
+        app: kleff-clusterhealth
+    spec:
+      imagePullSecrets:
+        - name: acr-creds
+
+      containers:
+        - name: kleff-clusterhealth
+          image: kleff.azurecr.io/kleff-clusterhealth:latest
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          imagePullPolicy: Always
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: kleff-deployment
+  name: kleff-clusterhealth-nodeport
+spec:
+  type: NodePort
+  selector:
+    app: kleff-clusterhealth
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+      nodePort: 30002
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kleff-clusterhealth
+  namespace: kleff-deployment
+spec:
+  selector:
+    app: kleff-clusterhealth
+  ports:
+    - name: http
+      port: 80
+      targetPort: 3001
+apiVersion: v1
+kind: Service
+metadata:
+  name: deployment-service-db
+  namespace: kleff-deployment
+spec:
+  ports:
+  - port: 5432
+  selector:
+    app: deployment-service-db
+  clusterIP: None 
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: deployment-service-db
+  namespace: kleff-deployment
+spec:
+  serviceName: "deployment-service-db"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: deployment-service-db
+  template:
+    metadata:
+      labels:
+        app: deployment-service-db
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:16
+        env:
+        - name: POSTGRES_DB
+          value: mydb
+        - name: PGDATA
+          value: /var/lib/postgresql/data/pgdata
+        - name: POSTGRES_USER
+          value: postgres
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-credentials
+              key: deployment_db_password
+        ports:
+        - containerPort: 5432
+          name: postgres
+        volumeMounts:
+        - name: db-data
+          mountPath: /var/lib/postgresql/data
+  volumeClaimTemplates:
+  - metadata:
+      name: db-data
+    spec:
+      storageClassName: longhorn 
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1Gi

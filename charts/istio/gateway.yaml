@@ -34,7 +34,7 @@ spec:
       protocol: HTTPS
     tls:
       mode: SIMPLE
-      credentialName: kleff-io-cert 
+      credentialName: kleff-io-tls
     hosts:
     - "kleff.io"
     - "*.kleff.io"
