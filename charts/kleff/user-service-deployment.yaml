@@ -1,0 +1,72 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: kleff-deployment
+  labels:
+    istio-injection: enabled
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-service
+  namespace: kleff-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: user-service
+  template:
+    metadata:
+      labels:
+        app: user-service
+    spec:
+      imagePullSecrets:
+      - name: acr-creds
+      containers:
+      - name: user-service
+        image: kleff.azurecr.io/user-service:latest
+        env:
+        - name: DB_HOST
+          value: user-db
+        - name: DB_PORT
+          value: "5432"
+        - name: DB_NAME
+          value: user_service
+        - name: DB_USERNAME
+          value: user_service
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-credentials
+              key: user_db_password
+        - name: SQL_INIT_MODE
+          value: never
+        - name: HIBERNATE_DDL_AUTO
+          value: update
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        imagePullPolicy: Always
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-service
+  namespace: kleff-deployment
+spec:
+  selector:
+    app: user-service
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8080
+
+

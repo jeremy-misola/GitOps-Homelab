@@ -14,9 +14,12 @@ spec:
     hosts:
     - "jeremymr.dev"
     - "*.jeremymr.dev"
+    - "kleff.io"
+    - "*.kleff.io"
+  # HTTPS for jeremymr.dev
   - port:
       number: 443
-      name: https
+      name: https-jeremy
       protocol: HTTPS
     tls:
       mode: SIMPLE
@@ -24,3 +27,14 @@ spec:
     hosts:
     - "jeremymr.dev"
     - "*.jeremymr.dev"
+  # HTTPS for kleff.io
+  - port:
+      number: 443
+      name: https-kleff
+      protocol: HTTPS
+    tls:
+      mode: SIMPLE
+      credentialName: kleff-io-cert # The name of the secret containing kleff.io certs
+    hosts:
+    - "kleff.io"
+    - "*.kleff.io"

@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kleff-deployment-backend
+  namespace: kleff-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: deployment-backend
+  template:
+    metadata:
+      labels:
+        app: deployment-backend
+      annotations:
+        sidecar.istio.io/inject: "false"
+    spec:
+      imagePullSecrets:
+        - name: acr-creds
+      serviceAccountName: deployment-backend-sa
+      containers:
+        - name: deployment-backend
+          image: kleff.azurecr.io/deployment-backend:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3000
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: deployment-backend-service
+  namespace: kleff-deployment
+spec:
+  selector:
+    app: deployment-backend
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+  type: ClusterIP
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: deployment-backend-nodeport
+  namespace: kleff-deployment
+spec:
+  type: NodePort
+  selector:
+    app: deployment-backend
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+      nodePort: 30010

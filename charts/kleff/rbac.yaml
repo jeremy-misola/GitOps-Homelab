@@ -1,0 +1,52 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: deployment-backend-sa
+  namespace: kleff-deployment
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: deployment-backend-cluster-role
+rules:
+  # 1. Allow creating and managing Namespaces
+  - apiGroups: [""]
+    resources: ["namespaces"]
+    verbs: ["create", "get", "list", "watch", "delete"]
+
+  # 2. Allow managing Jobs in ANY namespace
+  - apiGroups: ["batch"]
+    resources: ["jobs"]
+    verbs: ["create", "get", "list", "watch", "delete"]
+
+  # 3. Allow managing Secrets
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["create", "get", "list", "watch"]
+
+  # 4. Standard Pod logging/monitoring
+  - apiGroups: [""]
+    resources: ["pods", "pods/log"]
+    verbs: ["get", "list", "watch"]
+
+  # ---------------------------------------------------------------------
+  # 5. NEW: Allow managing WebApp Custom Resources (kleff.io)
+  # ---------------------------------------------------------------------
+  - apiGroups: ["kleff.kleff.io"]
+    resources: ["webapps"]
+    verbs: ["create", "get", "list", "watch", "update", "patch", "delete"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: deployment-backend-cluster-binding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: deployment-backend-cluster-role
+subjects:
+  - kind: ServiceAccount
+    name: deployment-backend-sa
+    namespace: kleff-deployment

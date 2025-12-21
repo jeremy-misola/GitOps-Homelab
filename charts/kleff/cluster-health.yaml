@@ -1,0 +1,68 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: kleff-deployment
+  labels:
+    istio-injection: enabled
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kleff-clusterhealth
+  namespace: kleff-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kleff-clusterhealth
+  template:
+    metadata:
+      labels:
+        app: kleff-clusterhealth
+    spec:
+      imagePullSecrets:
+        - name: acr-creds
+
+      containers:
+        - name: kleff-clusterhealth
+          image: kleff.azurecr.io/kleff-clusterhealth:latest
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          imagePullPolicy: Always
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: kleff-deployment
+  name: kleff-clusterhealth-nodeport
+spec:
+  type: NodePort
+  selector:
+    app: kleff-clusterhealth
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+      nodePort: 30002
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kleff-clusterhealth
+  namespace: kleff-deployment
+spec:
+  selector:
+    app: kleff-clusterhealth
+  ports:
+    - name: http
+      port: 80
+      targetPort: 3001

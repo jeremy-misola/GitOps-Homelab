@@ -1,0 +1,60 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: kleff-deployment
+  labels:
+    istio-injection: enabled
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kleff-frontend
+  namespace: kleff-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kleff-frontend
+  template:
+    metadata:
+      labels:
+        app: kleff-frontend
+      annotations:
+        sidecar.istio.io/inject: "false"
+    spec:
+      imagePullSecrets:
+      - name: acr-creds
+      containers:
+      - name: kleff-frontend
+        image: kleff.azurecr.io/frontend:latest
+        env:
+        - name: VITE_AUTH_CLIENT_ID
+          value: "8qNA2sSV88fusOocZcMj6GirTLWYygdAXnmtLUfe"
+        - name: VITE_BACKEND_URL
+          value: https://api.kleff.io
+        ports:
+        - containerPort: 3000
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        imagePullPolicy: Always
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: kleff-frontend
+  namespace: kleff-deployment
+spec:
+  selector:
+    app: kleff-frontend
+  ports:
+  - name: http
+    port: 80
+    targetPort: 3000
+

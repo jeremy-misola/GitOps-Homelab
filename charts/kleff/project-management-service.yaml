@@ -1,0 +1,65 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: kleff-deployment
+  labels:
+    istio-injection: enabled
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: project-management-service
+  namespace: kleff-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: project-management-service
+  template:
+    metadata:
+      labels:
+        app: project-management-service
+    spec:
+      imagePullSecrets:
+      - name: acr-creds
+      containers:
+      - name: project-management-service
+        image: kleff.azurecr.io/project-management-service:latest
+        env:
+        - name: SPRING_DATASOURCE_URL
+          value: jdbc:postgresql://project-management-db:5432/mydb
+        - name: SPRING_DATASOURCE_USERNAME
+          value: postgres
+        - name: SPRING_DATASOURCE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-credentials
+              key: project_management_db_password
+        - name: SPRING_JPA_HIBERNATE_DDL_AUTO
+          value: update
+
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        imagePullPolicy: Always
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: project-management-service
+  namespace: kleff-deployment
+spec:
+  selector:
+    app: project-management-service
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8080
