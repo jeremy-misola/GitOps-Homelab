@@ -9,12 +9,27 @@ spec:
   selector:
     matchLabels:
       security.istio.io/tlsMode: istio 
+  
   namespaceSelector:
     any: true
+
   podMetricsEndpoints:
   - path: /stats/prometheus
-    port: http-envoy-prom
+    targetPort: 15020
+    interval: 30s
+    honorLabels: true
+    
     relabelings:
     - action: keep
       sourceLabels: [__meta_kubernetes_pod_container_name]
-      regex: "istio-proxy"
+      regex: ".*"
+    
+    - sourceLabels: [__meta_kubernetes_pod_container_name]
+      targetLabel: container
+      action: replace
+      replacement: istio-proxy 
+
+    - sourceLabels: [__meta_kubernetes_namespace]
+      targetLabel: namespace
+    - sourceLabels: [__meta_kubernetes_pod_name]
+      targetLabel: pod
