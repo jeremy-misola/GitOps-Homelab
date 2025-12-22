@@ -8,7 +8,7 @@ metadata:
 spec:
   selector:
     matchLabels:
-      sidecar.istio.io/status: "injected" 
+      security.istio.io/tlsMode: istio 
   namespaceSelector:
     any: true
   podMetricsEndpoints:
