@@ -63,3 +63,12 @@ spec:
         host: deployment-backend-service
         port:
           number: 80
+
+  - match:
+    - uri:
+        prefix: /api/v1/systems
+    route:
+    - destination:
+        host: kleff-observability
+        port:
+          number: 80
