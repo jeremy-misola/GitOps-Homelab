@@ -14,7 +14,7 @@ spec:
   podMetricsEndpoints:
   - path: /stats/prometheus
 
-    targetPort: 15020
+    targetPort: 15090
     honorLabels: true
     relabelings:
     - targetLabel: container
