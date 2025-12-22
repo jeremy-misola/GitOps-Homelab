@@ -19,7 +19,7 @@ spec:
     metadata:
       labels:
         app: deployment-service
-    spec:
+        paas: kleff
       imagePullSecrets:
       - name: acr-creds
       containers:

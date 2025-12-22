@@ -19,6 +19,7 @@ spec:
     metadata:
       labels:
         app: kleff-frontend
+        paas: kleff
     spec:
       imagePullSecrets:
       - name: acr-creds

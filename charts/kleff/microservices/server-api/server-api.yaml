@@ -12,6 +12,7 @@ spec:
     metadata:
       labels:
         app: deployment-backend
+        paas: kleff
     spec:
       imagePullSecrets:
         - name: acr-creds
