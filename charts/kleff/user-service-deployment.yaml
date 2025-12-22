@@ -54,7 +54,7 @@ spec:
           valueFrom:
             secretKeyRef:
               name: postgres-credentials # Create this secret
-              key: authentik_admin_toekn
+              key: authentik_admin_token
 
         ports:
         - containerPort: 8080
