@@ -399,7 +399,7 @@ spec:
   hosts:
   - "kleff.io"
   gateways:
-  - istio-system/kleff-gateway
+  - istio-system/main-gateway
   http:
   - route:
     - destination:
@@ -418,7 +418,7 @@ spec:
   hosts:
   - "api.kleff.io"
   gateways:
-  - istio-system/kleff-gateway
+  - istio-system/main-gateway
   http:
   - match:
     - uri:

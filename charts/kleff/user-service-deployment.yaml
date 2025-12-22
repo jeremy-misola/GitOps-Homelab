@@ -26,23 +26,30 @@ spec:
       - name: user-service
         image: kleff.azurecr.io/user-service:latest
         env:
-        - name: DB_HOST
-          value: user-db
-        - name: DB_PORT
-          value: "5432"
-        - name: DB_NAME
-          value: user_service
-        - name: DB_USERNAME
-          value: user_service
+        # 1. Port Configuration
+        - name: HTTP_ADDR
+          value: ":8080"
+
+        # 2. Auth Configuration (Mapped from old OAUTH2_ISSUER_URI)
+        - name: AUTHENTIK_BASE_URL
+          value: "https://auth.kleff.io/application/o/kleff/"
+
+        # 3. Database Credentials (Helper variable to fetch the secret)
         - name: DB_PASSWORD
           valueFrom:
             secretKeyRef:
               name: postgres-credentials
               key: user_db_password
-        - name: SQL_INIT_MODE
-          value: never
-        - name: HIBERNATE_DDL_AUTO
-          value: update
+
+        # 4. Primary Database DSN
+        # Format: postgres://username:password@host:port/dbname?sslmode=disable
+        - name: POSTGRES_USER_DSN
+          value: "postgres://user_service:$(DB_PASSWORD)@user-db:5432/user_service?sslmode=disable"
+
+        # 5. Audit Database DSN (Pointing to same DB for now, or change as needed)
+        - name: POSTGRES_AUDIT_DSN
+          value: "postgres://user_service:$(DB_PASSWORD)@user-db:5432/user_service?sslmode=disable"
+
         ports:
         - containerPort: 8080
         resources:
