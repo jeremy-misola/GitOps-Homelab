@@ -33,7 +33,7 @@ spec:
 
           # 2. Auth Configuration (Mapped from old OAUTH2_ISSUER_URI)
           - name: PROMETHEUS_URL
-            value: "kube-prometheus-kube-prome-prometheus.monitoring.svc.cluster.local"
+            value: "http://kube-prometheus-kube-prome-prometheus.monitoring.svc.cluster.local"
 
           - name: ENVIRONMENT
             value: "development"
