@@ -8,7 +8,7 @@ metadata:
 spec:
   selector:
     matchLabels:
-      security.istio.io/tlsMode: istio 
+      paas: kleff
   namespaceSelector:
     any: true
   podMetricsEndpoints:
