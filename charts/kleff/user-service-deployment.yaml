@@ -32,7 +32,7 @@ spec:
 
         # 2. Auth Configuration (Mapped from old OAUTH2_ISSUER_URI)
         - name: AUTHENTIK_BASE_URL
-          value: "https://auth.kleff.io/application/o/kleff/"
+          value: "https://auth.kleff.io"
 
         # 3. Database Credentials (Helper variable to fetch the secret)
         - name: DB_PASSWORD
@@ -49,6 +49,12 @@ spec:
         # 5. Audit Database DSN (Pointing to same DB for now, or change as needed)
         - name: POSTGRES_AUDIT_DSN
           value: "postgres://user_service:$(DB_PASSWORD)@user-db:5432/user_service?sslmode=disable"
+
+        - name: AUTHENTIK_API_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: postgres-credentials # Create this secret
+              key: authentik_admin_toekn
 
         ports:
         - containerPort: 8080
