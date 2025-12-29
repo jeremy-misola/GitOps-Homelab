@@ -14,5 +14,5 @@ spec:
     clientID: "Wxqom19mHxBaVE3loYlVPsl4TgcpCupOOkmnDR5X"
     clientSecret:
       name: "longhorn-client-secret"
-    redirectURL: "https://longhorn.jeremymr.dev"
-    logoutPath: "/"
+    redirectURL: "https://longhorn.jeremymr.dev/oauth2/callback"
+    logoutPath: "/logout"
