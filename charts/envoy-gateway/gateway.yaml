@@ -23,7 +23,6 @@ spec:
       mode: Terminate
       certificateRefs:
         - name: homelab-cert
-          namespace: istio-system
     allowedRoutes:
       namespaces:
         from: All
