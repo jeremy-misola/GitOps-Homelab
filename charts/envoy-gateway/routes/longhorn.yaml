@@ -7,6 +7,6 @@ spec:
   hostnames:
     - longhorn.jeremymr.dev
   rules:
-    backendRefs:
+  - backendRefs:
     - name: longhorn-frontend
       port: 80
