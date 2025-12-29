@@ -13,7 +13,7 @@ spec:
         cloudflare:
           email: misolarellinj06@gmail.com
           apiTokenSecretRef:
-            name: cloudflare-api-token-secret-kleff
+            name: cloudflare-api-token-kleff
             key: api-token
 
 ---
@@ -31,5 +31,5 @@ spec:
         cloudflare:
           email: misolarellinj06@gmail.com
           apiTokenSecretRef:
-            name: cloudflare-api-token-secret-kleff
+            name: cloudflare-api-token-kleff
             key: api-token
