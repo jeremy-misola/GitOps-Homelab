@@ -11,6 +11,8 @@ spec:
     repoURL: https://github.com/jeremy-misola/GitOps-Homelab 
     targetRevision: HEAD
     path: charts/envoy-gateway
+    directory:
+      recurse: true
   destination:
     server: https://kubernetes.default.svc
     namespace: envoy-gateway-system
