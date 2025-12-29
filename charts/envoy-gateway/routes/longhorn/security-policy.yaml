@@ -12,6 +12,6 @@ spec:
       issuer: "https://auth.jeremymr.dev"
     clientID: "Wxqom19mHxBaVE3loYlVPsl4TgcpCupOOkmnDR5X"
     clientSecret:
-      name: ""
+      name: "longhorn-client-secret"
     redirectURL: "longhorn.jeremymr.dev"
     logoutPath: "/"
