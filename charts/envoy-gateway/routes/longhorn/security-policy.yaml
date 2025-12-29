@@ -10,7 +10,7 @@ spec:
       name: longhorn-route
   oidc:
     provider:
-      issuer: "https://auth.jeremymr.dev"
+      issuer: "https://auth.jeremymr.dev/application/o/longhorn/"
     clientID: "Wxqom19mHxBaVE3loYlVPsl4TgcpCupOOkmnDR5X"
     clientSecret:
       name: "longhorn-client-secret"
