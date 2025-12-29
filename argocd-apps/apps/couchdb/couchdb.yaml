@@ -20,6 +20,7 @@ spec:
         couchdbConfig:
           couchdb:
             uuid: $(curl https://www.uuidgenerator.net/api/version4 2>/dev/null | tr -d -)
+        persistentVolume.enabled: true
   destination:
     server: https://kubernetes.default.svc
     namespace: couchdb
