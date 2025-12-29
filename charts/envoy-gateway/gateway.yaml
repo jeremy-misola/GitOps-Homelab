@@ -23,6 +23,7 @@ spec:
       mode: Terminate
       certificateRefs:
         - name: homelab-cert
+          namespace: envoy-gateway-system
     allowedRoutes:
       namespaces:
         from: All
