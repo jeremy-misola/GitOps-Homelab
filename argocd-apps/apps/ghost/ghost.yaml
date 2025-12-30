@@ -3,16 +3,17 @@ kind: Application
 metadata:
   name: ghost
   namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
 spec:
   project: default
   source:
-    repoURL: https://charts.bitnami.com/bitnami
-    chart: ghost
-    targetRevision: 25.0.4
+    path: .
+    repoURL: oci://registry-1.docker.io/cloudpirates/ghost
+    targetRevision: 0.6.4
   destination:
     server: https://kubernetes.default.svc
     namespace: ghost
-  
   syncPolicy:
     automated:
       prune: true
