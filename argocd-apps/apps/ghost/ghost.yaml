@@ -18,6 +18,20 @@ spec:
           value: "https://ghost.jeremymr.dev"
         - name: admin__url
           value: "https://ghost-admin.jeremymr.dev"
+        # Gmail SMTP Configuration
+        - name: mail__transport
+          value: "SMTP"
+        - name: mail__from
+          value: "misolarellinj06@gmail.com"
+        - name: mail__options__service
+          value: "Gmail"
+        - name: mail__options__auth__user
+          value: "misolarellinj06@gmail.com"
+        - name: mail__options__auth__pass
+          valueFrom:
+            secretKeyRef:
+              name: gmail-app-password
+              key: app-password
   destination:
     server: https://kubernetes.default.svc
     namespace: ghost
