@@ -11,7 +11,6 @@ spec:
   dnsNames:
   - "jeremymr.dev"
   - "*.jeremymr.dev"
-  - "*.*.jeremymr.dev"
   
 ---
 
@@ -28,4 +27,3 @@ spec:
   dnsNames:
   - "jeremymr.dev"
   - "*.jeremymr.dev"
-  - "*.*.jeremymr.dev"
