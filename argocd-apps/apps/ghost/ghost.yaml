@@ -17,7 +17,7 @@ spec:
         - name: url
           value: "https://ghost.jeremymr.dev"
         - name: admin__url
-          value: "https://admin.ghost.jeremymr.dev"
+          value: "https://ghost-admin.jeremymr.dev"
   destination:
     server: https://kubernetes.default.svc
     namespace: ghost
