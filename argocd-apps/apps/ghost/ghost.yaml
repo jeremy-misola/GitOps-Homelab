@@ -16,6 +16,8 @@ spec:
         extraEnvVars:
         - name: url
           value: "https://ghost.jeremymr.dev"
+        - name: admin__url
+          value: "https://admin.ghost.jeremymr.dev"
   destination:
     server: https://kubernetes.default.svc
     namespace: ghost
