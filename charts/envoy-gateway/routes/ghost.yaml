@@ -11,5 +11,5 @@ spec:
     - ghost.jeremymr.dev
   rules:
   - backendRefs:
-    - name: argocd-server
+    - name: ghost
       port: 80
