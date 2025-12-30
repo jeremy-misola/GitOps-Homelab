@@ -15,9 +15,9 @@ spec:
       values: |
         extraEnvVars:
           - name: url
-            value: "https://saimas-blog.jeremymr.dev"
+            value: "https://saimachowdhury.ca"
           - name: admin__url
-            value: "https://saimas-blog-admin.jeremymr.dev"
+            value: "https://admin.saimachowdhury.ca"
           - name: mail__transport
             value: "SMTP"
           - name: mail__from
@@ -39,7 +39,7 @@ spec:
                 key: app-password
   destination:
     server: https://kubernetes.default.svc
-    namespace: ghost
+    namespace: ghost-saima
   syncPolicy:
     automated:
       prune: true

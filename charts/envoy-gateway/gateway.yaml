@@ -27,3 +27,15 @@ spec:
     allowedRoutes:
       namespaces:
         from: All
+
+  - name: saima-https
+    protocol: HTTPS
+    port: 443
+    tls:
+      mode: Terminate
+      certificateRefs:
+        - name: saima-cert
+          namespace: envoy-gateway-system
+    allowedRoutes:
+      namespaces:
+        from: All
