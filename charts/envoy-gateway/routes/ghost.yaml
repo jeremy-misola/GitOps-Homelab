@@ -14,6 +14,8 @@ spec:
     - name: ghost
       port: 80
 
+---
+
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
