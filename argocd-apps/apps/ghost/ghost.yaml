@@ -11,6 +11,11 @@ spec:
     path: .
     repoURL: oci://registry-1.docker.io/cloudpirates/ghost
     targetRevision: 0.6.4
+    helm:
+      values: |
+        extraEnvVars
+        - name: url
+          value: "https://ghost.jeremymr.dev"
   destination:
     server: https://kubernetes.default.svc
     namespace: ghost
