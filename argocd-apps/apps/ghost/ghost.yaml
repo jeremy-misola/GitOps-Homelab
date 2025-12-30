@@ -16,6 +16,8 @@ spec:
         extraEnvVars:
           - name: url
             value: "https://ghost.jeremymr.dev"
+          - name: admin__url
+            value: "https://ghost-admin.jeremymr.dev"
           - name: mail__transport
             value: "SMTP"
           - name: mail__from
