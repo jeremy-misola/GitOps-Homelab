@@ -11,7 +11,7 @@ spec:
     - saimachowdhury.ca
   rules:
   - backendRefs:
-    - name: ghost
+    - name: ghost-saima
       port: 80
 
 ---
@@ -29,5 +29,5 @@ spec:
     - admin.saimachowdhury.ca
   rules:
   - backendRefs:
-    - name: ghost
+    - name: ghost-saima
       port: 80
