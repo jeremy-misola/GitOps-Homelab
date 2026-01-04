@@ -2,7 +2,7 @@ apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: kleff-io-cert
-  namespace: istio-system
+  namespace: envoy-gateway-system
 spec:
   secretName: kleff-io-tls
   issuerRef:
