@@ -2,23 +2,6 @@ apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: homelab-cert
-  namespace: istio-system
-spec:
-  secretName: homelab-cert
-  issuerRef:
-    name: letsencrypt-prod
-    kind: ClusterIssuer
-  dnsNames:
-  - "jeremymr.dev"
-  - "*.jeremymr.dev"
-  - "*.ghost.jeremymr.dev"
-  
----
-
-apiVersion: cert-manager.io/v1
-kind: Certificate
-metadata:
-  name: homelab-cert
   namespace: envoy-gateway-system
 spec:
   secretName: homelab-cert

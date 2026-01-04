@@ -1,10 +1,3 @@
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: kleff-deployment
-  labels:
-    istio-injection: enabled
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:

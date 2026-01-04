@@ -23,9 +23,6 @@ spec:
         domainFilters:
           - kleff.io
         
-        sources:
-        - istio-virtualservice
-
         serviceAccount:
           create: true
           name: external-dns
