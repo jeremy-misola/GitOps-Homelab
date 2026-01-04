@@ -35,7 +35,7 @@ spec:
           valueFrom:
             secretKeyRef:
               name: cloudflare-api-token-kleff
-              key: cloudflare-api-token
+              key: api-token
 
   destination:
     server: https://kubernetes.default.svc
