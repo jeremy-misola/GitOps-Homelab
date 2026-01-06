@@ -65,7 +65,7 @@ spec:
               timeout: 10s
 
           exporters:
-            otlp/loki:
+            otlphttp/loki:
               endpoint: http://loki-stack-gateway.loki.svc.cluster.local:80/otlp
               headers:
                 X-Scope-OrgID: "1" 
@@ -75,7 +75,7 @@ spec:
               logs:
                 receivers: [otlp, filelog]
                 processors: [k8sattributes, batch]
-                exporters: [otlp/loki]
+                exporters: [otlphttp/loki]
   destination:
     server: https://kubernetes.default.svc
     namespace: opentelemetry-collector
