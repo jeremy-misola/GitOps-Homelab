@@ -15,6 +15,7 @@ spec:
       values: |
         releaseName: garage
         persistence:
+          enabled: true
           meta:
             storageClass: "longhorn"
             size: 500Mi
