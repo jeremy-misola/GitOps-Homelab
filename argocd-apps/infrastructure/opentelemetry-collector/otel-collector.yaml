@@ -66,10 +66,9 @@ spec:
 
           exporters:
             otlp/loki:
-              endpoint: http://loki-stack-gateway.loki.svc.cluster.local:3100/otlp
-              # Note: Loki OTLP usually requires this header if using specific auth
-              # headers:
-              #   X-Scope-OrgID: "1" 
+              endpoint: http://loki-stack-gateway.loki.svc.cluster.local/otlp
+                headers:
+                  X-Scope-OrgID: "1" 
 
           service:
             pipelines:
