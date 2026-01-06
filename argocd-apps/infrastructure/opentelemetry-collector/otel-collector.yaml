@@ -67,8 +67,8 @@ spec:
           exporters:
             otlp/loki:
               endpoint: http://loki-stack-gateway.loki.svc.cluster.local/otlp
-                headers:
-                  X-Scope-OrgID: "1" 
+              headers:
+                X-Scope-OrgID: "1" 
 
           service:
             pipelines:
