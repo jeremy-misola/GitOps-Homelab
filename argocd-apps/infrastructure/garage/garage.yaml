@@ -14,6 +14,13 @@ spec:
     helm:
       values: |
         releaseName: garage
+        persistence:
+          meta:
+            storageClass: "longhorn"
+            size: 500Mi
+          data:
+            storageClass: "longhorn"
+            size: 10Gi
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: garage
