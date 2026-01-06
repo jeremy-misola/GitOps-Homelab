@@ -13,56 +13,59 @@ spec:
     targetRevision: 6.49.0
     helm:
       values: |
+        loki:
+          # Configuration for the Loki binary itself
+          commonConfig:
+            replication_factor: 1 # Adjust to 3 for High Availability
+          
+          schemaConfig:
+            configs:
+              - from: "2024-01-01"
+                store: tsdb
+                object_store: s3
+                schema: v13
+                index:
+                  prefix: loki_index_
+                  period: 24h
+
+          storage:
+            type: s3
+            bucketNames:
+              chunks: loki-chunks
+              ruler: loki-ruler
+              admin: loki-admin
+            s3:
+              endpoint: garage.garage.svc.cluster.local:3900 
+              region: garage
+              accessKeyId: ${S3_ACCESS_KEY}
+              secretAccessKey: ${S3_SECRET_KEY}
+              s3ForcePathStyle: true
+              insecure: true
+
+        # Injecting Secrets into all components (Read, Write, Backend)
         write:
-          extraArgs:
-            - "-config.expand-env=true"
+          extraArgs: ["-config.expand-env=true"]
+          extraEnv: &lokiEnv
+            - name: S3_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: garage-loki-secrets
+                  key: access-key-id
+            - name: S3_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: garage-loki-secrets
+                  key: secret-access-key
         read:
-          extraArgs:
-            - "-config.expand-env=true"
+          extraArgs: ["-config.expand-env=true"]
+          extraEnv: *lokiEnv
         backend:
-          extraArgs:
-            - "-config.expand-env=true"
+          extraArgs: ["-config.expand-env=true"]
+          extraEnv: *lokiEnv
 
-        extraEnv:
-          - name: S3_ACCESS_KEY
-            valueFrom:
-              secretKeyRef:
-                name: garage-loki-secrets
-                key: access-key-id
-          - name: S3_SECRET_KEY
-            valueFrom:
-              secretKeyRef:
-                name: garage-loki-secrets
-                key: secret-access-key
-
-        schemaConfig:
-          configs:
-            - from: "2024-01-01" # This can be any date in the past
-              store: tsdb
-              object_store: s3
-              schema: v13
-              index:
-                prefix: loki_index_
-                period: 24h
-        storage:
-          type: s3
-          bucketNames:
-            chunks: loki-chunks
-            ruler: loki-ruler
-            admin: loki-admin
-          s3:
-            endpoint: garage.garage.svc.cluster.local:3900 
-            
-            region: garage           # Garage usually ignores this, but a value is required
-            accessKeyId: ${S3_ACCESS_KEY}
-            secretAccessKey: ${S3_SECRET_KEY}
-            
-            s3ForcePathStyle: true   # REQUIRED for Garage
-            insecure: true           # Set to 'true' if your Garage endpoint is http (not https)
   destination:
     server: https://kubernetes.default.svc
     namespace: loki
-
   syncPolicy:
     automated:
       prune: true
