@@ -11,6 +11,7 @@ spec:
     targetRevision: 11.6.1
     helm:
       values: |
+       releaseLabel: true
        serviceMonitor.targets:
         - name: example                    # Human readable URL that will appear in Prometheus / AlertManager
           url: http://argocd.jeremymr.dev/healthz  # The URL that blackbox will scrape
