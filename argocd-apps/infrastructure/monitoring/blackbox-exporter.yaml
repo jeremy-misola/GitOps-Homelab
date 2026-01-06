@@ -11,15 +11,15 @@ spec:
     targetRevision: 11.6.1
     helm:
       values: |
-       serviceMonitor:
-        enabled: true
-       releaseLabel: true
-       serviceMonitor.targets:
-        - name: example                    # Human readable URL that will appear in Prometheus / AlertManager
-          url: http://argocd.jeremymr.dev/healthz  # The URL that blackbox will scrape
-          interval: 60s                    # Scraping interval. Overrides value set in `defaults`
-          scrapeTimeout: 60s               # Scrape timeout. Overrides value set in `defaults`
-          module: http_2xx                 # Module used for scraping. Overrides value set in `defaults`
+        releaseLabel: true
+        serviceMonitor:
+          enabled: true
+          targets:
+          - name: example                    # Human readable URL that will appear in Prometheus / AlertManager
+            url: http://argocd.jeremymr.dev/healthz  # The URL that blackbox will scrape
+            interval: 60s                    # Scraping interval. Overrides value set in `defaults`
+            scrapeTimeout: 60s               # Scrape timeout. Overrides value set in `defaults`
+            module: http_2xx                 # Module used for scraping. Overrides value set in `defaults`
   destination:
     server: https://kubernetes.default.svc
     namespace: monitoring
