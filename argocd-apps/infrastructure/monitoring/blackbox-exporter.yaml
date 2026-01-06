@@ -11,6 +11,8 @@ spec:
     targetRevision: 11.6.1
     helm:
       values: |
+       serviceMonitor:
+        enabled: true
        releaseLabel: true
        serviceMonitor.targets:
         - name: example                    # Human readable URL that will appear in Prometheus / AlertManager
