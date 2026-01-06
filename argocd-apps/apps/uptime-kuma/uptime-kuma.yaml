@@ -1,0 +1,33 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: uptime-kuma
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://dirsigler.github.io/uptime-kuma-helm
+    chart: uptime-kuma
+    targetRevision: 2.24.0
+    helm:
+      values: |
+        createAdminSecret: false
+        extraSecretName: "couchdb-creds"
+        adminPasswordKey: "adminUsername"
+        adminPasswordKey: "adminPassword"
+        cookieAuthSecretKey: "cookieAuthSecret"
+        cookieAuthSecretKey: "erlangCookie"
+        couchdbConfig:
+          couchdb:
+            uuid: $(curl https://www.uuidgenerator.net/api/version4 2>/dev/null | tr -d -)
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: uptime-kuma
+  
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
