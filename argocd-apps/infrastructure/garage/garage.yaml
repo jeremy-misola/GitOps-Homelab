@@ -8,12 +8,14 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: 'https://git.deuxfleurs.fr/Deuxfleurs/garage'
-    targetRevision: HEAD
-    path: script/helm/garage
+    repoURL: 'https://datahub-local.github.io/garage-helm'
+    chart: garage
+    targetRevision: 0.2.1 # Match the version from the documentation provided
     helm:
       values: |
-        releaseName: garage
+        deployment:
+          replicaCount: 2
+
         persistence:
           enabled: true
           meta:
@@ -22,6 +24,30 @@ spec:
           data:
             storageClass: "longhorn"
             size: 10Gi
+
+        clusterConfig:
+          enabled: true
+          layout:
+            enabled: true
+            zone: dc1
+            capacity: 10Gi
+          
+          buckets:
+            - loki-chunks
+            - loki-ruler
+            - loki-admin
+          
+          keys:
+            loki-key:
+              keyId: "GK000000000000000000000001" # Placeholder or your specific ID
+
+        webui:
+          enabled: true
+        
+        monitoring:
+          metrics:
+            enabled: true
+
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: garage
