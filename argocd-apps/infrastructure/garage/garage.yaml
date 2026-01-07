@@ -15,11 +15,6 @@ spec:
       values: |
         fullnameOverride: "garage"
 
-        garage:
-          secret:
-            create: false
-            name: "garage-loki-secrets" # Your ExternalSecret
-
         clusterConfig:
           enabled: true
           layout:
