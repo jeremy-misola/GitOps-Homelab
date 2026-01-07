@@ -10,11 +10,11 @@ spec:
   source:
     repoURL: 'https://datahub-local.github.io/garage-helm'
     chart: garage
-    targetRevision: 0.2.1 # Match the version from the documentation provided
+    targetRevision: 0.2.1
     helm:
       values: |
         deployment:
-          replicaCount: 2
+          replicaCount: 3
 
         persistence:
           enabled: true
@@ -30,16 +30,17 @@ spec:
           layout:
             enabled: true
             zone: dc1
-            capacity: 10Gi
+            capacity: "10Gi"
           
+          # FIXED: Buckets must be a list of objects with a 'name' key
           buckets:
-            - loki-chunks
-            - loki-ruler
-            - loki-admin
+            - name: loki-chunks
+            - name: loki-ruler
+            - name: loki-admin
           
           keys:
             loki-key:
-              keyId: "GK000000000000000000000001" # Placeholder or your specific ID
+              keyId: "GK000000000000000000000001" 
 
         webui:
           enabled: true
