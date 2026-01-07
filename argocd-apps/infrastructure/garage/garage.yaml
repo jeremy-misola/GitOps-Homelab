@@ -13,17 +13,12 @@ spec:
     targetRevision: 0.2.1
     helm:
       values: |
-        deployment:
-          replicaCount: 3
+        fullnameOverride: "garage"
 
-        persistence:
-          enabled: true
-          meta:
-            storageClass: "longhorn"
-            size: 500Mi
-          data:
-            storageClass: "longhorn"
-            size: 10Gi
+        garage:
+          secret:
+            create: false
+            name: "garage-loki-secrets" # Your ExternalSecret
 
         clusterConfig:
           enabled: true
@@ -32,23 +27,18 @@ spec:
             zone: dc1
             capacity: "10Gi"
           
-          # FIXED: Buckets must be a list of objects with a 'name' key
           buckets:
             - name: loki-chunks
             - name: loki-ruler
             - name: loki-admin
           
-          keys:
-            loki-key:
-              keyId: "GK000000000000000000000001" 
+          keys: {}
 
-        webui:
-          enabled: true
-        
-        monitoring:
-          metrics:
-            enabled: true
-
+          extraCommands:
+            - "key create loki-key"
+            - "bucket allow loki-chunks --key loki-key --read --write"
+            - "bucket allow loki-ruler --key loki-key --read --write"
+            - "bucket allow loki-admin --key loki-key --read --write"
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: garage
