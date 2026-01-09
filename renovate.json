@@ -4,10 +4,10 @@
     "config:recommended"
   ],
   "argocd": {
-    "managerFilePatterns": [
-      "^argocd-apps/.*\\.yaml$",
-      "^bootstrap/.*\\.yaml$",
-      "^categories/.*\\.yaml$"
+    "fileMatch": [
+      "(^|/)argocd-apps/.*\\.yaml$",
+      "(^|/)bootstrap/.*\\.yaml$",
+      "(^|/)categories/.*\\.yaml$"
     ]
   }
 }
