@@ -25,6 +25,9 @@ The environment is architected into two logical layers: **Infrastructure Core** 
 | **Security** | Identity & Secrets | **Authentik** (OIDC), **External Secrets (ESO)**, **Cert-Manager** |
 | **Observability** | LGTM Stack | **Loki**, **Grafana**, **Tempo**, **Prometheus** |
 
+Here is a high-level overview of the cluster.
+![High-Level Cluster Architecture](./docs/images/high-lvl-cluster-architecture.svg)
+
 ---
 
 ## Repository Lifecycle (The Sync Chain)
@@ -35,7 +38,8 @@ To manage many different configurations, I'm using a multi-stage **ArgoCD sync c
 2.  **`categories/`**: Defines parent "Category Apps" (Infrastructure vs. Applications) that orchestrate the order of operations.
 3.  **`argocd-apps/`**: Contains individual `Application` manifests for services like `istio` or `ghost`.
 4.  **`charts/`**: The configuration source, containing Helm `values.yaml` overrides, Istio `VirtualServices`, and ESO `SecretStores`.
-<img width="1886" height="1138" alt="image" src="https://github.com/user-attachments/assets/251f3656-f95c-4b20-992e-951502e0ed10" />
+
+![ArgoCD App of Apps Architecture](./docs/images/argo-architecture.svg)
 
 
 ---
