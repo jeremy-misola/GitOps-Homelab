@@ -10,7 +10,7 @@ spec:
   source:
     path: .
     repoURL: oci://registry-1.docker.io/cloudpirates/ghost
-    targetRevision: 0.6.4
+    targetRevision: 0.6.5
     helm:
       values: |
         extraEnvVars:
