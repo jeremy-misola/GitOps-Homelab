@@ -1,7 +1,7 @@
 apiVersion: opentelemetry.io/v1alpha1
 kind: Instrumentation
 metadata:
-  name: java-Instrumentation
+  name: java-instrumentation
 spec:
   exporter:
     endpoint: http://otel-collector-opentelemetry-collector.default.svc.cluster.local:4317
