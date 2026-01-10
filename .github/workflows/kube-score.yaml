@@ -1,0 +1,19 @@
+name: Kube-score Check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  kube-score:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4 
+
+      - name: Run kube-score analysis
+        uses: piraces/kube-score-ga@v1 
+        with:
+          manifests-folders: "." 
