@@ -7,7 +7,7 @@ spec:
   project: default
   source:
     repoURL: https://github.com/jeremy-misola/GitOps-Homelab
-    targetRevision: HEAD
+    targetRevision: develop
     path: categories
   destination:
     server: https://kubernetes.default.svc
