@@ -5,7 +5,10 @@ metadata:
   namespace: kleff-deployment
 spec:
   exporter:
-    endpoint: otel-collector-opentelemetry-collector.opentelemetry-collector.svc.cluster.local:4317
+    endpoint: http://otel-collector-opentelemetry-collector.opentelemetry-collector.svc.cluster.local:4317
+  env:
+    - name: OTEL_EXPORTER_OTLP_PROTOCOL
+      value: grpc
   propagators:
     - tracecontext
     - baggage
