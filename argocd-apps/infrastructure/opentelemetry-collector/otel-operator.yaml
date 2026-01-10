@@ -22,7 +22,7 @@ spec:
 
   destination:
     server: https://kubernetes.default.svc
-    namespace: opentelemetry-collector
+    namespace: opentelemetry-operator
 
   syncPolicy:
     automated:
