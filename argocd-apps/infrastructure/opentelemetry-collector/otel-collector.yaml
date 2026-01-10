@@ -69,6 +69,10 @@ spec:
               endpoint: http://loki-stack-gateway.loki.svc.cluster.local:80/otlp
               headers:
                 X-Scope-OrgID: "1" 
+            otlp/tempo:
+              endpoint: tempo.tempo.svc.cluster.local:4317
+              tls:
+                insecure: true
 
           service:
             pipelines:
@@ -76,6 +80,10 @@ spec:
                 receivers: [otlp, filelog]
                 processors: [k8sattributes, batch]
                 exporters: [otlphttp/loki]
+              traces:
+                receivers: [otlp]
+                processors: [k8sattributes, batch]
+                exporters: [otlp/tempo]
   destination:
     server: https://kubernetes.default.svc
     namespace: opentelemetry-collector
