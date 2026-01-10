@@ -2,8 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: deployment-service
-  labels:
-    instrumentation.opentelemetry.io/inject-java: "true"
   namespace: kleff-deployment
 spec:
   replicas: 1
@@ -12,6 +10,8 @@ spec:
       app: deployment-service
   template:
     metadata:
+      annotations:
+        instrumentation.opentelemetry.io/inject-java: "true"
       labels:
         app: deployment-service
         paas: kleff

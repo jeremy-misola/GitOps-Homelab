@@ -2,6 +2,7 @@ apiVersion: opentelemetry.io/v1alpha1
 kind: Instrumentation
 metadata:
   name: java-instrumentation
+  namespace: kleff-deployment
 spec:
   exporter:
     endpoint: http://otel-collector-opentelemetry-collector.opentelemetry-collector.svc.cluster.local:4317
