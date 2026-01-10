@@ -4,7 +4,7 @@ metadata:
   name: java-instrumentation
 spec:
   exporter:
-    endpoint: http://otel-collector-opentelemetry-collector.default.svc.cluster.local:4317
+    endpoint: http://otel-collector-opentelemetry-collector.opentelemetry-collector.svc.cluster.local:4317
   propagators:
     - tracecontext
     - baggage
