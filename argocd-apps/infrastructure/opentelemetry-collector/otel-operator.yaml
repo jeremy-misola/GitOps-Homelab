@@ -14,7 +14,7 @@ spec:
     helm:
       values: |
         admissionWebhooks:
-          certManager:
+          cert-manager:
             enabled: true
         manager:
           collectorImage:
