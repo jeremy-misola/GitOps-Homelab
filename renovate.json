@@ -5,10 +5,10 @@
     "group:all"
   ],
   "argocd": {
-    "fileMatch": [
-      "(^|/)argocd-apps/.*\\.yaml$",
-      "(^|/)bootstrap/.*\\.yaml$",
-      "(^|/)categories/.*\\.yaml$"
+    "managerFilePatterns": [
+      "/(^|/)argocd-apps/.*\\.yaml$/",
+      "/(^|/)bootstrap/.*\\.yaml$/",
+      "/(^|/)categories/.*\\.yaml$/"
     ]
   }
 }
