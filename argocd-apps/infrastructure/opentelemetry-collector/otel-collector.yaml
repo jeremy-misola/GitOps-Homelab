@@ -16,6 +16,9 @@ spec:
         image:
           repository: "ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-k8s"
         mode: daemonset
+        service:
+          enabled: true
+          type: ClusterIP
 
         # 1. Provide permissions to read logs and talk to K8s API
         presets:

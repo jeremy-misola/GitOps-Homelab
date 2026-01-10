@@ -4,8 +4,7 @@ metadata:
   name: java-Instrumentation
 spec:
   exporter:
-    # Point this to the Service created by your existing Collector Helm chart
-    endpoint: http://existing-collector-service-name.namespace.svc.cluster.local:4317 
+    endpoint: http://otel-collector-opentelemetry-collector.default.svc.cluster.local:4317
   propagators:
     - tracecontext
     - baggage
