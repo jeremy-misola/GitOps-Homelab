@@ -1,0 +1,26 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: webapp-operator
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: oci://kleff.azurecr.io/helm
+    chart: operator
+    targetRevision: 0.1.0
+    helm:
+      values: |
+        manager:
+          image:
+            repository: kleff.azurecr.io/webapp-operator
+            tag: latest
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
