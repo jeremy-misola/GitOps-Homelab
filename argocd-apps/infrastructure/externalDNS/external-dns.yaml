@@ -30,7 +30,6 @@ spec:
           create: true
         sources:
           - gateway-httproute
-          - gateway-gateway
 
         env:
         - name: CF_API_TOKEN
