@@ -8,13 +8,15 @@ spec:
   source:
     repoURL: kleff.azurecr.io/helm
     chart: operator
-    targetRevision: 0.1.7
+    targetRevision: 0.1.8
     helm:
       values: |
         manager:
           image:
             repository: kleff.azurecr.io/webapp-operator
             tag: latest
+          imagePullSecrets:
+            - name: acr-creds
   destination:
     server: https://kubernetes.default.svc
     namespace: default
