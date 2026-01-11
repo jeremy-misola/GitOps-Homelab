@@ -3,6 +3,8 @@ kind: Gateway
 metadata:
   name: prod-web
   namespace: envoy-gateway-system
+  annotations:
+    external-dns.alpha.kubernetes.io/target: placeholder
 spec:
   gatewayClassName: envoy
   addresses:
