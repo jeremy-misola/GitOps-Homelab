@@ -8,7 +8,7 @@ spec:
   source:
     repoURL: kleff.azurecr.io/helm
     chart: operator
-    targetRevision: 0.1.6
+    targetRevision: 0.1.7
     helm:
       values: |
         manager:
