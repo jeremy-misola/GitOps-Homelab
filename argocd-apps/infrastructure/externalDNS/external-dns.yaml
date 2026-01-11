@@ -26,6 +26,8 @@ spec:
         serviceAccount:
           create: true
           name: external-dns
+        sources:
+          - gateway-httproute
 
         env:
         - name: CF_API_TOKEN
