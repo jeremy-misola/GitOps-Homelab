@@ -11,5 +11,5 @@ spec:
   - "portfolio.jeremymr.dev"
   rules:
   - backendRefs:
-    - name: portfolio-frontend
+    - name: frontend-service
       port: 80
