@@ -16,6 +16,6 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: jeremysCR.azurecr.io/portfolio:0.0.1
+        image: jeremyscr.azurecr.io/portfolio:0.0.1
         ports:
         - containerPort: 3000
