@@ -31,6 +31,14 @@ spec:
   - matches:
     - path:
         type: PathPrefix
+        value: /api/v1/users/me/invitations
+    backendRefs:
+    - name: project-management-service
+      port: 80
+  
+  - matches:
+    - path:
+        type: PathPrefix
         value: /api/v1/users
     backendRefs:
     - name: user-service
