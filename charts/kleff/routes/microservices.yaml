@@ -43,6 +43,14 @@ spec:
     backendRefs:
     - name: project-management-service
       port: 80
+  
+    - matches:
+    - path:
+        type: PathPrefix
+        value: /api/v1/invitations
+    backendRefs:
+    - name: project-management-service
+      port: 80
 
   - matches:
     - path:
@@ -67,6 +75,15 @@ spec:
     backendRefs:
     - name: billing-service
       port: 80
+  
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /api/v1/billing
+    backendRefs:
+    - name: billing-service
+      port: 80
+
 
   - matches:
     - path:
