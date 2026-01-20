@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: billing-service
+  namespace: kleff-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: billing-service
+  template:
+    metadata:
+      annotations:
+        instrumentation.opentelemetry.io/inject-java: "true"
+      labels:
+        app: billing-service
+        paas: kleff
+    spec:
+      imagePullSecrets:
+      - name: acr-creds
+      containers:
+      - name: billing-service
+        image: kleff.azurecr.io/billing-service:latest
+        imagePullPolicy: Always
+        env:
+        - name: SPRING_DATASOURCE_URL
+          value: jdbc:postgresql://billing-service-db:5432/mydb
+        - name: SPRING_DATASOURCE_USERNAME
+          value: postgres
+        - name: SPRING_DATASOURCE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-credentials
+              key: billing_db_password
+        - name: SPRING_JPA_HIBERNATE_DDL_AUTO
+          value: update
+        - name: STRIPE_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: postgres-credentials
+              key: stripe_api_key
+        - name: FRONTEND_URL
+          valueFrom:
+            secretKeyRef:
+              name: postgres-credentials
+              key: frontend_url
+        - name: VITE_BACKEND_URL
+          valueFrom:
+            secretKeyRef:
+              name: postgres-credentials
+              key: vite_backend_url
+
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        imagePullPolicy: Always
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: billing-service
+  namespace: kleff-deployment
+spec:
+  selector:
+    app: billing-service
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8080
