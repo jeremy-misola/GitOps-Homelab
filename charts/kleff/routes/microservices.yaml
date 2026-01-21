@@ -102,5 +102,5 @@ spec:
         type: PathPrefix
         value: /api/v1/hello
     backendRefs:
-    - name: kleff-observability
+    - name: deployment-backend-service
       port: 80
