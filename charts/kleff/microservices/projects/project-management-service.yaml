@@ -18,7 +18,7 @@ spec:
         - name: acr-creds
       containers:
         - name: project-management-service
-          image: kleff.azurecr.io/project-management-service:f4e017bb1a4ac7aa98b51788b8106144b69a60fe
+          image: kleff.azurecr.io/project-management-service:7dc490157032f80a7712130c74d5b267f4d153f3
           env:
             - name: SPRING_DATASOURCE_URL
               value: jdbc:postgresql://project-management-db:5432/mydb
