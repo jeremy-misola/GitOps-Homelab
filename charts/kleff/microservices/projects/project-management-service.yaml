@@ -15,36 +15,33 @@ spec:
         paas: kleff
     spec:
       imagePullSecrets:
-      - name: acr-creds
+        - name: acr-creds
       containers:
-      - name: project-management-service
-        image: kleff.azurecr.io/project-management-service:latest
-        env:
-        - name: SPRING_DATASOURCE_URL
-          value: jdbc:postgresql://project-management-db:5432/mydb
-        - name: SPRING_DATASOURCE_USERNAME
-          value: postgres
-        - name: SPRING_DATASOURCE_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: postgres-credentials
-              key: project_management_db_password
-        - name: SPRING_JPA_HIBERNATE_DDL_AUTO
-          value: update
-
-        ports:
-        - containerPort: 8080
-        resources:
-          requests:
-            cpu: 100m
-            memory: 128Mi
-          limits:
-            cpu: 500m
-            memory: 512Mi
-        imagePullPolicy: Always
-
+        - name: project-management-service
+          image: kleff.azurecr.io/project-management-service:8f7ca2a3e853f90b886d57d738d558fbf1ebee76
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://project-management-db:5432/mydb
+            - name: SPRING_DATASOURCE_USERNAME
+              value: postgres
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: project_management_db_password
+            - name: SPRING_JPA_HIBERNATE_DDL_AUTO
+              value: update
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          imagePullPolicy: Always
 ---
-
 apiVersion: v1
 kind: Service
 metadata:
@@ -54,6 +51,6 @@ spec:
   selector:
     app: project-management-service
   ports:
-  - name: http
-    port: 80
-    targetPort: 8080
+    - name: http
+      port: 80
+      targetPort: 8080

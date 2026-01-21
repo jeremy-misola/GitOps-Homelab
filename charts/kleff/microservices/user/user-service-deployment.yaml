@@ -15,54 +15,47 @@ spec:
         paas: kleff
     spec:
       imagePullSecrets:
-      - name: acr-creds
+        - name: acr-creds
       containers:
-      - name: user-service
-        image: kleff.azurecr.io/user-service:latest
-        env:
-        # 1. Port Configuration
-        - name: HTTP_ADDR
-          value: ":8080"
+        - name: user-service
+          image: kleff.azurecr.io/user-service:8f7ca2a3e853f90b886d57d738d558fbf1ebee76
+          env:
+            # 1. Port Configuration
+            - name: HTTP_ADDR
+              value: ":8080"
+            # 2. Auth Configuration (Mapped from old OAUTH2_ISSUER_URI)
+            - name: AUTHENTIK_BASE_URL
+              value: "https://auth.kleff.io"
+            # 3. Database Credentials (Helper variable to fetch the secret)
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: user_db_password
+            # 4. Primary Database DSN
 
-        # 2. Auth Configuration (Mapped from old OAUTH2_ISSUER_URI)
-        - name: AUTHENTIK_BASE_URL
-          value: "https://auth.kleff.io"
-
-        # 3. Database Credentials (Helper variable to fetch the secret)
-        - name: DB_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: postgres-credentials
-              key: user_db_password
-
-        # 4. Primary Database DSN
-        # Format: postgres://username:password@host:port/dbname?sslmode=disable
-        - name: POSTGRES_USER_DSN
-          value: "postgres://user_service:$(DB_PASSWORD)@user-db:5432/user_service?sslmode=disable"
-
-        # 5. Audit Database DSN (Pointing to same DB for now, or change as needed)
-        - name: POSTGRES_AUDIT_DSN
-          value: "postgres://user_service:$(DB_PASSWORD)@user-db:5432/user_service?sslmode=disable"
-
-        - name: AUTHENTIK_API_TOKEN
-          valueFrom:
-            secretKeyRef:
-              name: postgres-credentials # Create this secret
-              key: authentik_admin_token
-
-        ports:
-        - containerPort: 8080
-        resources:
-          requests:
-            cpu: 100m
-            memory: 128Mi
-          limits:
-            cpu: 500m
-            memory: 512Mi
-        imagePullPolicy: Always
-
+            # Format: postgres://username:password@host:port/dbname?sslmode=disable
+            - name: POSTGRES_USER_DSN
+              value: "postgres://user_service:$(DB_PASSWORD)@user-db:5432/user_service?sslmode=disable"
+            # 5. Audit Database DSN (Pointing to same DB for now, or change as needed)
+            - name: POSTGRES_AUDIT_DSN
+              value: "postgres://user_service:$(DB_PASSWORD)@user-db:5432/user_service?sslmode=disable"
+            - name: AUTHENTIK_API_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials # Create this secret
+                  key: authentik_admin_token
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          imagePullPolicy: Always
 ---
-
 apiVersion: v1
 kind: Service
 metadata:
@@ -72,8 +65,6 @@ spec:
   selector:
     app: user-service
   ports:
-  - name: http
-    port: 80
-    targetPort: 8080
-
-
+    - name: http
+      port: 80
+      targetPort: 8080
