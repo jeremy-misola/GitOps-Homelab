@@ -23,8 +23,6 @@ spec:
       app: project-management-db
   template:
     metadata:
-      annotations:
-        instrumentation.opentelemetry.io/inject-java: "true
       labels:
         app: project-management-db
     spec:
