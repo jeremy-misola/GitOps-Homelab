@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: kleff-observability
+  name: observability-service
   namespace: kleff-deployment
 spec:
   replicas: 1
@@ -17,7 +17,7 @@ spec:
       imagePullSecrets:
         - name: acr-creds
       containers:
-        - name: kleff-clusterhealth
+        - name: observability-service
           image: kleff.azurecr.io/observability-service:latest
           env:
             # 1. Port Configuration
