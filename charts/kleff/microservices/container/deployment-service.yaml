@@ -20,7 +20,7 @@ spec:
         - name: acr-creds
       containers:
         - name: deployment-service
-          image: kleff.azurecr.io/deployment-service:f4a62d67e1cd29f9f5ef15bc315c738ff4945a8f
+          image: kleff.azurecr.io/deployment-service:cdc962f2e1511f3f041bcb13e1ecace64f9322bf
           env:
             - name: SPRING_DATASOURCE_URL
               value: jdbc:postgresql://deployment-service-db:5432/mydb
