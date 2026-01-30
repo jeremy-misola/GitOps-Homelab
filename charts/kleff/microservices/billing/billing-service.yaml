@@ -1,38 +1,54 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: deployment-service
+  name: billing-service
   namespace: kleff-deployment
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: deployment-service
+      app: billing-service
   template:
     metadata:
       annotations:
         instrumentation.opentelemetry.io/inject-java: "true"
       labels:
-        app: deployment-service
+        app: billing-service
         paas: kleff
     spec:
       imagePullSecrets:
         - name: acr-creds
       containers:
-        - name: deployment-service
-          image: kleff.azurecr.io/deployment-service:54ed8de74b88c118d629d407a5c4cb869e795f57
+        - name: billing-service
+          image: kleff.azurecr.io/billing-service:3ac8f71d1069a222334adf42d13dcca3f27995ee
+          imagePullPolicy: Always
           env:
             - name: SPRING_DATASOURCE_URL
-              value: jdbc:postgresql://deployment-service-db:5432/mydb
+              value: jdbc:postgresql://billing-service-db:5432/mydb
             - name: SPRING_DATASOURCE_USERNAME
               value: postgres
             - name: SPRING_DATASOURCE_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: postgres-credentials
-                  key: deployment_db_password
+                  key: billing_db_password
             - name: SPRING_JPA_HIBERNATE_DDL_AUTO
               value: update
+            - name: STRIPE_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: stripe_api_key
+            - name: FRONTEND_URL
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: frontend_url
+            - name: VITE_BACKEND_URL
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: vite_backend_url
           ports:
             - containerPort: 8080
           resources:
@@ -47,11 +63,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: deployment-service
+  name: billing-service
   namespace: kleff-deployment
 spec:
   selector:
-    app: deployment-service
+    app: billing-service
   ports:
     - name: http
       port: 80

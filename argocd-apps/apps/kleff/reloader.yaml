@@ -1,19 +1,19 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: external-secrets-config
+  name: reloader
   namespace: argocd
   annotations:
-    argocd.argoproj.io/sync-wave: "1"
+    argocd.argoproj.io/sync-wave: "10"
 spec:
   project: default
   source:
-    repoURL: https://github.com/jeremy-misola/GitOps-Homelab 
-    targetRevision: develop
-    path: charts/external-secrets
+    repoURL: https://stakater.github.io/stakater-charts
+    chart: reloader
+    targetRevision: 2.2.7
   destination:
     server: https://kubernetes.default.svc
-    namespace: external-secrets
+    namespace: reloader
   syncPolicy:
     automated:
       prune: true

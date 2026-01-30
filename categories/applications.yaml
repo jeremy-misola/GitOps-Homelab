@@ -9,7 +9,7 @@ spec:
   project: default
   source:
     repoURL: https://github.com/jeremy-misola/GitOps-Homelab
-    targetRevision: HEAD
+    targetRevision: develop
     path: argocd-apps/apps
     directory:
       recurse: true       

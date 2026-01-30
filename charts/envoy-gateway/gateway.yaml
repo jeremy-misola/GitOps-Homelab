@@ -3,6 +3,8 @@ kind: Gateway
 metadata:
   name: prod-web
   namespace: envoy-gateway-system
+  annotations:
+    external-dns.alpha.kubernetes.io/target: 66.130.187.229
 spec:
   gatewayClassName: envoy
   addresses:

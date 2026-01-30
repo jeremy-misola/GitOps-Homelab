@@ -28,6 +28,16 @@ spec:
   hostnames:
   - "api.kleff.io"
   rules:
+  # 1. Specific User Exception (Route to Project Service)
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /api/v1/users/me/invitations
+    backendRefs:
+    - name: project-management-service
+      port: 80
+  
+  # 2. General User Service
   - matches:
     - path:
         type: PathPrefix
@@ -36,14 +46,25 @@ spec:
     - name: user-service
       port: 80
 
+  # 3. Project Management Service - Combined Rules
   - matches:
     - path:
         type: PathPrefix
         value: /api/v1/projects
+    - path:
+        type: PathPrefix
+        value: /api/v1/invitations
+    - path:
+        type: PathPrefix
+        value: /api/v1/collaborators  # Added this for your CollaboratorController
+    - path:
+        type: PathPrefix
+        value: /api/v1/custom-roles    # Added this for your CustomRoleController
     backendRefs:
     - name: project-management-service
       port: 80
 
+  # 4. Other Services
   - matches:
     - path:
         type: PathPrefix
@@ -63,7 +84,24 @@ spec:
   - matches:
     - path:
         type: PathPrefix
+        value: /api/v1/billing
+    backendRefs:
+    - name: billing-service
+      port: 80
+
+  - matches:
+    - path:
+        type: PathPrefix
         value: /api/v1/systems
     backendRefs:
     - name: kleff-observability
       port: 80
+
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /api/v1/hello
+    backendRefs:
+    - name: deployment-backend-service
+      port: 80
+      

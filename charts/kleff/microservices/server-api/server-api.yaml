@@ -19,7 +19,7 @@ spec:
       serviceAccountName: deployment-backend-sa
       containers:
         - name: deployment-backend
-          image: kleff.azurecr.io/deployment-backend:latest
+          image: kleff.azurecr.io/deployment-backend:54ed8de74b88c118d629d407a5c4cb869e795f57
           imagePullPolicy: Always
           ports:
             - containerPort: 8080
@@ -30,7 +30,6 @@ spec:
             limits:
               cpu: 500m
               memory: 512Mi
-
 ---
 apiVersion: v1
 kind: Service
@@ -45,9 +44,7 @@ spec:
       port: 80
       targetPort: 8080
   type: ClusterIP
-
 ---
-
 apiVersion: v1
 kind: Service
 metadata:

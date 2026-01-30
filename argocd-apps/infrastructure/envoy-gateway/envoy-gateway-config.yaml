@@ -9,7 +9,7 @@ spec:
   project: default
   source:
     repoURL: https://github.com/jeremy-misola/GitOps-Homelab 
-    targetRevision: HEAD
+    targetRevision: develop
     path: charts/envoy-gateway
     directory:
       recurse: true
@@ -19,7 +19,6 @@ spec:
   syncPolicy:
     automated:
       prune: true
-      selfHeal: true
     syncOptions:
       - CreateNamespace=true
       - ServerSideApply=true
