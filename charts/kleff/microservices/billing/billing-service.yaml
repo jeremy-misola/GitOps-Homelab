@@ -17,7 +17,7 @@ spec:
         paas: kleff
     spec:
       hostAliases:
-        - ip: "10.43.210.196" 
+        - ip: "192.168.0.241" 
       hostnames:
         - "api.kleff.io"
       imagePullSecrets:
