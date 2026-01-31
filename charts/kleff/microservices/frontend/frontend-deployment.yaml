@@ -15,28 +15,26 @@ spec:
         paas: kleff
     spec:
       imagePullSecrets:
-      - name: acr-creds
+        - name: acr-creds
       containers:
-      - name: kleff-frontend
-        image: kleff.azurecr.io/frontend:latest
-        env:
-        - name: VITE_AUTH_CLIENT_ID
-          value: "8qNA2sSV88fusOocZcMj6GirTLWYygdAXnmtLUfe"
-        - name: VITE_BACKEND_URL
-          value: https://api.kleff.io
-        ports:
-        - containerPort: 3000
-        resources:
-          requests:
-            cpu: 100m
-            memory: 128Mi
-          limits:
-            cpu: 500m
-            memory: 512Mi
-        imagePullPolicy: Always
-
+        - name: kleff-frontend
+          image: kleff.azurecr.io/frontend:ccdb36416ac59bf13c6d91a270c1c94a85e9be18
+          env:
+            - name: VITE_AUTH_CLIENT_ID
+              value: "8qNA2sSV88fusOocZcMj6GirTLWYygdAXnmtLUfe"
+            - name: VITE_BACKEND_URL
+              value: https://api.kleff.io
+          ports:
+            - containerPort: 3000
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          imagePullPolicy: Always
 ---
-
 apiVersion: v1
 kind: Service
 metadata:
@@ -46,7 +44,6 @@ spec:
   selector:
     app: kleff-frontend
   ports:
-  - name: http
-    port: 80
-    targetPort: 3000
-
+    - name: http
+      port: 80
+      targetPort: 3000

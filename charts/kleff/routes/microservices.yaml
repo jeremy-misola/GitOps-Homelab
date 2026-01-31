@@ -96,3 +96,12 @@ spec:
     backendRefs:
     - name: kleff-observability
       port: 80
+
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /api/v1/hello
+    backendRefs:
+    - name: deployment-backend-service
+      port: 80
+      
