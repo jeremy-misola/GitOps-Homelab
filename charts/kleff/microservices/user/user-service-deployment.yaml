@@ -18,7 +18,7 @@ spec:
         - name: acr-creds
       containers:
         - name: user-service
-          image: kleff.azurecr.io/user-service:a17a6a212845b575fd219125a99105c33476c0f2
+          image: kleff.azurecr.io/user-service:96bf071ccee3a15a9acb061e778d607fba030f8a
           env:
             # 1. Port Configuration
             - name: HTTP_ADDR
@@ -38,7 +38,6 @@ spec:
               # 4. Primary Database DSN
 
               # Format: postgres://username:password@host:port/dbname?sslmode=disable
-
               value: "postgres://user_service:$(DB_PASSWORD)@user-db:5432/user_service?sslmode=disable"
             - name: POSTGRES_AUDIT_DSN
               # 5. Audit Database DSN (Pointing to same DB for now, or change as needed)
