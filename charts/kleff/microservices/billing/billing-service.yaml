@@ -17,9 +17,9 @@ spec:
         paas: kleff
     spec:
       hostAliases:
-        - ip: "192.168.0.241" 
-      hostnames:
-        - "api.kleff.io"
+        - ip: "10.43.210.196" # Use the ClusterIP from your 'kubectl get svc'
+          hostnames:
+            - "api.kleff.io"
       imagePullSecrets:
         - name: acr-creds
       containers:
