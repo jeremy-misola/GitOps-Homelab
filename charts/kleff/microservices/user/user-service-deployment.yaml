@@ -49,7 +49,11 @@ spec:
             secretKeyRef:
               name: postgres-credentials # Create this secret
               key: authentik_admin_token
-
+        - name: DEFAULT_ADMIN_EMAIL
+          valueFrom:
+            secretKeyRef:
+              name: postgres-credentials
+              key: default_admin_email
         ports:
         - containerPort: 8080
         resources:
