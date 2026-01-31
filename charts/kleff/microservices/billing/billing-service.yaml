@@ -16,6 +16,10 @@ spec:
         app: billing-service
         paas: kleff
     spec:
+      hostAliases:
+        - ip: "10.43.210.196" 
+      hostnames:
+        - "api.kleff.io"
       imagePullSecrets:
         - name: acr-creds
       containers:
