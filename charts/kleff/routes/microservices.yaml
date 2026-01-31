@@ -8,6 +8,7 @@ spec:
   - name: prod-web
     namespace: envoy-gateway-system
   hostnames:
+  - "envoy-envoy-gateway-system-prod-web-5eba9e8a.envoy-gateway-system.svc.cluster.local"
   - "kleff.io"
   rules:
   - backendRefs:
