@@ -22,6 +22,8 @@ spec:
         - name: deployment-service
           image: kleff.azurecr.io/deployment-service:ef7536e7d3e58ba571cb4bc1291f7b28ea439cb8
           env:
+            - name: AUDIT_SERVICE_URL
+              value: https://api.kleff.io/api/v1/projects/audit/internal
             - name: SPRING_DATASOURCE_URL
               value: jdbc:postgresql://deployment-service-db:5432/mydb
             - name: SPRING_DATASOURCE_USERNAME
