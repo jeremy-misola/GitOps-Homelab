@@ -1,49 +1,49 @@
-# apiVersion: argoproj.io/v1alpha1
-# kind: Application
-# metadata:
-#   name: ghost-saima
-#   namespace: argocd
-#   annotations:
-#     argocd.argoproj.io/sync-wave: "2"
-# spec:
-#   project: default
-#   source:
-#     path: .
-#     repoURL: oci://registry-1.docker.io/cloudpirates/ghost
-#     targetRevision: 0.6.5
-#     helm:
-#       values: |
-#         extraEnvVars:
-#           - name: url
-#             value: "https://saimachowdhury.ca"
-#           - name: admin__url
-#             value: "https://admin.saimachowdhury.ca"
-#           - name: mail__transport
-#             value: "SMTP"
-#           - name: mail__from
-#             value: "misolarellinj06@gmail.com"
-#           - name: mail__options__service
-#             value: "Gmail"
-#           - name: mail__options__host
-#             value: "smtp.gmail.com"
-#           - name: mail__options__port
-#             value: "465"
-#           - name: mail__options__secure
-#             value: "true" # Required for port 465 / SSL
-#           - name: mail__options__auth__user
-#             value: "misolarellinj06@gmail.com"
-#           - name: mail__options__auth__pass
-#             valueFrom:
-#               secretKeyRef:
-#                 name: gmail-app-password
-#                 key: app-password
-#   destination:
-#     server: https://kubernetes.default.svc
-#     namespace: ghost-saima
-#   syncPolicy:
-#     automated:
-#       prune: true
-#       selfHeal: true
-#     syncOptions:
-#       - CreateNamespace=true
-#       - ServerSideApply=true
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: ghost-saima
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  project: default
+  source:
+    path: .
+    repoURL: oci://registry-1.docker.io/cloudpirates/ghost
+    targetRevision: 0.6.5
+    helm:
+      values: |
+        extraEnvVars:
+          - name: url
+            value: "https://saimachowdhury.ca"
+          - name: admin__url
+            value: "https://admin.saimachowdhury.ca"
+          - name: mail__transport
+            value: "SMTP"
+          - name: mail__from
+            value: "misolarellinj06@gmail.com"
+          - name: mail__options__service
+            value: "Gmail"
+          - name: mail__options__host
+            value: "smtp.gmail.com"
+          - name: mail__options__port
+            value: "465"
+          - name: mail__options__secure
+            value: "true" # Required for port 465 / SSL
+          - name: mail__options__auth__user
+            value: "misolarellinj06@gmail.com"
+          - name: mail__options__auth__pass
+            valueFrom:
+              secretKeyRef:
+                name: gmail-app-password
+                key: app-password
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: ghost-saima
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
