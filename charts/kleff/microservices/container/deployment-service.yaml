@@ -20,7 +20,7 @@ spec:
         - name: acr-creds
       containers:
         - name: deployment-service
-          image: kleff.azurecr.io/deployment-service:ef7536e7d3e58ba571cb4bc1291f7b28ea439cb8
+          image: kleff.azurecr.io/deployment-service:c80abe7b30358e3c0757dde4caf7db7177fbd0e1
           env:
             - name: AUDIT_SERVICE_URL
               value: http://api.kleff.io/api/v1/projects/audit/internal
