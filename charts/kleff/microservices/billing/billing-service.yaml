@@ -24,7 +24,7 @@ spec:
         - name: acr-creds
       containers:
         - name: billing-service
-          image: kleff.azurecr.io/billing-service:3ac8f71d1069a222334adf42d13dcca3f27995ee
+          image: kleff.azurecr.io/billing-service:bfe7662c0f7e253f4083d3f82da553944c7c4539
           imagePullPolicy: Always
           env:
             - name: SPRING_DATASOURCE_URL
