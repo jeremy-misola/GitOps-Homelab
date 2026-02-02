@@ -19,6 +19,10 @@ spec:
       imagePullSecrets:
         - name: acr-creds
       containers:
+      hostAliases:
+        - ip: "10.43.210.196" # Use the ClusterIP from your 'kubectl get svc'
+          hostnames:
+            - "api.kleff.io
         - name: deployment-service
           image: kleff.azurecr.io/deployment-service:c80abe7b30358e3c0757dde4caf7db7177fbd0e1
           env:
