@@ -17,10 +17,11 @@ spec:
           value: 'true'
   destination:
     server: https://kubernetes.default.svc
-    namespace: cloudnative-pg
+    namespace: cloudnativepg
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+      - ServerSideApply=true
