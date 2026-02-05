@@ -16,12 +16,15 @@ spec:
         app: billing-service
         paas: kleff
     spec:
+      hostAliases:
+        - ip: "10.43.210.196" # Use the ClusterIP from your 'kubectl get svc'
+          hostnames:
+            - "api.kleff.io"
       imagePullSecrets:
         - name: acr-creds
       containers:
         - name: billing-service
-          image: kleff.azurecr.io/billing-service:3ac8f71d1069a222334adf42d13dcca3f27995ee
-          imagePullPolicy: Always
+          image: kleff.azurecr.io/billing-service:bfe7662c0f7e253f4083d3f82da553944c7c4539
           env:
             - name: SPRING_DATASOURCE_URL
               value: jdbc:postgresql://billing-service-db:5432/mydb
