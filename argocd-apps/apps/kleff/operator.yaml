@@ -15,7 +15,7 @@ spec:
           image:
             repository: kleff.azurecr.io/webapp-operator
             tag: latest
-            pullPolicy: always
+            pullPolicy: Always
           imagePullSecrets:
             - name: acr-creds
   destination:
