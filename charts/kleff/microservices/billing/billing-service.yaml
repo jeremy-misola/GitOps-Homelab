@@ -10,8 +10,8 @@ spec:
       app: billing-service
   template:
     metadata:
-      annotations:
-        instrumentation.opentelemetry.io/inject-java: "true"
+      # annotations:
+      #   instrumentation.opentelemetry.io/inject-java: "true"
       labels:
         app: billing-service
         paas: kleff

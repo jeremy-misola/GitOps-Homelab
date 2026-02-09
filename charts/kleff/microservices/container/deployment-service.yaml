@@ -10,8 +10,8 @@ spec:
       app: deployment-service
   template:
     metadata:
-      annotations:
-        instrumentation.opentelemetry.io/inject-java: "true"
+      # annotations:
+      #   instrumentation.opentelemetry.io/inject-java: "true"
       labels:
         app: deployment-service
         paas: kleff
