@@ -19,7 +19,7 @@ spec:
       serviceAccountName: deployment-backend-sa
       containers:
         - name: deployment-backend
-          image: kleff.azurecr.io/deployment-backend:b69cd70634fffd91062885ffdceb216c75201153
+          image: kleff.azurecr.io/deployment-backend:89ea45c45814248433aa37f274d0614f85c590f9
           imagePullPolicy: Always
           ports:
             - containerPort: 8080
