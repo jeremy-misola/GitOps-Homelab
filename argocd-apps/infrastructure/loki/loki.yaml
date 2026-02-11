@@ -16,7 +16,9 @@ spec:
         loki:
           # Configuration for the Loki binary itself
           commonConfig:
-            replication_factor: 1 # Adjust to 3 for High Availability
+            replication_factor: 1
+          write:
+            replicas: 1
           
           schemaConfig:
             configs:

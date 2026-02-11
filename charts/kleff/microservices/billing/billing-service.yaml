@@ -17,7 +17,7 @@ spec:
         paas: kleff
     spec:
       hostAliases:
-        - ip: "10.43.210.196" # Use the ClusterIP from your 'kubectl get svc'
+        - ip: "10.43.70.0" # Use the ClusterIP from your 'kubectl get svc'
           hostnames:
             - "api.kleff.io"
       imagePullSecrets:
