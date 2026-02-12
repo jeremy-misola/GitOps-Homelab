@@ -24,7 +24,7 @@ spec:
         - name: acr-creds
       containers:
         - name: billing-service
-          image: kleff.azurecr.io/billing-service:4fe74672fdd7ae6a0a4ba1e7b9a7cce711940e29
+          image: kleff.azurecr.io/billing-service:4ad199b57bf0eefcad6626fb1940d7d1e93f831f
           env:
             - name: SPRING_DATASOURCE_URL
               value: jdbc:postgresql://billing-service-db:5432/mydb
