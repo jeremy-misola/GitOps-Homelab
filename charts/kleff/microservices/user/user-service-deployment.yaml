@@ -18,7 +18,7 @@ spec:
         - name: acr-creds
       containers:
         - name: user-service
-          image: kleff.azurecr.io/user-service:07a0c52412c27cd4732a83dd15a9474e15dce766
+          image: kleff.azurecr.io/user-service:4fe74672fdd7ae6a0a4ba1e7b9a7cce711940e29
           env:
             # 1. Port Configuration
             - name: HTTP_ADDR
