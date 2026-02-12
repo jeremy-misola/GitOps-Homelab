@@ -19,16 +19,16 @@ spec:
       imagePullSecrets:
         - name: acr-creds
       # hostAliases belongs to the PodSpec (same level as containers)
-      hostAliases:
-        - ip: "10.43.210.196"
-          hostnames:
-            - "api.kleff.io" # FIXED: Added closing quote
+      # hostAliases:
+      #   - ip: "10.43.210.196"
+      #     hostnames:
+      #       - "api.kleff.io" # FIXED: Added closing quote
       containers:
         - name: deployment-service
           image: kleff.azurecr.io/deployment-service:78d23b8b3b1a785b64216ac60df34a0f9c22a31a
           env:
             - name: AUDIT_SERVICE_URL
-              value: http://api.kleff.io/api/v1/projects/audit/internal
+              value: http://project-management-service.kleff-deployment.svc.cluster.local:8080/api/v1/projects/audit/internal
             - name: SPRING_DATASOURCE_URL
               value: jdbc:postgresql://deployment-service-db:5432/mydb
             - name: SPRING_DATASOURCE_USERNAME
