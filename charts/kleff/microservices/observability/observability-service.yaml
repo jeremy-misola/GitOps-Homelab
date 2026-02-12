@@ -18,7 +18,7 @@ spec:
         - name: acr-creds
       containers:
         - name: observability-service
-          image: kleff.azurecr.io/observability-service:c4b90499db10252e680fa79400108c02ab5faf12
+          image: kleff.azurecr.io/observability-service:07a0c52412c27cd4732a83dd15a9474e15dce766
           env:
             # 1. Port Configuration
             - name: SERVER_PORT
