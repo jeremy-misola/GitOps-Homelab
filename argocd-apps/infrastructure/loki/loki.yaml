@@ -60,10 +60,12 @@ spec:
                   key: secret-access-key
         read:
           replicas: 1
+          affinity: {}
           extraArgs: ["-config.expand-env=true"]
           extraEnv: *lokiEnv
         backend:
           replicas: 1
+          affinity: {}
           extraArgs: ["-config.expand-env=true"]
           extraEnv: *lokiEnv
 
