@@ -25,7 +25,7 @@ spec:
       #       - "api.kleff.io" # FIXED: Added closing quote
       containers:
         - name: deployment-service
-          image: kleff.azurecr.io/deployment-service:78d23b8b3b1a785b64216ac60df34a0f9c22a31a
+          image: kleff.azurecr.io/deployment-service:77364a9dc578579d74d63bd8eab5ff8ebf7a446d
           env:
             - name: AUDIT_SERVICE_URL
               value: http://project-management-service.kleff-deployment.svc.cluster.local:8080/api/v1/projects/audit/internal
