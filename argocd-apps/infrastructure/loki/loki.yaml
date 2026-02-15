@@ -46,6 +46,7 @@ spec:
 
         # Injecting Secrets into all components (Read, Write, Backend)
         write:
+          replicas: 1
           extraArgs: ["-config.expand-env=true"]
           extraEnv: &lokiEnv
             - name: S3_ACCESS_KEY
