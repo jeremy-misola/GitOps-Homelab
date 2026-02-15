@@ -59,9 +59,11 @@ spec:
                   name: garage-loki-secrets
                   key: secret-access-key
         read:
+          replicas: 1
           extraArgs: ["-config.expand-env=true"]
           extraEnv: *lokiEnv
         backend:
+          replicas: 1
           extraArgs: ["-config.expand-env=true"]
           extraEnv: *lokiEnv
 
