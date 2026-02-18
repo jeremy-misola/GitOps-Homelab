@@ -21,14 +21,20 @@ spec:
           image: kleff.azurecr.io/project-management-service:d7a453b7ae733c0429c0e55805c2aa3281c48be2
           env:
             - name: SPRING_DATASOURCE_URL
-              value: jdbc:postgresql://project-management-db:5432/mydb
+              valueFrom:
+                secretKeyRef:
+                  name: project-management-db-app
+                  key: jdbc-uri
             - name: SPRING_DATASOURCE_USERNAME
-              value: postgres
+              valueFrom:
+                secretKeyRef:
+                  name: project-management-db-app
+                  key: username
             - name: SPRING_DATASOURCE_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: postgres-credentials
-                  key: project_management_db_password
+                  name: project-management-db-app
+                  key: password
             - name: SPRING_JPA_HIBERNATE_DDL_AUTO
               value: update
           ports:

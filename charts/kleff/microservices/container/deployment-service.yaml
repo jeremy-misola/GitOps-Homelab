@@ -25,14 +25,20 @@ spec:
             - name: AUDIT_SERVICE_URL
               value: http://api-gateway.kleff-deployment.svc.cluster.local:80/api/v1/projects/audit/internal
             - name: SPRING_DATASOURCE_URL
-              value: jdbc:postgresql://deployment-service-db:5432/mydb
+              valueFrom:
+                secretKeyRef:
+                  name: deployment-service-db-app
+                  key: jdbc-uri
             - name: SPRING_DATASOURCE_USERNAME
-              value: postgres
+              valueFrom:
+                secretKeyRef:
+                  name: deployment-service-db-app
+                  key: username
             - name: SPRING_DATASOURCE_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: postgres-credentials
-                  key: deployment_db_password
+                  name: deployment-service-db-app
+                  key: password
             - name: SPRING_JPA_HIBERNATE_DDL_AUTO
               value: update
           ports:
