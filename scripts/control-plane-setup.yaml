@@ -1,0 +1,19 @@
+---
+- hosts: master
+  become: true
+
+  tasks:
+    - name: Install required system packages
+      apt:
+        pkg:
+          - kubecolor
+        state: latest
+        update_cache: true
+    
+    - name: Add aliases
+      ansible.builtin.lineinfile:
+        path: "~/.bashrc"
+        line: 'alias k="kubecolor"'
+        regexp: '^alias k="kubecolor"$'
+        state: present
+

@@ -18,7 +18,7 @@ spec:
         - name: acr-creds
       containers:
         - name: observability-service
-          image: kleff.azurecr.io/observability-service:latest
+          image: kleff.azurecr.io/observability-service:5393d2805f1a8725dc7203a4556c916c8b7f19bd
           env:
             # 1. Port Configuration
             - name: SERVER_PORT
@@ -30,6 +30,8 @@ spec:
               value: "development"
             - name: LOKI_URL
               value: "http://loki-stack-gateway.loki.svc.cluster.local:80"
+            - name: USER_SERVICE_URL
+              value: "http://user-service.kleff-deployment.svc.cluster.local:80"
           ports:
             - containerPort: 8080
           resources:

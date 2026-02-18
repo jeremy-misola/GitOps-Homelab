@@ -8,13 +8,14 @@ spec:
   source:
     repoURL: kleff.azurecr.io/helm
     chart: operator
-    targetRevision: 0.1.8
+    targetRevision: 0.1.0
     helm:
       values: |
         manager:
           image:
             repository: kleff.azurecr.io/webapp-operator
             tag: latest
+            pullPolicy: Always
           imagePullSecrets:
             - name: acr-creds
   destination:

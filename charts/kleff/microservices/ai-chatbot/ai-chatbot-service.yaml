@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ai-chatbot-service
+  namespace: kleff-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ai-chatbot-service
+  template:
+    metadata:
+      labels:
+        app: ai-chatbot-service
+        paas: kleff
+    spec:
+      imagePullSecrets:
+        - name: acr-creds
+      containers:
+        - name: ai-chatbot-service
+          image: kleff.azurecr.io/ai-chatbot-service:latest
+          imagePullPolicy: Always
+          env:
+            - name: OPENAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: ai-chatbot-secrets
+                  key: OPENAI_API_KEY
+            - name: PINECONE_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: ai-chatbot-secrets
+                  key: PINECONE_API_KEY
+            - name: PINECONE_ENVIRONMENT
+              valueFrom:
+                secretKeyRef:
+                  name: ai-chatbot-secrets
+                  key: PINECONE_ENVIRONMENT
+            - name: PINECONE_INDEX_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: ai-chatbot-secrets
+                  key: PINECONE_INDEX_NAME
+          ports:
+            - containerPort: 8086
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ai-chatbot-service
+  namespace: kleff-deployment
+spec:
+  selector:
+    app: ai-chatbot-service
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8086

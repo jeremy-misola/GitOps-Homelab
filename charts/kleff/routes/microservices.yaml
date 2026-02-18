@@ -5,14 +5,14 @@ metadata:
   namespace: kleff-deployment
 spec:
   parentRefs:
-  - name: prod-web
-    namespace: envoy-gateway-system
+    - name: prod-web
+      namespace: envoy-gateway-system
   hostnames:
-  - "kleff.io"
+    - "kleff.io"
   rules:
-  - backendRefs:
-    - name: kleff-frontend
-      port: 80
+    - backendRefs:
+        - name: kleff-frontend
+          port: 80
 
 ---
 
@@ -23,85 +23,81 @@ metadata:
   namespace: kleff-deployment
 spec:
   parentRefs:
-  - name: prod-web
-    namespace: envoy-gateway-system
+    - name: prod-web
+      namespace: envoy-gateway-system
   hostnames:
-  - "api.kleff.io"
+    - "api.kleff.io"
   rules:
-  # 1. Specific User Exception (Route to Project Service)
-  - matches:
-    - path:
-        type: PathPrefix
-        value: /api/v1/users/me/invitations
-    backendRefs:
-    - name: project-management-service
-      port: 80
-  
-  # 2. General User Service
-  - matches:
-    - path:
-        type: PathPrefix
-        value: /api/v1/users
-    backendRefs:
-    - name: user-service
-      port: 80
+    # ---------------------------------------------------------
+    # 1. USER & IDENTITY (Order Matters: Specific before General)
+    # ---------------------------------------------------------
+    
+    # Specific Exception: Route specific user sub-path to Project Service
+    - matches:
+        - path: { type: PathPrefix, value: /api/v1/users/me/invitations }
+      backendRefs:
+        - name: project-management-service
+          port: 80
 
-  # 3. Project Management Service - Combined Rules
-  - matches:
-    - path:
-        type: PathPrefix
-        value: /api/v1/projects
-    - path:
-        type: PathPrefix
-        value: /api/v1/invitations
-    - path:
-        type: PathPrefix
-        value: /api/v1/collaborators  # Added this for your CollaboratorController
-    - path:
-        type: PathPrefix
-        value: /api/v1/custom-roles    # Added this for your CustomRoleController
-    backendRefs:
-    - name: project-management-service
-      port: 80
+    # General User Service
+    - matches:
+        - path: { type: PathPrefix, value: /api/v1/users }
+      backendRefs:
+        - name: user-service
+          port: 80
 
-  # 4. Other Services
-  - matches:
-    - path:
-        type: PathPrefix
-        value: /api/v1/containers
-    backendRefs:
-    - name: deployment-service
-      port: 80
-  
-  - matches:
-    - path:
-        type: PathPrefix
-        value: /api/v1/build
-    backendRefs:
-    - name: deployment-backend-service
-      port: 80
+    # ---------------------------------------------------------
+    # 2. PROJECT MANAGEMENT SERVICE
+    # ---------------------------------------------------------
+    - matches:
+        - path: { type: PathPrefix, value: /api/v1/projects }
+        - path: { type: PathPrefix, value: /api/v1/invitations }
+        - path: { type: PathPrefix, value: /api/v1/collaborators }
+        - path: { type: PathPrefix, value: /api/v1/custom-roles }
+      backendRefs:
+        - name: project-management-service
+          port: 80
 
-  - matches:
-    - path:
-        type: PathPrefix
-        value: /api/v1/billing
-    backendRefs:
-    - name: billing-service
-      port: 80
+    # ---------------------------------------------------------
+    # 3. DEPLOYMENT & INFRASTRUCTURE
+    # ---------------------------------------------------------
+    
+    # Combined Deployment Backend Service (Namespace & Build)
+    - matches:
+        - path: { type: PathPrefix, value: /api/v1/namespace }
+        - path: { type: PathPrefix, value: /api/v1/build }
+        - path: { type: PathPrefix, value: /api/v1/webapp }
+      backendRefs:
+        - name: deployment-backend-service
+          port: 80
 
-  - matches:
-    - path:
-        type: PathPrefix
-        value: /api/v1/systems
-    backendRefs:
-    - name: kleff-observability
-      port: 80
+    # Deployment Service (Containers)
+    - matches:
+        - path: { type: PathPrefix, value: /api/v1/containers }
+      backendRefs:
+        - name: deployment-service
+          port: 80
 
-  - matches:
-    - path:
-        type: PathPrefix
-        value: /api/v1/hello
-    backendRefs:
-    - name: deployment-backend-service
-      port: 80
-      
+    # ---------------------------------------------------------
+    # 4. SUPPORTING SERVICES (Billing & Observability)
+    # ---------------------------------------------------------
+    
+    # Billing Service
+    - matches:
+        - path: { type: PathPrefix, value: /api/v1/billing }
+      backendRefs:
+        - name: billing-service
+          port: 80
+
+    # Observability Service
+    - matches:
+        - path: { type: PathPrefix, value: /api/v1/systems }
+      backendRefs:
+        - name: kleff-observability
+          port: 80
+    # Chat Service
+    - matches:
+        - path: { type: PathPrefix, value: /api/v1/chat }
+      backendRefs:
+        - name: ai-chatbot-service
+          port: 80
