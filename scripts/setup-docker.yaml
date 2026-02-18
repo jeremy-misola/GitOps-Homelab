@@ -1,0 +1,88 @@
+---
+- hosts: management
+  become: true
+  vars:
+    container_count: 4
+    default_container_name: docker
+    default_container_image: ubuntu
+    default_container_command: sleep 1
+  
+  tasks:
+    - name: Install aptitude
+      apt:
+        name: aptitude
+        state: latest
+        update_cache: true
+
+    - name: Install required system packages
+      apt:
+        pkg:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - software-properties-common
+          - python3-pip
+          - virtualenv
+          - python3-setuptools
+        state: latest
+        update_cache: true
+    
+    - name: Add Docker GPG apt Key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: Add Docker Repository
+      apt_repository:
+        repo: deb https://download.docker.com/linux/ubuntu jammy stable
+        state: present
+    
+    - name: Download lazydocker
+      ansible.builtin.get_url:
+        url: https://raw.githubusercontent.com/jesseduffield/lazydocker/master/scripts/install_update_linux.sh
+        dest: ~/ansible
+
+    - name: Lazydocker install
+      ansible.builtin.script: ~/ansible/install_update_linux.sh
+
+    - name: Update apt and install docker-ce
+      apt:
+        name: docker-ce
+        state: latest
+        update_cache: true
+
+    - name: Install Docker Module for Python
+      pip:
+        name: docker
+
+    - name: Download authentik docker compose file
+      ansible.builtin.get_url:
+        url: https://docs.goauthentik.io/docker-compose.yml
+        dest: /home/jurassicjey/authentik
+
+    - name: Generate password and secret key and write them to env
+      ansible.builtin.shell: |
+        # Generate random values (hex is safer for scripts than base64)
+        PG_PASS=$(openssl rand -hex 32)
+        SECRET=$(openssl rand -hex 50)
+        
+        # Write to .env file
+        echo "AUTHENTIK_SECRET_KEY=$SECRET" > .env
+        echo "AUTHENTIK_ERROR_REPORTING__ENABLED=true" >> .env
+        
+        # Set the Database Password (POSTGRES_PASSWORD)
+        echo "POSTGRES_PASSWORD=$PG_PASS" >> .env
+        
+        # Set the password Authentik uses to Connect (must match above)
+        echo "AUTHENTIK_POSTGRESQL__PASSWORD=$PG_PASS" >> .env
+      args:
+        chdir: /home/jurassicjey/authentik
+        creates: .env
+
+    - name: Deploy authentik docker compose
+      community.docker.docker_compose_v2:
+        project_src: /home/jurassicjey/authentik
+        files:
+          - docker-compose.yml
+        state: present # Ensures the stack is up and running
+      # You can add 'pull: always' to ensure images are always pulled
