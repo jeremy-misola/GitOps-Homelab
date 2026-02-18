@@ -7,7 +7,7 @@ spec:
   ports:
     - name: http
       port: 80
-      targetPort: 10080
+      targetPort: 8080
   selector:
     # Use the stable labels found in step 1
     gateway.envoyproxy.io/owning-gateway-namespace: envoy-gateway-system
