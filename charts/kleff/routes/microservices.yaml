@@ -27,6 +27,7 @@ spec:
       namespace: envoy-gateway-system
   hostnames:
     - "api.kleff.io"
+    - "api-gateway.kleff-deployment.svc.cluster.local"
   rules:
     # ---------------------------------------------------------
     # 1. USER & IDENTITY (Order Matters: Specific before General)
