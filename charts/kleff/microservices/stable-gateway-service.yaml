@@ -17,6 +17,6 @@ metadata:
   namespace: kleff-deployment
 subsets:
   - addresses:
-      - ip: 192.168.0.241  
+      - ip: 192.168.0.241
     ports:
       - port: 80
