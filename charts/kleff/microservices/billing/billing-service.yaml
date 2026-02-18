@@ -16,10 +16,6 @@ spec:
         app: billing-service
         paas: kleff
     spec:
-      hostAliases:
-        - ip: "10.43.70.0" # Use the ClusterIP from your 'kubectl get svc'
-          hostnames:
-            - "api.kleff.io"
       imagePullSecrets:
         - name: acr-creds
       containers:
