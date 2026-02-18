@@ -77,7 +77,7 @@ services:
     volumes:
       - ./logs:/vault/logs/:rw
       - ./data:/vault/data/:rw
-      - ./config:/vault/config/:rw
+      - ./vault:/vault/config/:rw
       - ./certs:/certs/:rw
       - ./file:/vault/file/:rw
     cap_add:
