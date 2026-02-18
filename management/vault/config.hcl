@@ -13,5 +13,5 @@ listener "tcp" {
   tls_key_file  = "/certs/server.key"
 }
 
-api_addr = "https://vault1.poc.jeremymr.dev:8200"
-cluster_addr = "https://vault1.poc.jeremymr.dev:8201"
+api_addr = "https://vault1.jeremymr.dev:8200"
+cluster_addr = "https://vault1.jeremymr.dev:8201"
