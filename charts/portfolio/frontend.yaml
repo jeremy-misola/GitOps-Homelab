@@ -43,7 +43,7 @@ spec:
             secretKeyRef:
               name: portfolio-db-app
               key: password
-
+              
         # Admin credentials from ExternalSecret
         - name: ADMIN_USERNAME
           valueFrom:
