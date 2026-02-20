@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: frontend
+  namespace: portfolio
   labels:
     app: frontend
 spec:
@@ -16,9 +17,87 @@ spec:
     spec:
       imagePullSecrets:
       - name: acr-creds
+      
+      # Init container to wait for database
+      initContainers:
+      - name: wait-for-db
+        image: postgres:16-alpine
+        command: ['sh', '-c', 'until pg_isready -h portfolio-db-rw -p 5432 -U portfolio; do echo waiting for database; sleep 2; done']
+        env:
+        - name: PGPASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: portfolio-db-app
+              key: password
+      
       containers:
       - name: frontend
-        image: jeremyscr.azurecr.io/portfolio:0.0.1
+        image: kleff.azurecr.io/portfolio:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 3000
+          name: http
+        
+        # Database environment variables from CNPG cluster secret
+        env:
+        - name: DATABASE_HOST
+          value: portfolio-db-rw
+        - name: DATABASE_PORT
+          value: "5432"
+        - name: DATABASE_NAME
+          value: portfolio
+        - name: DATABASE_USER
+          valueFrom:
+            secretKeyRef:
+              name: portfolio-db-app
+              key: username
+        - name: DATABASE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: portfolio-db-app
+              key: password
+        
+        # Admin credentials from ExternalSecret
+        - name: ADMIN_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: portfolio-admin-secrets
+              key: ADMIN_USERNAME
+        - name: ADMIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: portfolio-admin-secrets
+              key: ADMIN_PASSWORD
+        - name: ADMIN_SESSION_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: portfolio-admin-secrets
+              key: ADMIN_SESSION_SECRET
+        
+        # Resource limits
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        
+        # Health checks
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 3000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 3000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
