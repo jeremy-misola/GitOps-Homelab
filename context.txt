@@ -1,0 +1,3620 @@
+================================================================================
+                    GitOps-Homelab Project Context                           
+================================================================================
+Generated on: Wed Feb 18 02:24:27 EST 2026
+Project Root: /Users/jeremy/Documents/GitOps-Homelab
+
+🌳 DIRECTORY TREE STRUCTURE
+/Users/jeremy/Documents/GitOps-Homelab
+├── argocd-apps
+│   ├── apps
+│   │   ├── couchdb
+│   │   │   └── couchdb.yaml
+│   │   ├── ghost
+│   │   │   ├── ghost-saima.yaml
+│   │   │   └── ghost.yaml
+│   │   ├── kleff
+│   │   │   ├── applications.yaml
+│   │   │   └── operator.yaml
+│   │   └── portfolio
+│   │       └── portfolio.yaml
+│   └── infrastructure
+│       ├── authentik
+│       │   └── authentik.yaml
+│       ├── cert-manager
+│       │   ├── cert-manager-config.yaml
+│       │   └── cert-manager.yaml
+│       ├── cloudnativepg
+│       │   └── cloudnativepg.yaml
+│       ├── envoy-gateway
+│       │   ├── envoy-gateway-config.yaml
+│       │   └── envoy-gateway.yaml
+│       ├── external-secrets
+│       │   ├── eso-config.yaml
+│       │   └── external-secrets.yaml
+│       ├── externalDNS
+│       │   └── external-dns.yaml
+│       ├── garage
+│       │   └── garage.yaml
+│       ├── loki
+│       │   └── loki.yaml
+│       ├── longhorn
+│       │   └── longhorn.yaml
+│       ├── metallb
+│       │   ├── metallb-config.yaml
+│       │   └── metallb.yaml
+│       ├── monitoring
+│       │   ├── blackbox-exporter.yaml
+│       │   └── kube-prometheus.yaml
+│       ├── opentelemetry-collector
+│       │   ├── otel-collector.yaml
+│       │   ├── otel-config.yaml
+│       │   └── otel-operator.yaml
+│       └── tempo
+│           └── tempo.yaml
+├── bootstrap
+│   └── root-app.yaml
+├── categories
+│   ├── applications.yaml
+│   └── infrastructure.yaml
+├── charts
+│   ├── cert-manager
+│   │   ├── certificate.yaml
+│   │   ├── cluster-issuer.yaml
+│   │   ├── saima-cert.yaml
+│   │   └── saima-issuer.yaml
+│   ├── envoy-gateway
+│   │   ├── gateway-class.yaml
+│   │   ├── gateway.yaml
+│   │   └── routes
+│   │       ├── argocd.yaml
+│   │       ├── authentik.yaml
+│   │       ├── ghost.yaml
+│   │       ├── grafana.yaml
+│   │       ├── longhorn
+│   │       │   ├── client-id-secret.yaml
+│   │       │   ├── couchdb.yaml
+│   │       │   ├── longhorn.yaml
+│   │       │   └── security-policy.yaml
+│   │       └── saima-ghost.yaml
+│   ├── external-secrets
+│   │   ├── authentik-secrets.yaml
+│   │   ├── cloudflare-secret.yaml
+│   │   ├── couchdb-secrets.yaml
+│   │   ├── gmail-app-password.yaml
+│   │   ├── grafana-secret.yaml
+│   │   ├── loki_garage_secret.yaml
+│   │   ├── personal-acr-secret.yaml
+│   │   ├── saima-cloudflare-secret.yaml
+│   │   ├── saima-gmail-app-password.yaml
+│   │   └── secret-store.yaml
+│   ├── kleff
+│   │   ├── cert-manager
+│   │   │   ├── certificate.yaml
+│   │   │   └── cluster-issuer.yaml
+│   │   ├── microservices
+│   │   │   ├── ai-chatbot
+│   │   │   │   └── ai-chatbot-service.yaml
+│   │   │   ├── billing
+│   │   │   │   ├── billing-service-db.yaml
+│   │   │   │   └── billing-service.yaml
+│   │   │   ├── container
+│   │   │   │   ├── deployment-service-db.yaml
+│   │   │   │   └── deployment-service.yaml
+│   │   │   ├── frontend
+│   │   │   │   └── frontend-deployment.yaml
+│   │   │   ├── observability
+│   │   │   │   └── observability-service.yaml
+│   │   │   ├── projects
+│   │   │   │   ├── project-management-db.yaml
+│   │   │   │   └── project-management-service.yaml
+│   │   │   ├── server-api
+│   │   │   │   ├── rbac.yaml
+│   │   │   │   └── server-api.yaml
+│   │   │   ├── stable-gateway-service.yaml
+│   │   │   └── user
+│   │   │       ├── user-service-db.yaml
+│   │   │       └── user-service-deployment.yaml
+│   │   ├── operator
+│   │   ├── routes
+│   │   │   └── microservices.yaml
+│   │   └── secrets
+│   │       ├── ai-chatbot-secrets.yaml
+│   │       ├── authentik-secrets.yaml
+│   │       ├── cloudflare-token.yaml
+│   │       ├── cluster-acr-creds.yaml
+│   │       ├── cnpg-db-secrets.yaml
+│   │       ├── deployment-acr-creds.yaml
+│   │       ├── microservice-dbs.yaml
+│   │       └── secret-store.yaml
+│   ├── metallb
+│   │   ├── ip-pool.yaml
+│   │   └── listerner.yaml
+│   ├── open-telemetry
+│   │   └── java-instrumentation.yaml
+│   └── portfolio
+│       ├── frontend.yaml
+│       ├── route.yaml
+│       └── service.yaml
+├── context.txt
+├── docs
+│   ├── code
+│   │   ├── argo-architecture.mermaid
+│   │   └── high-lvl-cluster-architecture.mermaid
+│   └── images
+│       ├── argo-architecture-transparent.svg
+│       ├── argo-architecture.svg
+│       ├── high-lvl-cluster-architecture-transparent.png
+│       └── high-lvl-cluster-architecture.svg
+├── management
+│   ├── docker-compose.yaml
+│   └── vault
+│       └── config.hcl
+├── README.md
+├── renovate.json
+├── scripts
+│   ├── control-plane-setup.yaml
+│   ├── inventory.ini
+│   ├── setup-docker.yaml
+│   └── update-upgrade.yaml
+├── test
+└── tree-and-list.sh
+
+52 directories, 102 files
+
+================================================================================
+                    FILE CONTENTS                                              
+================================================================================
+
+--- FILE: bootstrap/root-app.yaml ---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: root
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/jeremy-misola/GitOps-Homelab
+    targetRevision: develop
+    path: categories
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+
+--- FILE: renovate.json ---
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    "group:all"
+  ],
+  "argocd": {
+    "fileMatch": [
+      "(^|/)argocd-apps/.*\\.yaml$",
+      "(^|/)bootstrap/.*\\.yaml$",
+      "(^|/)categories/.*\\.yaml$"
+    ]
+  }
+}
+
+--- FILE: management/docker-compose.yaml ---
+services:
+  postgresql:
+    environment:
+      POSTGRES_DB: ${PG_DB:-authentik}
+      POSTGRES_PASSWORD: ${PG_PASS:?database password required}
+      POSTGRES_USER: ${PG_USER:-authentik}
+    healthcheck:
+      interval: 30s
+      retries: 5
+      start_period: 20s
+      test:
+      - CMD-SHELL
+      - pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}
+      timeout: 5s
+    image: docker.io/library/postgres:16-alpine
+    restart: unless-stopped
+    volumes:
+    - database:/var/lib/postgresql/data
+  server:
+    command: server
+    depends_on:
+      postgresql:
+        condition: service_healthy
+    environment:
+      AUTHENTIK_POSTGRESQL__HOST: postgresql
+      AUTHENTIK_POSTGRESQL__NAME: ${PG_DB:-authentik}
+      AUTHENTIK_POSTGRESQL__PASSWORD: ${PG_PASS}
+      AUTHENTIK_POSTGRESQL__USER: ${PG_USER:-authentik}
+      AUTHENTIK_SECRET_KEY: ${AUTHENTIK_SECRET_KEY:?secret key required}
+    image: ${AUTHENTIK_IMAGE:-ghcr.io/goauthentik/server}:${AUTHENTIK_TAG:-2025.12.4}
+    ports:
+    - ${COMPOSE_PORT_HTTP:-9000}:9000
+    - ${COMPOSE_PORT_HTTPS:-9443}:9443
+    restart: unless-stopped
+    volumes:
+    - ./data:/data
+    - ./custom-templates:/templates
+  worker:
+    command: worker
+    depends_on:
+      postgresql:
+        condition: service_healthy
+    environment:
+      AUTHENTIK_POSTGRESQL__HOST: postgresql
+      AUTHENTIK_POSTGRESQL__NAME: ${PG_DB:-authentik}
+      AUTHENTIK_POSTGRESQL__PASSWORD: ${PG_PASS}
+      AUTHENTIK_POSTGRESQL__USER: ${PG_USER:-authentik}
+      AUTHENTIK_SECRET_KEY: ${AUTHENTIK_SECRET_KEY:?secret key required}
+    image: ${AUTHENTIK_IMAGE:-ghcr.io/goauthentik/server}:${AUTHENTIK_TAG:-2025.12.4}
+    restart: unless-stopped
+    user: root
+    volumes:
+    - /var/run/docker.sock:/var/run/docker.sock
+    - ./data:/data
+    - ./certs:/certs
+    - ./custom-templates:/templates
+
+  vault:
+    image: hashicorp/vault
+    container_name: vault-new
+    environment:
+      VAULT_ADDR: "https://vault1.jeremymr.dev:8200"
+      VAULT_API_ADDR: "https://vault1.jeremymr.dev:8200"
+      VAULT_ADDRESS: "https://vault1.jeremymr.dev:8200"
+      # VAULT_UI: true
+      # VAULT_TOKEN:
+    ports:
+      - "8200:8200"
+      - "8201:8201"
+    restart: always
+    volumes:
+      - ./logs:/vault/logs/:rw
+      - ./data:/vault/data/:rw
+      - ./vault:/vault/config/:rw
+      - ./certs:/certs/:rw
+      - ./file:/vault/file/:rw
+    cap_add:
+      - IPC_LOCK
+    entrypoint: vault server -config /vault/config/config.hcl
+
+volumes:
+  database:
+    driver: local
+
+
+--- FILE: management/vault/config.hcl ---
+ui = true
+disable_mlock = "true"
+
+storage "raft" {
+  path    = "/vault/data"
+  node_id = "node1"
+}
+
+listener "tcp" {
+  address = "[::]:8200"
+  tls_disable = "false"
+  tls_cert_file = "/certs/server.crt"
+  tls_key_file  = "/certs/server.key"
+}
+
+api_addr = "https://vault1.jeremymr.dev:8200"
+cluster_addr = "https://vault1.jeremymr.dev:8201"
+
+--- FILE: charts/kleff/microservices/server-api/rbac.yaml ---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: deployment-backend-sa
+  namespace: kleff-deployment
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: deployment-backend-cluster-role
+rules:
+  # 1. Allow creating and managing Namespaces
+  - apiGroups: [""]
+    resources: ["namespaces"]
+    verbs: ["create", "get", "list", "watch", "delete"]
+
+  # 2. Allow managing Jobs in ANY namespace
+  - apiGroups: ["batch"]
+    resources: ["jobs"]
+    verbs: ["create", "get", "list", "watch", "delete"]
+
+  # 3. Allow managing Secrets
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["create", "get", "list", "watch"]
+
+  # 4. Standard Pod logging/monitoring
+  - apiGroups: [""]
+    resources: ["pods", "pods/log"]
+    verbs: ["get", "list", "watch"]
+
+  # ---------------------------------------------------------------------
+  # 5. NEW: Allow managing WebApp Custom Resources (kleff.io)
+  # ---------------------------------------------------------------------
+  - apiGroups: ["kleff.kleff.io"]
+    resources: ["webapps"]
+    verbs: ["create", "get", "list", "watch", "update", "patch", "delete"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: deployment-backend-cluster-binding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: deployment-backend-cluster-role
+subjects:
+  - kind: ServiceAccount
+    name: deployment-backend-sa
+    namespace: kleff-deployment
+
+--- FILE: charts/kleff/microservices/server-api/server-api.yaml ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kleff-deployment-backend
+  namespace: kleff-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: deployment-backend
+  template:
+    metadata:
+      labels:
+        app: deployment-backend
+        paas: kleff
+    spec:
+      imagePullSecrets:
+        - name: acr-creds
+      serviceAccountName: deployment-backend-sa
+      containers:
+        - name: deployment-backend
+          image: kleff.azurecr.io/deployment-backend:77364a9dc578579d74d63bd8eab5ff8ebf7a446d
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: deployment-backend-service
+  namespace: kleff-deployment
+spec:
+  selector:
+    app: deployment-backend
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: deployment-backend-nodeport
+  namespace: kleff-deployment
+spec:
+  type: NodePort
+  selector:
+    app: deployment-backend
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+      nodePort: 30010
+
+
+--- FILE: charts/kleff/microservices/frontend/frontend-deployment.yaml ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kleff-frontend
+  namespace: kleff-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kleff-frontend
+  template:
+    metadata:
+      labels:
+        app: kleff-frontend
+        paas: kleff
+    spec:
+      imagePullSecrets:
+        - name: acr-creds
+      containers:
+        - name: kleff-frontend
+          image: kleff.azurecr.io/frontend:8e66c88cb3574a17bd0cd63a61a37acdc1d1aa5d
+          env:
+            - name: VITE_AUTH_CLIENT_ID
+              value: "8qNA2sSV88fusOocZcMj6GirTLWYygdAXnmtLUfe"
+            - name: VITE_BACKEND_URL
+              value: https://api.kleff.io
+          ports:
+            - containerPort: 3000
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          imagePullPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kleff-frontend
+  namespace: kleff-deployment
+spec:
+  selector:
+    app: kleff-frontend
+  ports:
+    - name: http
+      port: 80
+      targetPort: 3000
+
+
+--- FILE: charts/kleff/microservices/projects/project-management-db.yaml ---
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: project-management-db
+  namespace: kleff-deployment
+spec:
+  instances: 1
+  storage:
+    storageClass: longhorn
+    size: 1Gi
+  bootstrap:
+    initdb:
+      database: mydb
+      owner: postgres
+  superuserSecret:
+    name: project-management-db-credentials
+
+--- FILE: charts/kleff/microservices/projects/project-management-service.yaml ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: project-management-service
+  namespace: kleff-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: project-management-service
+  template:
+    metadata:
+      labels:
+        app: project-management-service
+        paas: kleff
+    spec:
+      imagePullSecrets:
+        - name: acr-creds
+      containers:
+        - name: project-management-service
+          image: kleff.azurecr.io/project-management-service:d7a453b7ae733c0429c0e55805c2aa3281c48be2
+          env:
+            - name: SPRING_DATASOURCE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: project-management-db-app
+                  key: jdbc-uri
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: project-management-db-app
+                  key: username
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: project-management-db-app
+                  key: password
+            - name: SPRING_JPA_HIBERNATE_DDL_AUTO
+              value: update
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          imagePullPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: project-management-service
+  namespace: kleff-deployment
+spec:
+  selector:
+    app: project-management-service
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8080
+
+
+--- FILE: charts/kleff/microservices/user/user-service-deployment.yaml ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-service
+  namespace: kleff-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: user-service
+  template:
+    metadata:
+      labels:
+        app: user-service
+        paas: kleff
+    spec:
+      imagePullSecrets:
+        - name: acr-creds
+      containers:
+        - name: user-service
+          image: kleff.azurecr.io/user-service:7dd6bdef043938632f59c6efc101f8dbc54944ef
+          env:
+            # 1. Port Configuration
+            - name: HTTP_ADDR
+              value: ":8080"
+            - name: AUTHENTIK_BASE_URL
+              # 2. Auth Configuration (Mapped from old OAUTH2_ISSUER_URI)
+
+              value: "https://auth.kleff.io"
+            - name: DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: user-db-app
+                  key: username
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: user-db-app
+                  key: password
+            - name: DB_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: user-db-app
+                  key: host
+            - name: DB_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: user-db-app
+                  key: port
+            - name: DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: user-db-app
+                  key: dbname
+            - name: POSTGRES_USER_DSN
+              # Format: postgres://username:password@host:port/dbname?sslmode=disable
+              value: "postgres://$(DB_USERNAME):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)?sslmode=disable"
+            - name: POSTGRES_AUDIT_DSN
+              # Audit Database DSN (Pointing to same DB for now, or change as needed)
+              value: "postgres://$(DB_USERNAME):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)?sslmode=disable"
+            - name: AUTHENTIK_API_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials # Create this secret
+                  key: authentik_admin_token
+            - name: DEFAULT_ADMIN_EMAIL
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: default_admin_email
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          imagePullPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-service
+  namespace: kleff-deployment
+spec:
+  selector:
+    app: user-service
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8080
+
+
+--- FILE: charts/kleff/microservices/user/user-service-db.yaml ---
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: user-db
+  namespace: kleff-deployment
+spec:
+  instances: 1
+  storage:
+    storageClass: longhorn
+    size: 1Gi
+  bootstrap:
+    initdb:
+      database: user_service
+      owner: user_service
+  superuserSecret:
+    name: user-db-credentials
+
+--- FILE: charts/kleff/microservices/observability/observability-service.yaml ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: observability-service
+  namespace: kleff-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kleff-observability
+  template:
+    metadata:
+      labels:
+        app: kleff-observability
+        paas: kleff
+    spec:
+      imagePullSecrets:
+        - name: acr-creds
+      containers:
+        - name: observability-service
+          image: kleff.azurecr.io/observability-service:5393d2805f1a8725dc7203a4556c916c8b7f19bd
+          env:
+            # 1. Port Configuration
+            - name: SERVER_PORT
+              value: "8080"
+            # 2. Auth Configuration (Mapped from old OAUTH2_ISSUER_URI)
+            - name: PROMETHEUS_URL
+              value: "http://kube-prometheus-kube-prome-prometheus.monitoring.svc.cluster.local:9090"
+            - name: ENVIRONMENT
+              value: "development"
+            - name: LOKI_URL
+              value: "http://loki-stack-gateway.loki.svc.cluster.local:80"
+            - name: USER_SERVICE_URL
+              value: "http://api-gateway.kleff-deployment.svc.cluster.local:80"
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          imagePullPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kleff-observability
+  namespace: kleff-deployment
+spec:
+  selector:
+    app: kleff-observability
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8080
+
+
+--- FILE: charts/kleff/microservices/stable-gateway-service.yaml ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: internal-gateway
+  namespace: envoy-gateway-system
+spec:
+  type: ClusterIP
+  selector:
+    # These labels are stable and based on your Gateway name ("prod-web")
+    gateway.envoyproxy.io/owning-gateway-name: prod-web
+    gateway.envoyproxy.io/owning-gateway-namespace: envoy-gateway-system
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 10080  # Standard Envoy HTTP port
+    - name: https
+      port: 443
+      protocol: TCP
+      targetPort: 10443 # Standard Envoy HTTPS port
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-gateway
+  namespace: kleff-deployment
+spec:
+  type: ExternalName
+  externalName: internal-gateway.envoy-gateway-system.svc.cluster.local
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
+
+--- FILE: charts/kleff/microservices/container/deployment-service.yaml ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment-service
+  namespace: kleff-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: deployment-service
+  template:
+    metadata:
+      # annotations:
+      #   instrumentation.opentelemetry.io/inject-java: "true"
+      labels:
+        app: deployment-service
+        paas: kleff
+    spec:
+      imagePullSecrets:
+        - name: acr-creds
+      containers:
+        - name: deployment-service
+          image: kleff.azurecr.io/deployment-service:77364a9dc578579d74d63bd8eab5ff8ebf7a446d
+          env:
+            - name: AUDIT_SERVICE_URL
+              value: http://api-gateway.kleff-deployment.svc.cluster.local:80/api/v1/projects/audit/internal
+            - name: SPRING_DATASOURCE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: deployment-service-db-app
+                  key: jdbc-uri
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: deployment-service-db-app
+                  key: username
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: deployment-service-db-app
+                  key: password
+            - name: SPRING_JPA_HIBERNATE_DDL_AUTO
+              value: update
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          imagePullPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: deployment-service
+  namespace: kleff-deployment
+spec:
+  selector:
+    app: deployment-service
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8080
+
+
+--- FILE: charts/kleff/microservices/container/deployment-service-db.yaml ---
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: deployment-service-db
+  namespace: kleff-deployment
+spec:
+  instances: 1
+  storage:
+    storageClass: longhorn
+    size: 1Gi
+  bootstrap:
+    initdb:
+      database: mydb
+      owner: postgres
+  superuserSecret:
+    name: deployment-service-db-credentials
+
+--- FILE: charts/kleff/microservices/ai-chatbot/ai-chatbot-service.yaml ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ai-chatbot-service
+  namespace: kleff-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ai-chatbot-service
+  template:
+    metadata:
+      labels:
+        app: ai-chatbot-service
+        paas: kleff
+    spec:
+      imagePullSecrets:
+        - name: acr-creds
+      containers:
+        - name: ai-chatbot-service
+          image: kleff.azurecr.io/ai-chatbot-service:latest
+          imagePullPolicy: Always
+          env:
+            - name: OPENAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: ai-chatbot-secrets
+                  key: OPENAI_API_KEY
+            - name: PINECONE_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: ai-chatbot-secrets
+                  key: PINECONE_API_KEY
+            - name: PINECONE_ENVIRONMENT
+              valueFrom:
+                secretKeyRef:
+                  name: ai-chatbot-secrets
+                  key: PINECONE_ENVIRONMENT
+            - name: PINECONE_INDEX_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: ai-chatbot-secrets
+                  key: PINECONE_INDEX_NAME
+          ports:
+            - containerPort: 8086
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ai-chatbot-service
+  namespace: kleff-deployment
+spec:
+  selector:
+    app: ai-chatbot-service
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8086
+
+
+--- FILE: charts/kleff/microservices/billing/billing-service.yaml ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: billing-service
+  namespace: kleff-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: billing-service
+  template:
+    metadata:
+      # annotations:
+      #   instrumentation.opentelemetry.io/inject-java: "true"
+      labels:
+        app: billing-service
+        paas: kleff
+    spec:
+      imagePullSecrets:
+        - name: acr-creds
+      containers:
+        - name: billing-service
+          image: kleff.azurecr.io/billing-service:14ebbb811011581d83c312f9b97beeadf7fcd845
+          env:
+            - name: SPRING_DATASOURCE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: billing-service-db-app
+                  key: jdbc-uri
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: billing-service-db-app
+                  key: username
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: billing-service-db-app
+                  key: password
+            - name: SPRING_JPA_HIBERNATE_DDL_AUTO
+              value: update
+            - name: STRIPE_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: stripe_api_key
+            - name: FRONTEND_URL
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: frontend_url
+            - name: VITE_BACKEND_URL
+              value: http://api-gateway.kleff-deployment.svc.cluster.local
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          imagePullPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: billing-service
+  namespace: kleff-deployment
+spec:
+  selector:
+    app: billing-service
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8080
+
+
+--- FILE: charts/kleff/microservices/billing/billing-service-db.yaml ---
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: billing-service-db
+  namespace: kleff-deployment
+spec:
+  instances: 1
+  storage:
+    storageClass: longhorn
+    size: 1Gi
+  bootstrap:
+    initdb:
+      database: mydb
+      owner: postgres
+  superuserSecret:
+    name: billing-db-credentials
+
+--- FILE: charts/kleff/secrets/cnpg-db-secrets.yaml ---
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: user-db-credentials
+  namespace: kleff-deployment
+spec:
+  secretStoreRef:
+    name: doppler-secret-store-kleff
+    kind: ClusterSecretStore
+  target:
+    name: user-db-credentials
+    creationPolicy: Owner
+    template:
+      type: kubernetes.io/basic-auth
+  data:
+  - secretKey: username
+    remoteRef:
+      key: USER_DB_USERNAME
+  - secretKey: password
+    remoteRef:
+      key: USER_DB_PASSWORD
+---
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: project-management-db-credentials
+  namespace: kleff-deployment
+spec:
+  secretStoreRef:
+    name: doppler-secret-store-kleff
+    kind: ClusterSecretStore
+  target:
+    name: project-management-db-credentials
+    creationPolicy: Owner
+    template:
+      type: kubernetes.io/basic-auth
+  data:
+  - secretKey: username
+    remoteRef:
+      key: PROJECT_MANAGEMENT_DB_USERNAME
+  - secretKey: password
+    remoteRef:
+      key: PROJECT_MANAGEMENT_DB_PASSWORD
+---
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: deployment-service-db-credentials
+  namespace: kleff-deployment
+spec:
+  secretStoreRef:
+    name: doppler-secret-store-kleff
+    kind: ClusterSecretStore
+  target:
+    name: deployment-service-db-credentials
+    creationPolicy: Owner
+    template:
+      type: kubernetes.io/basic-auth
+  data:
+  - secretKey: username
+    remoteRef:
+      key: DEPLOYMENT_DB_USERNAME
+  - secretKey: password
+    remoteRef:
+      key: DEPLOYMENT_DB_PASSWORD
+---
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: billing-db-credentials
+  namespace: kleff-deployment
+spec:
+  secretStoreRef:
+    name: doppler-secret-store-kleff
+    kind: ClusterSecretStore
+  target:
+    name: billing-db-credentials
+    creationPolicy: Owner
+    template:
+      type: kubernetes.io/basic-auth
+  data:
+  - secretKey: username
+    remoteRef:
+      key: BILLING_DB_USERNAME
+  - secretKey: password
+    remoteRef:
+      key: BILLING_DB_PASSWORD
+
+--- FILE: charts/kleff/secrets/cluster-acr-creds.yaml ---
+apiVersion: external-secrets.io/v1
+kind: ClusterExternalSecret
+metadata:
+  name: global-acr-creds
+spec:
+  externalSecretName: acr-creds
+  namespaceSelector:
+    matchLabels:
+      managed-by: paas-backend
+  refreshInterval: "1h"
+  externalSecretSpec:
+    secretStoreRef:
+      name: doppler-secret-store-kleff
+      kind: ClusterSecretStore
+    target:
+      name: acr-creds
+      template:
+        engineVersion: v2
+        data:
+          .dockerconfigjson: |
+            {
+              "auths": {
+                "{{ .acr_server }}": {
+                  "username": "{{ .acr_username }}",
+                  "password": "{{ .acr_password }}",
+                  "auth": "{{ (printf "%s:%s" .acr_username .acr_password) | b64enc }}"
+                }
+              }
+            }
+        type: kubernetes.io/dockerconfigjson
+    data:
+    - secretKey: acr_server
+      remoteRef:
+        key: ACR_SERVER
+    - secretKey: acr_username
+      remoteRef:
+        key: ACR_USERNAME
+    - secretKey: acr_password
+      remoteRef:
+        key: ACR_PASSWORD1
+
+--- FILE: charts/kleff/secrets/secret-store.yaml ---
+apiVersion: external-secrets.io/v1
+kind: ClusterSecretStore
+metadata:
+  name: doppler-secret-store-kleff
+  namespace: default
+spec:
+  provider:
+    doppler:
+      auth:
+        secretRef:
+          dopplerToken:
+            name: doppler-token-auth-api-kleff
+            key: dopplerToken
+            namespace: external-secrets
+
+--- FILE: charts/kleff/secrets/ai-chatbot-secrets.yaml ---
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: ai-chatbot-secrets
+  namespace: kleff-deployment
+spec:
+  secretStoreRef:
+    name: doppler-secret-store-kleff
+    kind: ClusterSecretStore
+  target:
+    name: ai-chatbot-secrets
+    creationPolicy: Owner
+  data:
+    - secretKey: OPENAI_API_KEY
+      remoteRef:
+        key: OPENAI_API_KEY
+    - secretKey: PINECONE_API_KEY
+      remoteRef:
+        key: PINECONE_API_KEY
+    - secretKey: PINECONE_ENVIRONMENT
+      remoteRef:
+        key: PINECONE_ENVIRONMENT
+    - secretKey: PINECONE_INDEX_NAME
+      remoteRef:
+        key: PINECONE_INDEX_NAME
+
+
+--- FILE: charts/kleff/secrets/microservice-dbs.yaml ---
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: postgres-credentials
+  namespace: kleff-deployment
+spec:
+  secretStoreRef:
+    name: doppler-secret-store-kleff
+    kind: ClusterSecretStore
+  target:
+    name: postgres-credentials
+    creationPolicy: Owner
+  data:
+  - secretKey: stripe_api_key
+    remoteRef:
+      key: STRIPE_API_KEY
+  - secretKey: frontend_url
+    remoteRef:
+      key: FRONTEND_URL
+  - secretKey: vite_backend_url
+    remoteRef:
+      key: VITE_BACKEND_URL
+  - secretKey: authentik_admin_token
+    remoteRef:
+      key: AUTHENTIK_ADMIN_TOKEN
+  - secretKey: default_admin_email
+    remoteRef:
+      key: DEFAULT_ADMIN_EMAIL
+
+
+--- FILE: charts/kleff/secrets/deployment-acr-creds.yaml ---
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: kleff-acr-creds
+  namespace: kleff-deployment
+spec:
+  secretStoreRef:
+    name: doppler-secret-store-kleff
+    kind: ClusterSecretStore
+  target:
+    name: acr-creds
+    creationPolicy: Owner
+    template:
+      engineVersion: v2
+      data:
+        .dockerconfigjson: |
+          {
+            "auths": {
+              "{{ .acr_server }}": {
+                "username": "{{ .acr_username }}",
+                "password": "{{ .acr_password }}",
+                "auth": "{{ (printf "%s:%s" .acr_username .acr_password) | b64enc }}"
+              }
+            }
+          }
+      type: kubernetes.io/dockerconfigjson
+  data:
+  - secretKey: acr_server
+    remoteRef:
+      key: ACR_SERVER
+  - secretKey: acr_username
+    remoteRef:
+      key: ACR_USERNAME
+  - secretKey: acr_password
+    remoteRef:
+      key: ACR_PASSWORD1
+
+---
+
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: default-acr-creds
+  namespace: default
+spec:
+  secretStoreRef:
+    name: doppler-secret-store-kleff
+    kind: ClusterSecretStore
+  target:
+    name: acr-creds
+    creationPolicy: Owner
+    template:
+      engineVersion: v2
+      data:
+        .dockerconfigjson: |
+          {
+            "auths": {
+              "{{ .acr_server }}": {
+                "username": "{{ .acr_username }}",
+                "password": "{{ .acr_password }}",
+                "auth": "{{ (printf "%s:%s" .acr_username .acr_password) | b64enc }}"
+              }
+            }
+          }
+      type: kubernetes.io/dockerconfigjson
+  data:
+  - secretKey: acr_server
+    remoteRef:
+      key: ACR_SERVER
+  - secretKey: acr_username
+    remoteRef:
+      key: ACR_USERNAME
+  - secretKey: acr_password
+    remoteRef:
+      key: ACR_PASSWORD1
+
+---
+
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: kleff-acr-repo-config
+  namespace: argocd 
+spec:
+  secretStoreRef:
+    name: doppler-secret-store-kleff
+    kind: ClusterSecretStore
+  target:
+    name: kleff-acr-repo-config
+    template:
+      metadata:
+        labels:
+          argocd.argoproj.io/secret-type: repository
+      data:
+        type: helm
+        url: kleff.azurecr.io/helm
+        name: kleff-acr
+        enableOCI: "true"
+        username: "{{ .acr_username }}"
+        password: "{{ .acr_password }}"
+  data:
+  - secretKey: acr_username
+    remoteRef:
+      key: ACR_USERNAME
+  - secretKey: acr_password
+    remoteRef:
+      key: ACR_PASSWORD1
+
+--- FILE: charts/kleff/secrets/cloudflare-token.yaml ---
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: cloudflare-kleff-secret
+  namespace: cert-manager
+spec:
+  secretStoreRef:
+    name: doppler-secret-store-kleff
+    kind: ClusterSecretStore
+  target:
+    name: cloudflare-api-token-kleff
+    creationPolicy: Owner
+  data:
+  - secretKey: api-token
+    remoteRef:
+      key: CLOUDFLARE_API_TOKEN
+
+---
+
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: cloudflare-kleff-secret
+  namespace: external-dns
+spec:
+  secretStoreRef:
+    name: doppler-secret-store-kleff
+    kind: ClusterSecretStore
+  target:
+    name: cloudflare-api-token-kleff
+    creationPolicy: Owner
+  data:
+  - secretKey: api-token
+    remoteRef:
+      key: CLOUDFLARE_API_TOKEN
+
+
+--- FILE: charts/kleff/secrets/authentik-secrets.yaml ---
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: authentik-secrets
+  namespace: authentik
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    name: doppler-secret-store-kleff 
+    kind: ClusterSecretStore
+  target:
+    name: authentik-secrets-store 
+    creationPolicy: Owner
+  data:
+  - secretKey: AUTHENTIK_SECRET_KEY
+    remoteRef:
+      key: AUTHENTIK_SECRET_KEY
+
+  - secretKey: POSTGRESQL_PASSWORD
+    remoteRef:
+      key: DB_PASSWORD 
+
+  - secretKey: REDIS_PASSWORD
+    remoteRef:
+      key: REDIS_PASSWORD
+
+--- FILE: charts/kleff/cert-manager/cluster-issuer.yaml ---
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-prod
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: misolarellinj06@gmail.com
+    privateKeySecretRef:
+      name: letsencrypt-prod
+    solvers:
+    - dns01:
+        cloudflare:
+          email: misolarellinj06@gmail.com
+          apiTokenSecretRef:
+            name: cloudflare-api-token-kleff
+            key: api-token
+
+---
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-staging
+spec:
+  acme:
+    server: https://acme-staging-v02.api.letsencrypt.org/directory
+    privateKeySecretRef:
+      name: letsencrypt-staging
+    solvers:
+    - dns01:
+        cloudflare:
+          email: misolarellinj06@gmail.com
+          apiTokenSecretRef:
+            name: cloudflare-api-token-kleff
+            key: api-token
+
+--- FILE: charts/kleff/cert-manager/certificate.yaml ---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: kleff-io-cert
+  namespace: envoy-gateway-system
+spec:
+  secretName: kleff-io-tls
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  dnsNames:
+  - "kleff.io"
+  - "*.kleff.io"
+
+--- FILE: charts/kleff/routes/microservices.yaml ---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: frontend-route
+  namespace: kleff-deployment
+spec:
+  parentRefs:
+    - name: prod-web
+      namespace: envoy-gateway-system
+  hostnames:
+    - "kleff.io"
+  rules:
+    - backendRefs:
+        - name: kleff-frontend
+          port: 80
+
+---
+
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: microservices-route
+  namespace: kleff-deployment
+spec:
+  parentRefs:
+    - name: prod-web
+      namespace: envoy-gateway-system
+  hostnames:
+    - "api.kleff.io"
+    - "api-gateway.kleff-deployment.svc.cluster.local"
+  rules:
+    # ---------------------------------------------------------
+    # 1. USER & IDENTITY (Order Matters: Specific before General)
+    # ---------------------------------------------------------
+    
+    # Specific Exception: Route specific user sub-path to Project Service
+    - matches:
+        - path: { type: PathPrefix, value: /api/v1/users/me/invitations }
+      backendRefs:
+        - name: project-management-service
+          port: 80
+
+    # General User Service
+    - matches:
+        - path: { type: PathPrefix, value: /api/v1/users }
+      backendRefs:
+        - name: user-service
+          port: 80
+
+    # ---------------------------------------------------------
+    # 2. PROJECT MANAGEMENT SERVICE
+    # ---------------------------------------------------------
+    - matches:
+        - path: { type: PathPrefix, value: /api/v1/projects }
+        - path: { type: PathPrefix, value: /api/v1/invitations }
+        - path: { type: PathPrefix, value: /api/v1/collaborators }
+        - path: { type: PathPrefix, value: /api/v1/custom-roles }
+      backendRefs:
+        - name: project-management-service
+          port: 80
+
+    # ---------------------------------------------------------
+    # 3. DEPLOYMENT & INFRASTRUCTURE
+    # ---------------------------------------------------------
+    
+    # Combined Deployment Backend Service (Namespace & Build)
+    - matches:
+        - path: { type: PathPrefix, value: /api/v1/namespace }
+        - path: { type: PathPrefix, value: /api/v1/build }
+        - path: { type: PathPrefix, value: /api/v1/webapp }
+      backendRefs:
+        - name: deployment-backend-service
+          port: 80
+
+    # Deployment Service (Containers)
+    - matches:
+        - path: { type: PathPrefix, value: /api/v1/containers }
+      backendRefs:
+        - name: deployment-service
+          port: 80
+
+    # ---------------------------------------------------------
+    # 4. SUPPORTING SERVICES (Billing & Observability)
+    # ---------------------------------------------------------
+    
+    # Billing Service
+    - matches:
+        - path: { type: PathPrefix, value: /api/v1/billing }
+      backendRefs:
+        - name: billing-service
+          port: 80
+
+    # Observability Service
+    - matches:
+        - path: { type: PathPrefix, value: /api/v1/systems }
+      backendRefs:
+        - name: kleff-observability
+          port: 80
+    # Chat Service
+    - matches:
+        - path: { type: PathPrefix, value: /api/v1/chat }
+      backendRefs:
+        - name: ai-chatbot-service
+          port: 80
+
+--- FILE: charts/cert-manager/cluster-issuer.yaml ---
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-prod
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: misolarellinj06@gmail.com
+    privateKeySecretRef:
+      name: letsencrypt-prod
+    solvers:
+    - dns01:
+        cloudflare:
+          email: misolarellinj06@gmail.com
+          apiTokenSecretRef:
+            name: cloudflare-api-token-secret
+            key: api-token
+
+---
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-staging
+spec:
+  acme:
+    server: https://acme-staging-v02.api.letsencrypt.org/directory
+    privateKeySecretRef:
+      name: letsencrypt-staging
+    solvers:
+    - dns01:
+        cloudflare:
+          email: misolarellinj06@gmail.com
+          apiTokenSecretRef:
+            name: cloudflare-api-token-secret
+            key: api-token
+
+
+--- FILE: charts/cert-manager/saima-issuer.yaml ---
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-prod
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: misolarellinj06@gmail.com
+    privateKeySecretRef:
+      name: letsencrypt-prod
+    solvers:
+    - dns01:
+        cloudflare:
+          email: misolarellinj06@gmail.com
+          apiTokenSecretRef:
+            name: saima-cloudflare-api-token-secret
+            key: api-token
+
+---
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-staging
+spec:
+  acme:
+    server: https://acme-staging-v02.api.letsencrypt.org/directory
+    privateKeySecretRef:
+      name: letsencrypt-staging
+    solvers:
+    - dns01:
+        cloudflare:
+          email: misolarellinj06@gmail.com
+          apiTokenSecretRef:
+            name: saima-cloudflare-api-token-secret
+            key: api-token
+
+
+--- FILE: charts/cert-manager/certificate.yaml ---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: homelab-cert
+  namespace: envoy-gateway-system
+spec:
+  secretName: homelab-cert
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  dnsNames:
+  - "jeremymr.dev"
+  - "*.jeremymr.dev"
+  - "*.ghost.jeremymr.dev"
+
+--- FILE: charts/cert-manager/saima-cert.yaml ---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: saima-cert
+  namespace: envoy-gateway-system
+spec:
+  secretName: saima-cert
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  dnsNames:
+  - "saimachowdhury.ca"
+  - "*.saimachowdhury.ca"
+
+--- FILE: charts/open-telemetry/java-instrumentation.yaml ---
+apiVersion: opentelemetry.io/v1alpha1
+kind: Instrumentation
+metadata:
+  name: java-instrumentation
+  namespace: kleff-deployment
+spec:
+  exporter:
+    endpoint: http://otel-collector-opentelemetry-collector.opentelemetry-collector.svc.cluster.local:4317
+  env:
+    - name: OTEL_EXPORTER_OTLP_PROTOCOL
+      value: grpc
+  propagators:
+    - tracecontext
+    - baggage
+  java:
+    image: ghcr.io/open-telemetry/opentelemetry-operator/autoinstrumentation-java:latest
+
+--- FILE: charts/envoy-gateway/gateway.yaml ---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: prod-web
+  namespace: envoy-gateway-system
+  annotations:
+    external-dns.alpha.kubernetes.io/target: 66.130.187.229
+spec:
+  gatewayClassName: envoy
+  addresses:
+  - type: IPAddress
+    value: 192.168.0.241
+  infrastructure:
+    labels:
+      gateway: envoy
+  listeners:
+  - name: http
+    protocol: HTTP
+    port: 80
+    allowedRoutes:
+      namespaces:
+        from: All
+
+  - name: https
+    protocol: HTTPS
+    port: 443
+    tls:
+      mode: Terminate
+      certificateRefs:
+        - name: homelab-cert
+        - name: kleff-io-tls
+        - name: saima-cert
+          namespace: envoy-gateway-system
+    allowedRoutes:
+      namespaces:
+        from: All
+
+--- FILE: charts/envoy-gateway/gateway-class.yaml ---
+apiVersion: gateway.networking.k8s.io/v1
+kind: GatewayClass
+metadata:
+  name: envoy
+spec:
+  controllerName: gateway.envoyproxy.io/gatewayclass-controller
+
+--- FILE: charts/envoy-gateway/routes/saima-ghost.yaml ---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: saima-ghost-route
+  namespace: ghost-saima
+spec:
+  parentRefs:
+  - name: prod-web
+    namespace: envoy-gateway-system
+  hostnames:
+    - saimachowdhury.ca
+  rules:
+  - backendRefs:
+    - name: ghost-saima
+      port: 80
+
+---
+
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: saima-admin-ghost-route
+  namespace: ghost-saima
+spec:
+  parentRefs:
+  - name: prod-web
+    namespace: envoy-gateway-system
+  hostnames:
+    - admin.saimachowdhury.ca
+  rules:
+  - backendRefs:
+    - name: ghost-saima
+      port: 80
+
+--- FILE: charts/envoy-gateway/routes/grafana.yaml ---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: grafana-route
+  namespace: monitoring
+spec:
+  parentRefs:
+  - name: prod-web
+    namespace: envoy-gateway-system
+  hostnames:
+    - grafana.jeremymr.dev
+  rules:
+  - backendRefs:
+    - name: kube-prometheus-grafana
+      port: 80
+
+--- FILE: charts/envoy-gateway/routes/longhorn/couchdb.yaml ---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: couchdb-route
+  namespace: couchdb
+spec:
+  parentRefs:
+  - name: prod-web
+    namespace: envoy-gateway-system
+  hostnames:
+    - couchdb.jeremymr.dev
+  rules:
+  - backendRefs:
+    - name: couchdb-svc-couchdb
+      port: 5984
+
+
+--- FILE: charts/envoy-gateway/routes/longhorn/security-policy.yaml ---
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: SecurityPolicy
+metadata:
+  name: longhorn-oidc-config
+  namespace: longhorn-system
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: longhorn-route
+  oidc:
+    provider:
+      issuer: "https://auth.jeremymr.dev/application/o/longhorn/"
+    clientID: "Wxqom19mHxBaVE3loYlVPsl4TgcpCupOOkmnDR5X"
+    clientSecret:
+      name: "longhorn-client-secret"
+    redirectURL: "https://longhorn.jeremymr.dev/oauth2/callback"
+    logoutPath: "/logout"
+
+--- FILE: charts/envoy-gateway/routes/longhorn/client-id-secret.yaml ---
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: longhorn-client-secret
+  namespace: longhorn-system
+spec:
+  secretStoreRef:
+    name: doppler-secret-store
+    kind: ClusterSecretStore
+  target:
+    name: longhorn-client-secret
+    creationPolicy: Owner
+  data:
+  - secretKey: client-secret
+    remoteRef:
+      key: HOMELAB_AUTHENTIK_LONGHORN_CLIENT_SECRET
+
+--- FILE: charts/envoy-gateway/routes/longhorn/longhorn.yaml ---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: longhorn-route
+  namespace: longhorn-system
+spec:
+  parentRefs:
+  - name: prod-web
+    namespace: envoy-gateway-system
+  hostnames:
+    - longhorn.jeremymr.dev
+  rules:
+  - backendRefs:
+    - name: longhorn-frontend
+      port: 80
+
+
+--- FILE: charts/envoy-gateway/routes/argocd.yaml ---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: argocd-route
+  namespace: argocd
+spec:
+  parentRefs:
+  - name: prod-web
+    namespace: envoy-gateway-system
+  hostnames:
+    - argocd.jeremymr.dev
+  rules:
+  - backendRefs:
+    - name: argocd-server
+      port: 80
+
+
+--- FILE: charts/envoy-gateway/routes/authentik.yaml ---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: authentik-route
+  namespace: authentik
+spec:
+  parentRefs:
+  - name: prod-web
+    namespace: envoy-gateway-system
+  hostnames:
+    - auth.jeremymr.dev
+  rules:
+  - backendRefs:
+    - name: authentik-server
+      port: 80
+
+
+--- FILE: charts/envoy-gateway/routes/ghost.yaml ---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: ghost-route
+  namespace: ghost
+spec:
+  parentRefs:
+  - name: prod-web
+    namespace: envoy-gateway-system
+  hostnames:
+    - ghost.jeremymr.dev
+  rules:
+  - backendRefs:
+    - name: ghost
+      port: 80
+
+---
+
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: admin-ghost-route
+  namespace: ghost
+spec:
+  parentRefs:
+  - name: prod-web
+    namespace: envoy-gateway-system
+  hostnames:
+    - ghost-admin.jeremymr.dev
+  rules:
+  - backendRefs:
+    - name: ghost
+      port: 80
+
+--- FILE: charts/metallb/ip-pool.yaml ---
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: production-pool
+  namespace: metallb
+spec:
+  addresses:
+  - 192.168.0.240-192.168.0.250
+
+--- FILE: charts/metallb/listerner.yaml ---
+apiVersion: metallb.io/v1beta1
+kind: L2Advertisement
+metadata:
+  name: production-l2
+  namespace: metallb
+spec:
+  ipAddressPools:
+  - production-pool
+
+--- FILE: charts/portfolio/frontend.yaml ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  labels:
+    app: frontend
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      imagePullSecrets:
+      - name: acr-creds
+      containers:
+      - name: frontend
+        image: jeremyscr.azurecr.io/portfolio:0.0.1
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 3000
+
+
+--- FILE: charts/portfolio/service.yaml ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-service
+spec:
+  selector:
+    app: frontend
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
+
+
+--- FILE: charts/portfolio/route.yaml ---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: portfolio-frontend-route
+  namespace: portfolio
+spec:
+  parentRefs:
+  - name: prod-web
+    namespace: envoy-gateway-system
+  hostnames:
+  - "hvd.jeremymr.dev"
+  rules:
+  - backendRefs:
+    - name: frontend-service
+      port: 80
+
+--- FILE: charts/external-secrets/saima-cloudflare-secret.yaml ---
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: saima-cloudflare-secret
+  namespace: cert-manager
+spec:
+  secretStoreRef:
+    name: doppler-secret-store
+    kind: ClusterSecretStore
+  target:
+    name: saima-cloudflare-api-token-secret
+    creationPolicy: Owner
+  data:
+  - secretKey: api-token
+    remoteRef:
+      key: SAIMA_CLOUDFLARE_API_TOKEN
+
+--- FILE: charts/external-secrets/saima-gmail-app-password.yaml ---
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: saima-gmail-app-password
+  namespace: ghost-saima
+spec:
+  secretStoreRef:
+    name: doppler-secret-store
+    kind: ClusterSecretStore
+  target:
+    name: gmail-app-password
+    creationPolicy: Owner
+  data:
+  - secretKey: app-password
+    remoteRef:
+      key: GMAIL_APP_PASSWORD
+
+--- FILE: charts/external-secrets/secret-store.yaml ---
+apiVersion: external-secrets.io/v1
+kind: ClusterSecretStore
+metadata:
+  name: doppler-secret-store
+  namespace: external-secrets
+spec:
+  provider:
+    doppler:
+      auth:
+        secretRef:
+          dopplerToken:
+            name: doppler-token-auth-api
+            key: dopplerToken
+            namespace: external-secrets
+
+--- FILE: charts/external-secrets/personal-acr-secret.yaml ---
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: azure-cr-creds
+  namespace: portfolio
+spec:
+  secretStoreRef:
+    name: doppler-secret-store
+    kind: ClusterSecretStore
+  target:
+    name: acr-creds
+    creationPolicy: Owner
+    template:
+      engineVersion: v2
+      data:
+        .dockerconfigjson: |
+          {
+            "auths": {
+              "{{ .acr_server }}": {
+                "username": "{{ .acr_username }}",
+                "password": "{{ .acr_password }}",
+                "auth": "{{ (printf "%s:%s" .acr_username .acr_password) | b64enc }}"
+              }
+            }
+          }
+      type: kubernetes.io/dockerconfigjson
+  data:
+  - secretKey: acr_server
+    remoteRef:
+      key: ACR_SERVER
+  - secretKey: acr_username
+    remoteRef:
+      key: ACR_USERNAME
+  - secretKey: acr_password
+    remoteRef:
+      key: ACR_PASSWORD1
+
+--- FILE: charts/external-secrets/gmail-app-password.yaml ---
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: gmail-app-password
+  namespace: ghost
+spec:
+  secretStoreRef:
+    name: doppler-secret-store
+    kind: ClusterSecretStore
+  target:
+    name: gmail-app-password
+    creationPolicy: Owner
+  data:
+  - secretKey: app-password
+    remoteRef:
+      key: GMAIL_APP_PASSWORD
+
+
+
+--- FILE: charts/external-secrets/couchdb-secrets.yaml ---
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: couchdb-password
+  namespace: couchdb
+spec:
+  secretStoreRef:
+    kind: ClusterSecretStore
+    name: doppler-secret-store
+
+  target:
+    name: couchdb-creds
+
+  data:
+    - secretKey: adminUsername
+      remoteRef:
+        key: COUCHDB_USERNAME
+
+    - secretKey: adminPassword
+      remoteRef:
+        key: COUCHDB_PASSWORD
+
+    - secretKey: erlangCookie
+      remoteRef:
+        key: COUCHDB_ERLANG_COOKIE
+
+    - secretKey: cookietAuthSecret
+      remoteRef:
+        key: COUCHDB_COOKIE_AUTH_SECRET
+
+
+--- FILE: charts/external-secrets/loki_garage_secret.yaml ---
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: garage-loki-secret
+  namespace: loki
+spec:
+  secretStoreRef:
+    name: doppler-secret-store
+    kind: ClusterSecretStore
+  target:
+    name: garage-loki-secrets
+    creationPolicy: Owner
+  data:
+  - secretKey: access-key-id
+    remoteRef:
+      key: GARAGE_LOKI_KEY_ID
+  - secretKey: secret-access-key
+    remoteRef:
+      key: GARAGE_LOKI_SECRET_KEY
+
+
+--- FILE: charts/external-secrets/grafana-secret.yaml ---
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: grafana-secret
+  namespace: monitoring
+spec:
+  secretStoreRef:
+    name: doppler-secret-store
+    kind: ClusterSecretStore
+  target:
+    name: grafana-secret
+    creationPolicy: Owner
+  data:
+  - secretKey: admin-password
+    remoteRef:
+      key: GRAFANA_ADMIN_PASSWORD
+  - secretKey: admin-user
+    remoteRef:
+      key: GRAFANA_ADMIN_USER
+
+
+
+--- FILE: charts/external-secrets/authentik-secrets.yaml ---
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: authentik-secrets
+  namespace: authentik
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    name: doppler-secret-store 
+    kind: ClusterSecretStore
+  target:
+    name: authentik-secrets
+    creationPolicy: Owner
+  data:
+  - secretKey: AUTHENTIK_SECRET_KEY
+    remoteRef:
+      key: AUTHENTIK_SECRET_KEY
+
+  - secretKey: POSTGRESQL_PASSWORD
+    remoteRef:
+      key: DB_PASSWORD 
+
+  - secretKey: REDIS_PASSWORD
+    remoteRef:
+      key: REDIS_PASSWORD
+
+--- FILE: charts/external-secrets/cloudflare-secret.yaml ---
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: cloudflare-cert-manager
+  namespace: cert-manager
+spec:
+  secretStoreRef:
+    name: doppler-secret-store
+    kind: ClusterSecretStore
+  target:
+    name: cloudflare-api-token-secret
+    creationPolicy: Owner
+  data:
+  - secretKey: api-token
+    remoteRef:
+      key: CLOUDFLARE_API_TOKEN
+
+
+--- FILE: docs/code/argo-architecture.mermaid ---
+---
+config:
+  layout: dagre
+---
+flowchart TB
+ subgraph GitHub["GitHub Repository (Source of Truth)"]
+        Repo["GitOps-Homelab"]
+  end
+ subgraph ArgoControl["ArgoCD Control Plane"]
+        Root@{ label: "'Root' App" }
+        InfraCat@{ label: "'Infrastructure' Category" }
+        AppCat@{ label: "'Applications' Category" }
+  end
+ subgraph K8sCluster["Kubernetes Cluster State"]
+        Core["Platform Primitives"]
+        Services["User Services"]
+  end
+    Repo -- Manual Apply --> Root
+    Root -- Deploys /categories --> InfraCat & AppCat
+    InfraCat -. "Sync Wave: -5" .-> Core
+    AppCat -. Sync Wave: 0 .-> Services
+    InfraCat -- "Watches /argocd-apps/infrastructure" --> Core
+    AppCat -- "Watches /argocd-apps/apps" --> Services
+    Note1["Root App is the single entry point for the cluster"] -.- Root
+    Note2["Infrastructure must sync before Workloads"] -.- InfraCat
+
+    Root@{ shape: rect}
+    InfraCat@{ shape: rect}
+    AppCat@{ shape: rect}
+     Root:::info
+     InfraCat:::infra
+     AppCat:::workload
+     Note1:::note
+     Note2:::note
+    classDef success fill:#90EE90,stroke:#2E7D32,color:#000
+    classDef infra fill:#81D4FA,stroke:#0277BD,color:#000
+    classDef workload fill:#CE93D8,stroke:#7B1FA2,color:#000
+    classDef info fill:#FFF9C4,stroke:#FBC02D,color:#000
+    classDef note fill:#F5F5F5,stroke:#9E9E9E,color:#616161,stroke-dasharray:3
+
+--- FILE: docs/code/high-lvl-cluster-architecture.mermaid ---
+flowchart TD
+    User["User Request"] --> Ingress["Network Edge (MetalLB/Envoy)"]
+    LE["Let's Encrypt (CA)"] -.->|TLS Certificates| Ingress
+
+    subgraph Cluster["K3s Cluster"]
+        direction TB
+        Ingress --> Auth{"Authentik (SSO)"}
+        
+        Auth -->|Authorized| Apps["Application Workloads"]
+        
+        Apps --> Storage["Storage (Longhorn/Garage)"]
+        
+        %% Control Plane Services
+        ESO["External Secrets"] -.->|Injects| Apps
+        Apps -.->|Telemetry| LGTM["Observability (LGTM)"]
+    end
+
+    classDef success fill:#90EE90,stroke:#2E7D32,color:#000
+    classDef info fill:#81D4FA,stroke:#0277BD,color:#000
+    classDef warning fill:#FFE082,stroke:#F57C00,color:#000
+    classDef note fill:#F5F5F5,stroke:#9E9E9E,color:#616161,stroke-dasharray:3
+
+    class Apps success
+    class Ingress info
+    class Auth,ESO warning
+    class Storage,LGTM,LE note
+
+--- FILE: README.md ---
+# GitOps-Homelab
+
+[![Kubernetes](https://img.shields.io/badge/kubernetes-%23326ce5.svg?style=flat&logo=kubernetes&logoColor=white)](https://kubernetes.io)
+[![ArgoCD](https://img.shields.io/badge/Argo%20CD-EF7B4D?style=flat&logo=argo-cd&logoColor=white)](https://argoproj.github.io/cd/)
+[![Istio](https://img.shields.io/badge/Istio-466BB0?style=flat&logo=istio&logoColor=white)](https://istio.io/)
+
+This repository serves as the **Single Source of Truth** for my homelab. Developed over the last eight months as part of my transition into DevOps.
+
+The cluster is managed through **Declarative GitOps** and the **App of Apps pattern**, ensuring the entire infrastructure—from networking to end-user services—is reproducible, version-controlled, and self-healing.
+
+---
+
+## System Architecture
+
+The environment is architected into two logical layers: **Infrastructure Core** (Platform Primitives) and **Application Workloads** (Service Layer).
+
+### Technical Stack
+
+| Layer | Component | Implementation |
+| :--- | :--- | :--- |
+| **Orchestration** | Runtime | **K3s** (Lightweight Kubernetes) |
+| **GitOps** | CD Engine | **ArgoCD** |
+| **Networking** | Service Mesh & L2 | **Istio**, **Envoy Gateway**, **MetalLB** |
+| **Storage** | Block & S3 | **Longhorn** (CSI), **Garage S3** |
+| **Security** | Identity & Secrets | **Authentik** (OIDC), **External Secrets (ESO)**, **Cert-Manager** |
+| **Observability** | LGTM Stack | **Loki**, **Grafana**, **Tempo**, **Prometheus** |
+
+Here is a high-level overview of the cluster.
+![High-Level Cluster Architecture](./docs/images/high-lvl-cluster-architecture.svg)
+
+---
+
+## Repository Lifecycle (The Sync Chain)
+
+To manage many different configurations, I'm using a multi-stage **ArgoCD sync chain**. This allows for a "bootstrap-from-zero" workflow where applying a single file triggers the recursive deployment of the entire stack.
+
+1.  **`bootstrap/`**: Contains the `root-app.yaml`. This is the manual entry point.
+2.  **`categories/`**: Defines parent "Category Apps" (Infrastructure vs. Applications) that orchestrate the order of operations.
+3.  **`argocd-apps/`**: Contains individual `Application` manifests for services like `istio` or `ghost`.
+4.  **`charts/`**: The configuration source, containing Helm `values.yaml` overrides, Istio `VirtualServices`, and ESO `SecretStores`.
+
+![ArgoCD App of Apps Architecture](./docs/images/argo-architecture.svg)
+
+
+---
+
+## Service Catalog
+
+### User-Facing Applications
+*   **[Ghost](https://ghost.jeremymr.dev/):** My personal blog platform. Engineered with a **MariaDB** backend and **Longhorn** for persistent volume management.
+*   **[Kleff](https://kleff.io):** A microservice architecture based PaaS (Vercel alternative). This serves as the testing ground for **Istio service mesh** traffic shifting and **distributed tracing with Tempo**.
+*   **Obsidian Vault Sync:** A **CouchDB** NoSQL cluster configured for cross-device synchronization of my Obsidian knowledge base.
+
+### Infrastructure Services
+*   **Garage S3:** Self-hosted, distributed S3 storage. Acts as the primary backup target for Longhorn snapshots and the long-term storage backend for Loki logs.
+*   **External Secrets (ESO):** Decouples secret management from Git. ESO dynamically pulls credentials from an encrypted provider and injects them as native K8s secrets at runtime.
+*   **Identity Management:** **Authentik** serves as the cluster's OIDC provider, enforcing unified SSO across internal administrative dashboards.
+
+---
+
+## Observability & Reliability
+
+The **LGTM stack** provides deep visibility into the cluster's health and performance:
+- **Metrics & Alerting:** Prometheus monitors node/pod resources with Grafana for visualization.
+- **Log Aggregation:** Loki handles log streams from the control plane and workloads.
+- **Distributed Tracing:** Tempo tracks requests through the Kleff Microservices to identify latency bottlenecks.
+- **Data Durability:** Automated volume backups are replicated to off-site S3 storage via Longhorn's recurring job system.
+
+---
+*Maintained by [Jeremy Misola](http://github.com/jeremy-misola) — DevOps Engineer & Platform Enthusiast.*
+
+---
+
+
+--- FILE: scripts/setup-docker.yaml ---
+---
+- hosts: management
+  become: true
+  vars:
+    container_count: 4
+    default_container_name: docker
+    default_container_image: ubuntu
+    default_container_command: sleep 1
+  
+  tasks:
+    - name: Install aptitude
+      apt:
+        name: aptitude
+        state: latest
+        update_cache: true
+
+    - name: Install required system packages
+      apt:
+        pkg:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - software-properties-common
+          - python3-pip
+          - virtualenv
+          - python3-setuptools
+        state: latest
+        update_cache: true
+    
+    - name: Add Docker GPG apt Key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: Add Docker Repository
+      apt_repository:
+        repo: deb https://download.docker.com/linux/ubuntu jammy stable
+        state: present
+
+    - name: Update apt and install docker-ce
+      apt:
+        name: docker-ce
+        state: latest
+        update_cache: true
+
+    - name: Install Docker Module for Python
+      pip:
+        name: docker
+
+
+--- FILE: scripts/control-plane-setup.yaml ---
+---
+- hosts: master
+  become: true
+
+  tasks:
+    - name: Install required system packages
+      apt:
+        pkg:
+          - kubecolor
+        state: latest
+        update_cache: true
+    
+    - name: Add aliases
+      ansible.builtin.lineinfile:
+        path: "~/.bashrc"
+        line: 'alias k="kubecolor"'
+        regexp: '^alias k="kubecolor"$'
+        state: present
+
+
+
+--- FILE: scripts/update-upgrade.yaml ---
+---
+- hosts: all
+  become: true
+  tasks:
+    - name: Update apt cache and upgrade all installed packages
+      ansible.builtin.apt:
+        update_cache: yes
+        upgrade: yes
+        cache_valid_time: 3600
+
+--- FILE: scripts/inventory.ini ---
+[all:vars]
+ansible_user=jurassicjey
+
+[management]
+192.168.0.205
+
+[master]
+192.168.0.210
+192.168.0.211
+192.168.0.212
+
+[worker]
+192.168.0.213
+192.168.0.214
+192.168.0.215
+
+--- FILE: tree-and-list.sh ---
+#!/bin/bash
+
+# GitOps-Homelab - SAFE FILE EXPORTER
+# Usage: ./script.sh > context.txt
+
+# --- CONFIGURATION ---
+OUTPUT_FILENAME="context.txt"
+MAX_FILE_SIZE_KB=500
+EXCLUDE_DIRS="\.git\|\.terraform\|node_modules\|venv\|\.venv\|dist\|build\|\.cache"
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# --- COLOR LOGIC ---
+# Only use colors if outputting to a terminal (not a file)
+if [ -t 1 ]; then
+    RED='\033[0;31m'
+    GREEN='\033[0;32m'
+    YELLOW='\033[1;33m'
+    BLUE='\033[0;34m'
+    CYAN='\033[0;36m'
+    WHITE='\033[1;37m'
+    NC='\033[0m'
+else
+    RED='' GREEN='' YELLOW='' BLUE='' CYAN='' WHITE='' NC=''
+fi
+
+echo -e "${WHITE}================================================================================${NC}"
+echo -e "${WHITE}                    GitOps-Homelab Project Context                           ${NC}"
+echo -e "${WHITE}================================================================================${NC}"
+echo -e "Generated on: $(date)"
+echo -e "Project Root: $PROJECT_ROOT"
+echo ""
+
+echo -e "${WHITE}🌳 DIRECTORY TREE STRUCTURE${NC}"
+if command -v tree >/dev/null 2>&1; then
+    tree -I '.git|.terraform|node_modules|venv|.venv|dist|build|.cache' "$PROJECT_ROOT"
+else
+    find . -maxdepth 2 -not -path '*/.*'
+fi
+
+echo -e "\n${WHITE}================================================================================${NC}"
+echo -e "${WHITE}                    FILE CONTENTS                                              ${NC}"
+echo -e "${WHITE}================================================================================${NC}"
+
+# Find files but EXPLICITLY ignore the output file itself to prevent crashes
+while IFS= read -r file; do
+    # 1. Skip if it's the output file we are currently writing to
+    if [[ "$file" == *"$OUTPUT_FILENAME"* ]]; then continue; fi
+    
+    # 2. Check file size
+    filesize=$(du -k "$file" | cut -f1)
+    if [ "$filesize" -gt "$MAX_FILE_SIZE_KB" ]; then
+        echo -e "${RED} [!] Skipping $file (Too Large: ${filesize}KB)${NC}"
+        continue
+    fi
+
+    relative_path="${file#$PROJECT_ROOT/}"
+    
+    echo -e "\n${WHITE}--- FILE: $relative_path ---${NC}"
+    
+    # Use cat for file output (cleaner than bat for text files)
+    if [ -t 1 ] && command -v bat >/dev/null 2>&1; then
+        bat --style=plain --color=always "$file"
+    else
+        cat "$file"
+    fi
+    echo ""
+
+done < <(find "$PROJECT_ROOT" -type f \
+    \( -name "*.yaml" -o -name "*.yml" -o -name "*.md" -o -name "*.sh" -o -name "*.mermaid" -o -name "*.ini" -o -name "*.hcl" -o -name "*.json" -o -name "*.txt" -o -name "*.conf" -o -name "*.config" \) \
+    -not -path "*/.*" | grep -v -E "$EXCLUDE_DIRS")
+
+echo -e "\n${GREEN}✅ Done.${NC}"
+
+--- FILE: categories/infrastructure.yaml ---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: infrastructure
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "-5"
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/jeremy-misola/GitOps-Homelab
+    targetRevision: develop
+    path: argocd-apps/infrastructure  
+    directory:
+      recurse: true       
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+
+--- FILE: categories/applications.yaml ---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: applications
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/jeremy-misola/GitOps-Homelab
+    targetRevision: develop
+    path: argocd-apps/apps
+    directory:
+      recurse: true       
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+
+--- FILE: argocd-apps/infrastructure/opentelemetry-collector/otel-operator.yaml ---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: otel-operator
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "15"
+spec:
+  project: default
+  source:
+    repoURL: https://open-telemetry.github.io/opentelemetry-helm-charts
+    chart: opentelemetry-operator
+    targetRevision: 0.102.0
+    helm:
+      values: |
+        admissionWebhooks:
+          certManager:
+            enabled: true
+        manager:
+          collectorImage:
+            repository: ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-k8s
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: opentelemetry-operator
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+
+--- FILE: argocd-apps/infrastructure/opentelemetry-collector/otel-collector.yaml ---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: otel-collector
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "14"
+spec:
+  project: default
+  source:
+    repoURL: https://open-telemetry.github.io/opentelemetry-helm-charts
+    chart: opentelemetry-collector
+    targetRevision: 0.143.0
+    helm:
+      values: |
+        image:
+          repository: "ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-k8s"
+        mode: daemonset
+        service:
+          enabled: true
+          type: ClusterIP
+
+        # 1. Provide permissions to read logs and talk to K8s API
+        presets:
+          logsCollection:
+            enabled: true
+          kubernetesAttributes:
+            enabled: true
+
+        config:
+          receivers:
+            otlp:
+              protocols:
+                grpc:
+                  endpoint: 0.0.0.0:4317
+                http:
+                  endpoint: 0.0.0.0:4318
+            # filelog is automatically configured by the logsCollection preset above,
+            # but you can override it here if needed.
+            filelog:
+              include: [ /var/log/pods/*/*/*.log ]
+              # Exclude the collector's own logs to avoid loops
+              exclude: [ /var/log/pods/opentelemetry-collector_*/*/*.log ]
+              operators:
+                - type: container
+
+          processors:
+            # Adds pod_name, namespace, etc. to the logs
+            k8sattributes:
+              extract:
+                metadata:
+                  - k8s.pod.name
+                  - k8s.pod.uid
+                  - k8s.deployment.name
+                  - k8s.namespace.name
+                  - k8s.node.name
+                  - k8s.container.name
+              pod_association:
+                - sources:
+                    - from: resource_attribute
+                      name: k8s.pod.name
+                - sources:
+                    - from: resource_attribute
+                      name: k8s.pod.ip
+
+            batch:
+              send_batch_size: 1000
+              timeout: 10s
+
+          exporters:
+            otlphttp/loki:
+              endpoint: http://loki-stack-gateway.loki.svc.cluster.local:80/otlp
+              headers:
+                X-Scope-OrgID: "1" 
+            otlp/tempo:
+              endpoint: tempo.tempo.svc.cluster.local:4317
+              tls:
+                insecure: true
+
+          service:
+            pipelines:
+              logs:
+                receivers: [otlp, filelog]
+                processors: [k8sattributes, batch]
+                exporters: [otlphttp/loki]
+              traces:
+                receivers: [otlp]
+                processors: [k8sattributes, batch]
+                exporters: [otlp/tempo]
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: opentelemetry-collector
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+
+--- FILE: argocd-apps/infrastructure/opentelemetry-collector/otel-config.yaml ---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: otel-config
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "16"
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/jeremy-misola/GitOps-Homelab 
+    targetRevision: develop
+    path: charts/open-telemetry
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: opentelemetry-operator
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+
+--- FILE: argocd-apps/infrastructure/loki/loki.yaml ---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: loki-stack
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "9"
+spec:
+  project: default
+  source:
+    repoURL: https://grafana.github.io/helm-charts
+    chart: loki
+    targetRevision: 6.49.0
+    helm:
+      values: |
+        loki:
+          # Configuration for the Loki binary itself
+          commonConfig:
+            replication_factor: 1
+          write:
+            replicas: 1
+          
+          schemaConfig:
+            configs:
+              - from: "2024-01-01"
+                store: tsdb
+                object_store: s3
+                schema: v13
+                index:
+                  prefix: loki_index_
+                  period: 24h
+
+          storage:
+            type: s3
+            bucketNames:
+              chunks: loki-chunks
+              ruler: loki-ruler
+              admin: loki-admin
+            s3:
+              endpoint: garage.garage.svc.cluster.local:3900 
+              region: garage
+              accessKeyId: ${S3_ACCESS_KEY}
+              secretAccessKey: ${S3_SECRET_KEY}
+              s3ForcePathStyle: true
+              insecure: true
+
+        # Injecting Secrets into all components (Read, Write, Backend)
+        write:
+          replicas: 1
+          extraArgs: ["-config.expand-env=true"]
+          extraEnv: &lokiEnv
+            - name: S3_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: garage-loki-secrets
+                  key: access-key-id
+            - name: S3_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: garage-loki-secrets
+                  key: secret-access-key
+        read:
+          replicas: 1
+          affinity: {}
+          extraArgs: ["-config.expand-env=true"]
+          extraEnv: *lokiEnv
+        backend:
+          replicas: 1
+          affinity: {}
+          extraArgs: ["-config.expand-env=true"]
+          extraEnv: *lokiEnv
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: loki
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+
+--- FILE: argocd-apps/infrastructure/cert-manager/cert-manager-config.yaml ---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cert-manager-config
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/jeremy-misola/GitOps-Homelab 
+    targetRevision: develop
+    path: charts/cert-manager
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: external-secrets
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+
+--- FILE: argocd-apps/infrastructure/cert-manager/cert-manager.yaml ---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cert-manager
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  project: default
+  source:
+    repoURL: https://charts.jetstack.io
+    chart: cert-manager
+    targetRevision: v1.19.2
+    helm:
+      parameters:
+        - name: installCRDs
+          value: 'true'
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: cert-manager
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+
+--- FILE: argocd-apps/infrastructure/authentik/authentik.yaml ---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: authentik
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "10"
+spec:
+  project: default
+  source:
+    repoURL: https://charts.goauthentik.io/
+    chart: authentik
+    targetRevision: 2025.10.3
+    helm:
+      values: |
+        authentik:
+          secret_key: ""
+          
+          # Disable chart-managed passwords
+          postgresql:
+            password: ""
+          redis:
+            password: ""
+
+        server:
+          env:
+            - name: AUTHENTIK_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: authentik-secrets
+                  key: AUTHENTIK_SECRET_KEY
+            - name: AUTHENTIK_POSTGRESQL__PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: authentik-secrets
+                  key: POSTGRESQL_PASSWORD
+            - name: AUTHENTIK_REDIS__PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: authentik-secrets
+                  key: REDIS_PASSWORD
+
+        worker:
+          env:
+            - name: AUTHENTIK_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: authentik-secrets
+                  key: AUTHENTIK_SECRET_KEY
+            - name: AUTHENTIK_POSTGRESQL__PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: authentik-secrets
+                  key: POSTGRESQL_PASSWORD
+            - name: AUTHENTIK_REDIS__PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: authentik-secrets
+                  key: REDIS_PASSWORD
+
+        postgresql:
+          enabled: true
+          auth:
+            existingSecret: "authentik-secrets"
+            secretKeys:
+              # Map the keys defined in your ExternalSecret
+              adminPasswordKey: "POSTGRESQL_PASSWORD"
+              userPasswordKey: "POSTGRESQL_PASSWORD"
+
+        redis:
+          enabled: true
+          auth:
+            enabled: true
+            existingSecret: "authentik-secrets"
+            existingSecretPasswordKey: "REDIS_PASSWORD"
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: authentik
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+
+--- FILE: argocd-apps/infrastructure/externalDNS/external-dns.yaml ---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: external-dns
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "10"
+spec:
+  project: default
+  source:
+    repoURL: https://kubernetes-sigs.github.io/external-dns
+    chart: external-dns
+    targetRevision: 1.20.0
+    helm:
+      values: |
+        provider: cloudflare
+
+        policy: sync
+        
+        registry: txt
+        txtOwnerId: paas-cluster
+
+        domainFilters:
+          - kleff.io
+        
+        serviceAccount:
+          create: true
+          name: external-dns
+        rbac:
+          create: true
+        sources:
+          - gateway-httproute
+
+        env:
+        - name: CF_API_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: cloudflare-api-token-kleff
+              key: api-token
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: external-dns
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+
+--- FILE: argocd-apps/infrastructure/longhorn/longhorn.yaml ---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: longhorn
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "4"
+spec:
+  project: default
+  source:
+    repoURL: https://charts.longhorn.io
+    chart: longhorn
+    targetRevision: 1.10.1
+    helm:
+      values: |
+        preUpgradeChecker:
+          jobEnabled: false
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: longhorn-system
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+
+--- FILE: argocd-apps/infrastructure/envoy-gateway/envoy-gateway-config.yaml ---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: envoy-gateway-config
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "11"
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/jeremy-misola/GitOps-Homelab 
+    targetRevision: develop
+    path: charts/envoy-gateway
+    directory:
+      recurse: true
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: envoy-gateway-system
+  syncPolicy:
+    automated:
+      prune: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+
+--- FILE: argocd-apps/infrastructure/envoy-gateway/envoy-gateway.yaml ---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: envoy-gateway
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "10"
+spec:
+  project: default
+  source:
+    path: .
+    repoURL: oci://docker.io/envoyproxy/gateway-helm 
+    targetRevision: 1.6.2
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: envoy-gateway-system
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+
+--- FILE: argocd-apps/infrastructure/tempo/tempo.yaml ---
+# apiVersion: argoproj.io/v1alpha1
+# kind: Application
+# metadata:
+#   name: tempo
+#   namespace: argocd
+#   annotations:
+#     argocd.argoproj.io/sync-wave: "9"
+# spec:
+#   project: default
+#   source:
+#     repoURL: https://grafana.github.io/helm-charts
+#     chart: tempo
+#     targetRevision: 1.24.2
+#   destination:
+#     server: https://kubernetes.default.svc
+#     namespace: tempo
+#   syncPolicy:
+#     automated:
+#       prune: true
+#       selfHeal: true
+#     syncOptions:
+#       - CreateNamespace=true
+
+--- FILE: argocd-apps/infrastructure/metallb/metallb.yaml ---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: metallb
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  project: default
+  source:
+    repoURL:  https://metallb.github.io/metallb
+    chart: metallb
+    targetRevision: 0.15.3
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: metallb
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+
+--- FILE: argocd-apps/infrastructure/metallb/metallb-config.yaml ---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: metallb-config
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/jeremy-misola/GitOps-Homelab 
+    targetRevision: develop
+    path: charts/metallb
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: metallb
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+
+--- FILE: argocd-apps/infrastructure/monitoring/kube-prometheus.yaml ---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kube-prometheus
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "9"
+spec:
+  project: default
+  source:
+    repoURL: https://prometheus-community.github.io/helm-charts
+    chart: kube-prometheus-stack
+    targetRevision: 80.13.3
+    helm:
+      values: |
+        grafana:
+          admin:
+            existingSecret: "grafana-secret"
+            userKey: admin-user
+            passwordKey: admin-password
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: monitoring
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+
+--- FILE: argocd-apps/infrastructure/monitoring/blackbox-exporter.yaml ---
+# apiVersion: argoproj.io/v1alpha1
+# kind: Application
+# metadata:
+#   name: blackbox-exporter
+#   namespace: argocd
+# spec:
+#   project: default
+#   source:
+#     repoURL: https://prometheus-community.github.io/helm-charts
+#     chart: prometheus-blackbox-exporter
+#     targetRevision: 11.7.0
+#     helm:
+#       values: |
+#         releaseLabel: true
+#         serviceMonitor:
+#           enabled: true
+#           defaults:
+#             labels:
+#               release: kube-prometheus
+#           targets:
+#           - name: argocd
+#             url: http://argocd.jeremymr.dev/healthz  # The URL that blackbox will scrape
+#             interval: 60s                    # Scraping interval. Overrides value set in `defaults`
+#             scrapeTimeout: 60s               # Scrape timeout. Overrides value set in `defaults`
+#             module: http_2xx                 # Module used for scraping. Overrides value set in `defaults`
+#           - name: kleff
+#             url: https://kleff.io
+#             interval: 60s
+#             scrapeTimeout: 60s
+#             module: http_2xx
+#   destination:
+#     server: https://kubernetes.default.svc
+#     namespace: monitoring
+  
+#   syncPolicy:
+#     automated:
+#       prune: true
+#       selfHeal: true
+#     syncOptions:
+#       - CreateNamespace=true
+#       - ServerSideApply=true
+
+
+--- FILE: argocd-apps/infrastructure/external-secrets/external-secrets.yaml ---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: external-secrets
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  project: default
+  source:
+    repoURL:  https://charts.external-secrets.io
+    chart: external-secrets
+    targetRevision: 1.2.1
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: external-secrets
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+
+--- FILE: argocd-apps/infrastructure/external-secrets/eso-config.yaml ---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: external-secrets-config
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/jeremy-misola/GitOps-Homelab 
+    targetRevision: develop
+    path: charts/external-secrets
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: external-secrets
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+
+--- FILE: argocd-apps/infrastructure/garage/garage.yaml ---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: garage
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "8"
+spec:
+  project: default
+  source:
+    repoURL: 'https://datahub-local.github.io/garage-helm'
+    chart: garage
+    targetRevision: 0.2.1
+    helm:
+      values: |
+        fullnameOverride: "garage"
+
+        clusterConfig:
+          enabled: true
+          layout:
+            enabled: true
+            zone: dc1
+            capacity: "10Gi"
+          
+          buckets:
+            - name: loki-chunks
+            - name: loki-ruler
+            - name: loki-admin
+          
+          keys: {}
+
+          extraCommands:
+            - "key create loki-key"
+            - "bucket allow loki-chunks --key loki-key --read --write"
+            - "bucket allow loki-ruler --key loki-key --read --write"
+            - "bucket allow loki-admin --key loki-key --read --write"
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: garage
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+
+--- FILE: argocd-apps/infrastructure/cloudnativepg/cloudnativepg.yaml ---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cloudnativepg
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "13"
+spec:
+  project: default
+  source:
+    repoURL: https://cloudnative-pg.io/charts/
+    chart: cloudnative-pg
+    targetRevision: 0.27.0
+    helm:
+      parameters:
+        - name: monitoring.podMonitorEnabled
+          value: 'true'
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: cloudnativepg
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+
+--- FILE: argocd-apps/apps/couchdb/couchdb.yaml ---
+# apiVersion: argoproj.io/v1alpha1
+# kind: Application
+# metadata:
+#   name: couchdb
+#   namespace: argocd
+# spec:
+#   project: default
+#   source:
+#     repoURL: https://apache.github.io/couchdb-helm
+#     chart: couchdb
+#     targetRevision: 4.6.3
+#     helm:
+#       values: |
+#         createAdminSecret: false
+#         extraSecretName: "couchdb-creds"
+#         adminPasswordKey: "adminUsername"
+#         adminPasswordKey: "adminPassword"
+#         cookieAuthSecretKey: "cookieAuthSecret"
+#         cookieAuthSecretKey: "erlangCookie"
+#         couchdbConfig:
+#           couchdb:
+#             uuid: $(curl https://www.uuidgenerator.net/api/version4 2>/dev/null | tr -d -)
+#   destination:
+#     server: https://kubernetes.default.svc
+#     namespace: couchdb
+  
+#   syncPolicy:
+#     automated:
+#       prune: true
+#       selfHeal: true
+#     syncOptions:
+#       - CreateNamespace=true
+#       - ServerSideApply=true
+
+
+--- FILE: argocd-apps/apps/kleff/operator.yaml ---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: webapp-operator
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: kleff.azurecr.io/helm
+    chart: operator
+    targetRevision: 0.1.0
+    helm:
+      values: |
+        manager:
+          image:
+            repository: kleff.azurecr.io/webapp-operator
+            tag: latest
+            pullPolicy: Always
+          imagePullSecrets:
+            - name: acr-creds
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+
+--- FILE: argocd-apps/apps/kleff/applications.yaml ---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kleff-deployment
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "11"
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/jeremy-misola/GitOps-Homelab
+    targetRevision: develop
+    path: charts/kleff
+    directory:
+      recurse: true       
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+
+--- FILE: argocd-apps/apps/ghost/ghost-saima.yaml ---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: ghost-saima
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  project: default
+  source:
+    path: .
+    repoURL: oci://registry-1.docker.io/cloudpirates/ghost
+    targetRevision: 0.6.5
+    helm:
+      values: |
+        extraEnvVars:
+          - name: url
+            value: "https://saimachowdhury.ca"
+          - name: admin__url
+            value: "https://admin.saimachowdhury.ca"
+          - name: mail__transport
+            value: "SMTP"
+          - name: mail__from
+            value: "misolarellinj06@gmail.com"
+          - name: mail__options__service
+            value: "Gmail"
+          - name: mail__options__host
+            value: "smtp.gmail.com"
+          - name: mail__options__port
+            value: "465"
+          - name: mail__options__secure
+            value: "true" # Required for port 465 / SSL
+          - name: mail__options__auth__user
+            value: "misolarellinj06@gmail.com"
+          - name: mail__options__auth__pass
+            valueFrom:
+              secretKeyRef:
+                name: gmail-app-password
+                key: app-password
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: ghost-saima
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+
+--- FILE: argocd-apps/apps/ghost/ghost.yaml ---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: ghost
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  project: default
+  source:
+    path: .
+    repoURL: oci://registry-1.docker.io/cloudpirates/ghost
+    targetRevision: 0.6.5
+    helm:
+      values: |
+        extraEnvVars:
+          - name: url
+            value: "https://ghost.jeremymr.dev"
+          - name: admin__url
+            value: "https://ghost-admin.jeremymr.dev"
+          - name: mail__transport
+            value: "SMTP"
+          - name: mail__from
+            value: "misolarellinj06@gmail.com"
+          - name: mail__options__service
+            value: "Gmail"
+          - name: mail__options__host
+            value: "smtp.gmail.com"
+          - name: mail__options__port
+            value: "465"
+          - name: mail__options__secure
+            value: "true" # Required for port 465 / SSL
+          - name: mail__options__auth__user
+            value: "misolarellinj06@gmail.com"
+          - name: mail__options__auth__pass
+            valueFrom:
+              secretKeyRef:
+                name: gmail-app-password
+                key: app-password
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: ghost
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+
+--- FILE: argocd-apps/apps/portfolio/portfolio.yaml ---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: portfolio
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "11"
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/jeremy-misola/GitOps-Homelab
+    targetRevision: develop
+    path: charts/portfolio
+    directory:
+      recurse: true       
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: portfolio
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+
+✅ Done.
