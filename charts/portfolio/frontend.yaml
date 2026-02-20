@@ -17,19 +17,6 @@ spec:
     spec:
       imagePullSecrets:
       - name: acr-creds
-      
-      # Init container to wait for database
-      initContainers:
-      - name: wait-for-db
-        image: postgres:16-alpine
-        command: ['sh', '-c', 'until pg_isready -h portfolio-db-rw -p 5432 -U portfolio; do echo waiting for database; sleep 2; done']
-        env:
-        - name: PGPASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: portfolio-db-app
-              key: password
-      
       containers:
       - name: frontend
         image: kleff.azurecr.io/portfolio:latest
@@ -41,11 +28,11 @@ spec:
         # Database environment variables from CNPG cluster secret
         env:
         - name: DATABASE_HOST
-          value: portfolio-db-rw
+          value: "postgres-db"       # Points to the Service name
         - name: DATABASE_PORT
-          value: "5432"
+          value: "5432"              # Default Postgres port
         - name: DATABASE_NAME
-          value: portfolio
+          value: "portfolio_db"      # Matches POSTGRES_DB in the StatefulSet
         - name: DATABASE_USER
           valueFrom:
             secretKeyRef:
@@ -56,7 +43,7 @@ spec:
             secretKeyRef:
               name: portfolio-db-app
               key: password
-        
+
         # Admin credentials from ExternalSecret
         - name: ADMIN_USERNAME
           valueFrom:
