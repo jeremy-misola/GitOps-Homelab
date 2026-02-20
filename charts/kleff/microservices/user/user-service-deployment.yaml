@@ -27,22 +27,37 @@ spec:
               # 2. Auth Configuration (Mapped from old OAUTH2_ISSUER_URI)
 
               value: "https://auth.kleff.io"
-            - name: DB_PASSWORD
-              # 3. Database Credentials (Helper variable to fetch the secret)
-
+            - name: DB_USERNAME
               valueFrom:
                 secretKeyRef:
-                  name: postgres-credentials
-                  key: user_db_password
+                  name: user-db-app
+                  key: username
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: user-db-app
+                  key: password
+            - name: DB_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: user-db-app
+                  key: host
+            - name: DB_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: user-db-app
+                  key: port
+            - name: DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: user-db-app
+                  key: dbname
             - name: POSTGRES_USER_DSN
-              # 4. Primary Database DSN
-
               # Format: postgres://username:password@host:port/dbname?sslmode=disable
-              value: "postgres://user_service:$(DB_PASSWORD)@user-db:5432/user_service?sslmode=disable"
+              value: "postgres://$(DB_USERNAME):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)?sslmode=disable"
             - name: POSTGRES_AUDIT_DSN
-              # 5. Audit Database DSN (Pointing to same DB for now, or change as needed)
-
-              value: "postgres://user_service:$(DB_PASSWORD)@user-db:5432/user_service?sslmode=disable"
+              # Audit Database DSN (Pointing to same DB for now, or change as needed)
+              value: "postgres://$(DB_USERNAME):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)?sslmode=disable"
             - name: AUTHENTIK_API_TOKEN
               valueFrom:
                 secretKeyRef:

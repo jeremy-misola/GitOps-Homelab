@@ -60,11 +60,38 @@ To manage many different configurations, I'm using a multi-stage **ArgoCD sync c
 
 ## Observability & Reliability
 
-The **LGTM stack** provides deep visibility into the cluster's health and performance:
-- **Metrics & Alerting:** Prometheus monitors node/pod resources with Grafana for visualization.
-- **Log Aggregation:** Loki handles log streams from the control plane and workloads.
-- **Distributed Tracing:** Tempo tracks requests through the Kleff Microservices to identify latency bottlenecks.
-- **Data Durability:** Automated volume backups are replicated to off-site S3 storage via Longhorn's recurring job system.
+A comprehensive observability stack built on the **LGTM** (Loki, Grafana, Tempo, Prometheus) framework with **OpenTelemetry** as the unified telemetry pipeline.
+
+### Architecture Overview
+
+![Observability Architecture](./docs/images/observability.svg)
+
+### Telemetry Pipeline
+
+| Component | Role | Configuration Highlights |
+| :--- | :--- | :--- |
+| **OpenTelemetry Collector** | Unified telemetry ingestion | DaemonSet mode, OTLP (gRPC/HTTP), K8s attributes enrichment, batch processing |
+| **Prometheus** | Metrics collection | Kube-Prometheus Stack with Alertmanager, ServiceMonitor CRDs |
+| **Loki** | Log aggregation | TSDB schema v13, S3 backend (Garage), OTLP ingestion via gateway |
+| **Tempo** | Distributed tracing | Backend for OpenTelemetry traces, gRPC receiver |
+| **Blackbox Exporter** | Endpoint probing | HTTP probes for external services (ArgoCD, Kleff) |
+| **Grafana** | Unified visualization | Single pane of glass for metrics, logs, and traces |
+
+### Data Flow
+
+1. **Metrics** — Prometheus scrapes metrics from K8s components, Envoy proxies, and Kleff microservices via `ServiceMonitor` CRDs
+2. **Logs** — OpenTelemetry Collector reads from `/var/log/pods`, enriches with K8s metadata, and pushes to Loki via OTLP
+3. **Traces** — Kleff microservices auto-instrumented with Java agent emit spans to Otel Collector → Tempo
+4. **Storage** — Loki persists log chunks to Garage S3 for cost-effective, durable long-term storage
+5. **Visualization** — Grafana queries all three backends (Prometheus, Loki, Tempo) for correlated observability
+
+### Key Features
+
+- **Zero-Code Instrumentation:** Java microservices automatically instrumented via OpenTelemetry Operator's `Instrumentation` CRD
+- **S3-Backed Storage:** Loki uses Garage S3 for scalable, cost-effective log retention
+- **Uptime Monitoring:** Blackbox Exporter probes external endpoints and exposes availability metrics to Prometheus
+- **Correlated Debugging:** Trace IDs from Tempo can be cross-referenced with logs in Loki through Grafana's Explore view
+- **Data Durability:** Automated volume backups are replicated to off-site S3 storage via Longhorn's recurring job system
 
 ---
 *Maintained by [Jeremy Misola](http://github.com/jeremy-misola) — DevOps Engineer & Platform Enthusiast.*

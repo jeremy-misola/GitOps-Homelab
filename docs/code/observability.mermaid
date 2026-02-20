@@ -1,0 +1,42 @@
+flowchart LR
+ subgraph Sources["Workloads"]
+        Apps["Kleff Apps"]
+        K8s["K8s / Envoy"]
+  end
+ subgraph Collection["Telemetry Pipeline"]
+        Otel["Otel Collector<br>(Process &amp; Batch)"]
+        Prom["Prometheus"]
+        Blackbox["Blackbox"]
+  end
+ subgraph Storage["Storage & Analysis"]
+        Loki["Loki (Logs)"]
+        Tempo["Tempo (Traces)"]
+        Garage[("Garage S3")]
+  end
+ subgraph UI["Visibility"]
+        Grafana["Grafana"]
+  end
+    K8s -- Logs/Traces --> Otel
+    Apps -- Metrics --> Prom
+    K8s -- Metrics --> Prom
+    Blackbox -- Probes --> Apps
+    Otel -- Push --> Loki & Tempo
+    Loki --> Garage
+    Loki -. Query .-> Grafana
+    Tempo -. Query .-> Grafana
+    Prom -. Query .-> Grafana
+    Apps -- Logs/Traces --> Otel
+
+     K8s:::workload
+     Apps:::workload
+     Blackbox:::collector
+     Prom:::collector
+     Otel:::collector
+     Garage:::backend
+     Tempo:::backend
+     Loki:::backend
+     Grafana:::ui
+    classDef workload fill:#e1f5fe,stroke:#01579b
+    classDef collector fill:#fff3e0,stroke:#e65100
+    classDef backend fill:#f3e5f5,stroke:#4a148c
+    classDef ui fill:#e8f5e9,stroke:#1b5e20

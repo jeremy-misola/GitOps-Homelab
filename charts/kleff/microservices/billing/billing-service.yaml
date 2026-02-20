@@ -16,10 +16,6 @@ spec:
         app: billing-service
         paas: kleff
     spec:
-      hostAliases:
-        - ip: "10.43.70.0" # Use the ClusterIP from your 'kubectl get svc'
-          hostnames:
-            - "api.kleff.io"
       imagePullSecrets:
         - name: acr-creds
       containers:
@@ -27,14 +23,20 @@ spec:
           image: kleff.azurecr.io/billing-service:14ebbb811011581d83c312f9b97beeadf7fcd845
           env:
             - name: SPRING_DATASOURCE_URL
-              value: jdbc:postgresql://billing-service-db:5432/mydb
+              valueFrom:
+                secretKeyRef:
+                  name: billing-service-db-app
+                  key: jdbc-uri
             - name: SPRING_DATASOURCE_USERNAME
-              value: postgres
+              valueFrom:
+                secretKeyRef:
+                  name: billing-service-db-app
+                  key: username
             - name: SPRING_DATASOURCE_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: postgres-credentials
-                  key: billing_db_password
+                  name: billing-service-db-app
+                  key: password
             - name: SPRING_JPA_HIBERNATE_DDL_AUTO
               value: update
             - name: STRIPE_API_KEY
@@ -48,10 +50,7 @@ spec:
                   name: postgres-credentials
                   key: frontend_url
             - name: VITE_BACKEND_URL
-              valueFrom:
-                secretKeyRef:
-                  name: postgres-credentials
-                  key: vite_backend_url
+              value: http://api-gateway.kleff-deployment.svc.cluster.local
           ports:
             - containerPort: 8080
           resources:

@@ -36,14 +36,6 @@
       apt_repository:
         repo: deb https://download.docker.com/linux/ubuntu jammy stable
         state: present
-    
-    - name: Download lazydocker
-      ansible.builtin.get_url:
-        url: https://raw.githubusercontent.com/jesseduffield/lazydocker/master/scripts/install_update_linux.sh
-        dest: ~/ansible
-
-    - name: Lazydocker install
-      ansible.builtin.script: ~/ansible/install_update_linux.sh
 
     - name: Update apt and install docker-ce
       apt:
