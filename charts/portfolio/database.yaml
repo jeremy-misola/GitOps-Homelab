@@ -4,6 +4,10 @@ metadata:
   name: portfolio-db
   namespace: portfolio
 spec:
+  managed:
+    databases:
+      - name: portfolio
+        owner: app
   
   postgresql:
     parameters:
@@ -30,4 +34,3 @@ spec:
     limits:
       memory: "1Gi"
       cpu: "500m"
-  
