@@ -1,0 +1,39 @@
+---
+config:
+  layout: dagre
+---
+flowchart TB
+ subgraph GitHub["GitHub Repository (Source of Truth)"]
+        Repo["GitOps-Homelab"]
+  end
+ subgraph ArgoControl["ArgoCD Control Plane"]
+        Root@{ label: "'Root' App" }
+        InfraCat@{ label: "'Infrastructure' Category" }
+        AppCat@{ label: "'Applications' Category" }
+  end
+ subgraph K8sCluster["Kubernetes Cluster State"]
+        Core["Platform Primitives"]
+        Services["User Services"]
+  end
+    Repo -- Manual Apply --> Root
+    Root -- Deploys /categories --> InfraCat & AppCat
+    InfraCat -. "Sync Wave: -5" .-> Core
+    AppCat -. Sync Wave: 0 .-> Services
+    InfraCat -- "Watches /argocd-apps/infrastructure" --> Core
+    AppCat -- "Watches /argocd-apps/apps" --> Services
+    Note1["Root App is the single entry point for the cluster"] -.- Root
+    Note2["Infrastructure must sync before Workloads"] -.- InfraCat
+
+    Root@{ shape: rect}
+    InfraCat@{ shape: rect}
+    AppCat@{ shape: rect}
+     Root:::info
+     InfraCat:::infra
+     AppCat:::workload
+     Note1:::note
+     Note2:::note
+    classDef success fill:#90EE90,stroke:#2E7D32,color:#000
+    classDef infra fill:#81D4FA,stroke:#0277BD,color:#000
+    classDef workload fill:#CE93D8,stroke:#7B1FA2,color:#000
+    classDef info fill:#FFF9C4,stroke:#FBC02D,color:#000
+    classDef note fill:#F5F5F5,stroke:#9E9E9E,color:#616161,stroke-dasharray:3
