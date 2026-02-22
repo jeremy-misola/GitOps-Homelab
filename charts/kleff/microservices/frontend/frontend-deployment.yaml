@@ -18,7 +18,7 @@ spec:
         - name: acr-creds
       containers:
         - name: kleff-frontend
-          image: kleff.azurecr.io/frontend:4f8ce4383efa2d5554773347acf66266ae447a9e
+          image: kleff.azurecr.io/frontend:c3953c92a18627f91b2b83616e545ce7361ae272
           env:
             - name: VITE_AUTH_CLIENT_ID
               value: "8qNA2sSV88fusOocZcMj6GirTLWYygdAXnmtLUfe"
