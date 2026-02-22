@@ -1,24 +1,6 @@
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
-  name: frontend-route
-  namespace: kleff-deployment
-spec:
-  parentRefs:
-    - name: prod-web
-      namespace: envoy-gateway-system
-  hostnames:
-    - "kleff.io"
-  rules:
-    - backendRefs:
-        - name: kleff-frontend
-          port: 80
-
----
-
-apiVersion: gateway.networking.k8s.io/v1
-kind: HTTPRoute
-metadata:
   name: microservices-route
   namespace: kleff-deployment
 spec:
@@ -30,7 +12,25 @@ spec:
     - "api-gateway.kleff-deployment.svc.cluster.local"
   rules:
     # ---------------------------------------------------------
-    # 1. USER & IDENTITY (Order Matters: Specific before General)
+    # 1. ADMIN ROUTES (Must come before general routes)
+    # ---------------------------------------------------------
+    
+    # Admin Project Management Routes
+    - matches:
+        - path: { type: PathPrefix, value: /api/v1/admin/projects }
+      backendRefs:
+        - name: project-management-service
+          port: 80
+
+    # Admin User Service Routes
+    - matches:
+        - path: { type: PathPrefix, value: /api/v1/admin }
+      backendRefs:
+        - name: user-service
+          port: 80
+
+    # ---------------------------------------------------------
+    # 2. USER & IDENTITY (Order Matters: Specific before General)
     # ---------------------------------------------------------
     
     # Specific Exception: Route specific user sub-path to Project Service
@@ -48,7 +48,7 @@ spec:
           port: 80
 
     # ---------------------------------------------------------
-    # 2. PROJECT MANAGEMENT SERVICE
+    # 3. PROJECT MANAGEMENT SERVICE
     # ---------------------------------------------------------
     - matches:
         - path: { type: PathPrefix, value: /api/v1/projects }
@@ -60,7 +60,7 @@ spec:
           port: 80
 
     # ---------------------------------------------------------
-    # 3. DEPLOYMENT & INFRASTRUCTURE
+    # 4. DEPLOYMENT & INFRASTRUCTURE
     # ---------------------------------------------------------
     
     # Combined Deployment Backend Service (Namespace & Build)
@@ -80,7 +80,7 @@ spec:
           port: 80
 
     # ---------------------------------------------------------
-    # 4. SUPPORTING SERVICES (Billing & Observability)
+    # 5. SUPPORTING SERVICES (Billing & Observability)
     # ---------------------------------------------------------
     
     # Billing Service
@@ -96,6 +96,7 @@ spec:
       backendRefs:
         - name: kleff-observability
           port: 80
+        
     # Chat Service
     - matches:
         - path: { type: PathPrefix, value: /api/v1/chat }
