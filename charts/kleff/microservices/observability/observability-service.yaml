@@ -32,6 +32,12 @@ spec:
               value: "http://loki-stack-gateway.loki.svc.cluster.local:80"
             - name: USER_SERVICE_URL
               value: "http://api-gateway.kleff-deployment.svc.cluster.local:80"
+            - name: PROJECT_MANAGEMENT_SERVICE_URL
+              value: "http://api-gateway.kleff-deployment.svc.cluster.local:80"
+            - name: CPU_ALERT_THRESHOLD
+              value: "80" 
+            - name: MEMORY_ALERT_THRESHOLD
+              value: "80"
           ports:
             - containerPort: 8080
           resources:
