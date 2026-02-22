@@ -1,16 +1,58 @@
-apiVersion: postgresql.cnpg.io/v1
-kind: Cluster
+apiVersion: v1
+kind: Service
 metadata:
   name: billing-service-db
   namespace: kleff-deployment
 spec:
-  instances: 1
-  storage:
-    storageClass: longhorn
-    size: 1Gi
-  bootstrap:
-    initdb:
-      database: mydb
-      owner: postgres
-  superuserSecret:
-    name: billing-db-credentials
+  ports:
+  - port: 5432
+  selector:
+    app: billing-service-db
+  clusterIP: None
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: billing-service-db
+  namespace: kleff-deployment
+spec:
+  serviceName: "billing-service-db"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: billing-service-db
+  template:
+    metadata:
+      labels:
+        app: billing-service-db
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:16
+        env:
+        - name: POSTGRES_DB
+          value: mydb
+        - name: PGDATA
+          value: /var/lib/postgresql/data/pgdata
+        - name: POSTGRES_USER
+          value: postgres
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-credentials
+              key: billing_db_password
+        ports:
+        - containerPort: 5432
+          name: postgres
+        volumeMounts:
+        - name: db-data
+          mountPath: /var/lib/postgresql/data
+  volumeClaimTemplates:
+  - metadata:
+      name: db-data
+    spec:
+      storageClassName: longhorn
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1Gi
