@@ -18,7 +18,7 @@ spec:
         - name: acr-creds
       containers:
         - name: observability-service
-          image: kleff.azurecr.io/observability-service:008a3ac3f6e01b442ab10d897e1b8c9f0af8fe81
+          image: kleff.azurecr.io/observability-service:4f8ce4383efa2d5554773347acf66266ae447a9e
           env:
             # 1. Port Configuration
             - name: SERVER_PORT
@@ -35,12 +35,12 @@ spec:
             - name: PROJECT_MANAGEMENT_SERVICE_URL
               value: "http://api-gateway.kleff-deployment.svc.cluster.local:80"
             - name: CPU_ALERT_THRESHOLD
-              value: "80" 
+              value: "80"
             - name: MEMORY_ALERT_THRESHOLD
               value: "80"
             - name: PROJECT_NAMESPACE_FILTERING_ENABLED
               value: "true"
-            - name: SYSTEM_NAMESPACE_BLOCKLIST 
+            - name: SYSTEM_NAMESPACE_BLOCKLIST
               value: "default,kube-system,kube-public,kube-node-lease,monitoring,ingress-nginx,loki,prometheus,cert-manager"
             - name: PROJECT_ENRICHMENT_MAX_CONCURRENCY
               value: "8"
