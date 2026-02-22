@@ -20,23 +20,17 @@ spec:
         - name: acr-creds
       containers:
         - name: billing-service
-          image: kleff.azurecr.io/billing-service:14ebbb811011581d83c312f9b97beeadf7fcd845
+          image: kleff.azurecr.io/billing-service:008a3ac3f6e01b442ab10d897e1b8c9f0af8fe81
           env:
             - name: SPRING_DATASOURCE_URL
-              valueFrom:
-                secretKeyRef:
-                  name: billing-service-db-app
-                  key: jdbc-uri
+              value: jdbc:postgresql://billing-service-db:5432/mydb
             - name: SPRING_DATASOURCE_USERNAME
-              valueFrom:
-                secretKeyRef:
-                  name: billing-service-db-app
-                  key: username
+              value: postgres
             - name: SPRING_DATASOURCE_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: billing-service-db-app
-                  key: password
+                  name: postgres-credentials
+                  key: billing_db_password
             - name: SPRING_JPA_HIBERNATE_DDL_AUTO
               value: update
             - name: STRIPE_API_KEY
