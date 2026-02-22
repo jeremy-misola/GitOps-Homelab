@@ -38,6 +38,12 @@ spec:
               value: "80" 
             - name: MEMORY_ALERT_THRESHOLD
               value: "80"
+            - name: PROJECT_NAMESPACE_FILTERING_ENABLED
+              value: "true"
+            - name: SYSTEM_NAMESPACE_BLOCKLIST 
+              value: "default,kube-system,kube-public,kube-node-lease,monitoring,ingress-nginx,loki,prometheus,cert-manager"
+            - name: PROJECT_ENRICHMENT_MAX_CONCURRENCY
+              value: "8"
           ports:
             - containerPort: 8080
           resources:
