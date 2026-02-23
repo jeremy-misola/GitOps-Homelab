@@ -40,12 +40,20 @@ spec:
         - name: project-management-service
           port: 80
 
-    # Admin User Service Routes
+    # ⭐ NEW: Admin Insights Route (Observability Service)
+    - matches:
+        - path: { type: PathPrefix, value: /api/v1/admin/insights }
+      backendRefs:
+        - name: kleff-observability
+          port: 80
+
+    # Admin User Service Routes (general /api/v1/admin)
     - matches:
         - path: { type: PathPrefix, value: /api/v1/admin }
       backendRefs:
         - name: user-service
           port: 80
+
 
     # ---------------------------------------------------------
     # 2. USER & IDENTITY (Order Matters: Specific before General)
