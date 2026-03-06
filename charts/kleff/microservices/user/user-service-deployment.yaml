@@ -18,7 +18,7 @@ spec:
         - name: acr-creds
       containers:
         - name: user-service
-          image: kleff.azurecr.io/user-service:7dd6bdef043938632f59c6efc101f8dbc54944ef
+          image: kleff.azurecr.io/user-service:e0e100f296a10e11da8d5dca127255ad56aae6c7
           env:
             # 1. Port Configuration
             - name: HTTP_ADDR
@@ -27,37 +27,22 @@ spec:
               # 2. Auth Configuration (Mapped from old OAUTH2_ISSUER_URI)
 
               value: "https://auth.kleff.io"
-            - name: DB_USERNAME
-              valueFrom:
-                secretKeyRef:
-                  name: user-db-app
-                  key: username
             - name: DB_PASSWORD
+              # 3. Database Credentials (Helper variable to fetch the secret)
+
               valueFrom:
                 secretKeyRef:
-                  name: user-db-app
-                  key: password
-            - name: DB_HOST
-              valueFrom:
-                secretKeyRef:
-                  name: user-db-app
-                  key: host
-            - name: DB_PORT
-              valueFrom:
-                secretKeyRef:
-                  name: user-db-app
-                  key: port
-            - name: DB_NAME
-              valueFrom:
-                secretKeyRef:
-                  name: user-db-app
-                  key: dbname
+                  name: postgres-credentials
+                  key: user_db_password
             - name: POSTGRES_USER_DSN
+              # 4. Primary Database DSN
+
               # Format: postgres://username:password@host:port/dbname?sslmode=disable
-              value: "postgres://$(DB_USERNAME):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)?sslmode=disable"
+              value: "postgres://user_service:$(DB_PASSWORD)@user-db:5432/user_service?sslmode=disable"
             - name: POSTGRES_AUDIT_DSN
-              # Audit Database DSN (Pointing to same DB for now, or change as needed)
-              value: "postgres://$(DB_USERNAME):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)?sslmode=disable"
+              # 5. Audit Database DSN (Pointing to same DB for now, or change as needed)
+
+              value: "postgres://user_service:$(DB_PASSWORD)@user-db:5432/user_service?sslmode=disable"
             - name: AUTHENTIK_API_TOKEN
               valueFrom:
                 secretKeyRef:
