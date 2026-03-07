@@ -1,0 +1,128 @@
+diff --git a/.gitignore b/.gitignore
+index 2eea525..377731a 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -1 +1,28 @@
+-.env
+\ No newline at end of file
++.env
++
++# Terraform
++# Local .terraform directories
++.terraform/
++
++# .tfstate files
++*.tfstate
++*.tfstate.*
++
++# Crash log files
++crash.log
++crash.*.log
++
++# Sensitive variable files
++*.tfvars
++*.tfvars.json
++!*.example.tfvars
++
++# Override files
++override.tf
++override.tf.json
++*_override.tf
++*_override.tf.json
++
++# CLI configuration files
++.terraformrc
++terraform.rc
+\ No newline at end of file
+diff --git a/README.md b/README.md
+index 014490c..3dbd5a8 100644
+--- a/README.md
++++ b/README.md
+@@ -23,6 +23,7 @@ The environment is architected into two logical layers: **Infrastructure Core**
+ | **Networking** | Service Mesh & L2 | **Istio**, **Envoy Gateway**, **MetalLB** |
+ | **Storage** | Block & S3 | **Longhorn** (CSI), **Garage S3** |
+ | **Security** | Identity & Secrets | **Authentik** (OIDC), **External Secrets (ESO)**, **Cert-Manager** |
++| **Infrastructure as Code** | Resource Management | **Crossplane** (with provider-terraform) |
+ | **Observability** | LGTM Stack | **Loki**, **Grafana**, **Tempo**, **Prometheus** |
+ 
+ Here is a high-level overview of the cluster.
+diff --git a/manifests/infra/envoy-gateway/routes/longhorn/client-id-secret.yaml b/manifests/infra/envoy-gateway/routes/longhorn/client-id-secret.yaml
+deleted file mode 100644
+index 4280d69..0000000
+--- a/manifests/infra/envoy-gateway/routes/longhorn/client-id-secret.yaml
++++ /dev/null
+@@ -1,16 +0,0 @@
+-apiVersion: external-secrets.io/v1
+-kind: ExternalSecret
+-metadata:
+-  name: longhorn-client-secret
+-  namespace: longhorn-system
+-spec:
+-  secretStoreRef:
+-    name: doppler-secret-store
+-    kind: ClusterSecretStore
+-  target:
+-    name: longhorn-client-secret
+-    creationPolicy: Owner
+-  data:
+-  - secretKey: client-secret
+-    remoteRef:
+-      key: HOMELAB_AUTHENTIK_LONGHORN_CLIENT_SECRET
+\ No newline at end of file
+diff --git a/manifests/infra/envoy-gateway/routes/longhorn/security-policy.yaml b/manifests/infra/envoy-gateway/routes/longhorn/security-policy.yaml
+index 40b1196..ff0a194 100644
+--- a/manifests/infra/envoy-gateway/routes/longhorn/security-policy.yaml
++++ b/manifests/infra/envoy-gateway/routes/longhorn/security-policy.yaml
+@@ -3,6 +3,9 @@ kind: SecurityPolicy
+ metadata:
+   name: longhorn-oidc-config
+   namespace: longhorn-system
++  annotations:
++    # Crossplane creates the secret, so we need to ensure it exists first
++    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+ spec:
+   targetRefs:
+     - group: gateway.networking.k8s.io
+@@ -11,8 +14,13 @@ spec:
+   oidc:
+     provider:
+       issuer: "https://auth.jeremymr.dev/application/o/longhorn/"
+-    clientID: "Wxqom19mHxBaVE3loYlVPsl4TgcpCupOOkmnDR5X"
++    # Client ID and Secret are now managed by Crossplane Workspace
++    # The secret is created by: manifests/infra/crossplane/workspaces/longhorn-auth.yaml
++    clientID:
++      name: longhorn-client-secret
++      key: client_id
+     clientSecret:
+-      name: "longhorn-client-secret"
++      name: longhorn-client-secret
++      key: client_secret
+     redirectURL: "https://longhorn.jeremymr.dev/oauth2/callback"
+-    logoutPath: "/logout"
+\ No newline at end of file
++    logoutPath: "/logout"
+diff --git a/manifests/shared/cloudflare-secret.yaml b/manifests/shared/cloudflare-secret.yaml
+index d0f9547..cd76dd1 100644
+--- a/manifests/shared/cloudflare-secret.yaml
++++ b/manifests/shared/cloudflare-secret.yaml
+@@ -14,20 +14,3 @@ spec:
+   - secretKey: api-token
+     remoteRef:
+       key: CLOUDFLARE_API_TOKEN
+----
+-apiVersion: external-secrets.io/v1
+-kind: ExternalSecret
+-metadata:
+-  name: cloudflare-api-token-kleff
+-  namespace: external-dns
+-spec:
+-  secretStoreRef:
+-    name: doppler-secret-store
+-    kind: ClusterSecretStore
+-  target:
+-    name: cloudflare-api-token-kleff
+-    creationPolicy: Owner
+-  data:
+-  - secretKey: api-token
+-    remoteRef:
+-      key: CLOUDFLARE_API_TOKEN

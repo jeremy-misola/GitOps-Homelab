@@ -1,0 +1,162 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: authentik-oidc-app-module
+  namespace: crossplane-system
+  annotations:
+    crossplane.io/terraform-module: "true"
+data:
+  main.tf: |
+    terraform {
+      required_providers {
+        authentik = {
+          source  = "goauthentik/authentik"
+          version = "~> 2025.2.0"
+        }
+      }
+    }
+
+    provider "authentik" {
+      url   = var.authentik_url
+      token = var.authentik_token
+    }
+
+    # Create OIDC Provider
+    resource "authentik_provider_oauth2" "oidc" {
+      name               = var.app_name
+      authorization_flow = var.authorization_flow
+      client_id          = var.client_id
+      
+      # Client secret will be auto-generated if not provided
+      client_type        = "confidential"
+      
+      redirect_uris = [
+        var.redirect_uri
+      ]
+      
+      property_mappings = var.property_mappings
+      
+      signing_key = var.signing_key
+      access_token_validity = var.access_token_validity
+      refresh_token_validity = var.refresh_token_validity
+    }
+
+    # Create Application
+    resource "authentik_application" "app" {
+      name              = var.app_name
+      slug              = var.app_slug
+      provider          = authentik_provider_oauth2.oidc.id
+      policy_engine_mode = var.policy_engine_mode
+      
+      dynamic "meta_launch_url" {
+        for_each = var.launch_url != "" ? [1] : []
+        content {
+          value = var.launch_url
+        }
+      }
+      
+      dynamic "icon" {
+        for_each = var.icon_url != "" ? [1] : []
+        content {
+          value = var.icon_url
+        }
+      }
+    }
+
+    # Outputs for Kubernetes secret
+    output "client_id" {
+      value = authentik_provider_oauth2.oidc.client_id
+    }
+
+    output "client_secret" {
+      value     = authentik_provider_oauth2.oidc.client_secret
+      sensitive = true
+    }
+
+    output "application_id" {
+      value = authentik_application.app.id
+    }
+
+    output "provider_id" {
+      value = authentik_provider_oauth2.oidc.id
+    }
+  variables.tf: |
+    variable "authentik_url" {
+      type        = string
+      description = "Authentik server URL"
+    }
+
+    variable "authentik_token" {
+      type        = string
+      sensitive   = true
+      description = "Authentik API token"
+    }
+
+    variable "app_name" {
+      type        = string
+      description = "Name of the application"
+    }
+
+    variable "app_slug" {
+      type        = string
+      description = "URL-friendly slug for the application"
+    }
+
+    variable "redirect_uri" {
+      type        = string
+      description = "OAuth2 redirect URI"
+    }
+
+    variable "client_id" {
+      type        = string
+      default     = ""
+      description = "Optional client ID (auto-generated if empty)"
+    }
+
+    variable "authorization_flow" {
+      type        = string
+      default     = "default-provider-authorization-explicit-consent"
+      description = "UUID of the authorization flow"
+    }
+
+    variable "property_mappings" {
+      type        = list(string)
+      default     = []
+      description = "List of property mapping UUIDs"
+    }
+
+    variable "signing_key" {
+      type        = string
+      default     = ""
+      description = "Signing key name for JWT tokens"
+    }
+
+    variable "access_token_validity" {
+      type        = string
+      default     = "hours=1"
+      description = "Access token validity duration"
+    }
+
+    variable "refresh_token_validity" {
+      type        = string
+      default     = "days=30"
+      description = "Refresh token validity duration"
+    }
+
+    variable "policy_engine_mode" {
+      type        = string
+      default     = "any"
+      description = "Policy engine mode"
+    }
+
+    variable "launch_url" {
+      type        = string
+      default     = ""
+      description = "Launch URL for the application"
+    }
+
+    variable "icon_url" {
+      type        = string
+      default     = ""
+      description = "Icon URL for the application"
+    }

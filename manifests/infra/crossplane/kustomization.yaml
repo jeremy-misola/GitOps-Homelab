@@ -1,0 +1,18 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  # Providers - installed first
+  - providers/provider-terraform.yaml
+  - providers/provider-config.yaml
+  
+  # Secrets - need to be ready before workspaces
+  - secrets/authentik-api-token.yaml
+  
+  # Workspaces - actual infrastructure
+  - workspaces/longhorn-auth.yaml
+
+# Common labels for all resources
+commonLabels:
+  app.kubernetes.io/managed-by: argocd
+  app.kubernetes.io/part-of: crossplane-config

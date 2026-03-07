@@ -1,0 +1,75 @@
+apiVersion: tf.crossplane.io/v1alpha1
+kind: Workspace
+metadata:
+  name: longhorn-auth
+  namespace: crossplane-system
+  annotations:
+    crossplane.io/external-name: longhorn-auth
+spec:
+  forProvider:
+    # Inline Terraform configuration for Authentik OIDC app
+    source: Inline
+    module: |
+      terraform {
+        required_providers {
+          authentik = {
+            source  = "goauthentik/authentik"
+            version = "~> 2025.2.0"
+          }
+        }
+      }
+
+      provider "authentik" {
+        url   = var.authentik_url
+        token = var.authentik_token
+      }
+
+      # Create OIDC Provider
+      resource "authentik_provider_oauth2" "longhorn" {
+        name               = "Longhorn"
+        authorization_flow = var.authorization_flow
+        client_type        = "confidential"
+        
+        redirect_uris = [
+          "https://longhorn.jeremymr.dev/oauth2/callback"
+        ]
+      }
+
+      # Create Application
+      resource "authentik_application" "longhorn" {
+        name              = "Longhorn"
+        slug              = "longhorn"
+        provider          = authentik_provider_oauth2.longhorn.id
+        policy_engine_mode = "any"
+      }
+
+      # Outputs for Kubernetes secret
+      output "client_id" {
+        value = authentik_provider_oauth2.longhorn.client_id
+      }
+
+      output "client_secret" {
+        value     = authentik_provider_oauth2.longhorn.client_secret
+        sensitive = true
+      }
+
+    variables:
+      - key: authentik_url
+        value: "https://auth.jeremymr.dev"
+      - key: authentik_token
+        sensitive: true
+        valueFrom:
+          secretKeyRef:
+            namespace: crossplane-system
+            name: authentik-api-token
+            key: token
+      - key: authorization_flow
+        value: "default-provider-authorization-explicit-consent"
+
+  # Write outputs to a secret that can be used by SecurityPolicy
+  writeConnectionSecretToRef:
+    name: longhorn-client-secret
+    namespace: longhorn-system
+
+  providerConfigRef:
+    name: terraform-config

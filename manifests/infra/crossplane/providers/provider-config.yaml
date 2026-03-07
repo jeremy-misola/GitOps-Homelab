@@ -1,0 +1,15 @@
+apiVersion: tf.crossplane.io/v1alpha1
+kind: ProviderConfig
+metadata:
+  name: terraform-config
+spec:
+  configuration:
+    # Terraform will run in-cluster and requires credentials for external providers
+    # Authentik credentials are injected via environment variables
+  credentials:
+    - filename: authentik-token
+      source: Secret
+      secretRef:
+        namespace: crossplane-system
+        name: authentik-api-token
+        key: token

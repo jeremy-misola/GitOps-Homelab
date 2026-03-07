@@ -23,6 +23,7 @@ The environment is architected into two logical layers: **Infrastructure Core** 
 | **Networking** | Service Mesh & L2 | **Istio**, **Envoy Gateway**, **MetalLB** |
 | **Storage** | Block & S3 | **Longhorn** (CSI), **Garage S3** |
 | **Security** | Identity & Secrets | **Authentik** (OIDC), **External Secrets (ESO)**, **Cert-Manager** |
+| **Infrastructure as Code** | Resource Management | **Crossplane** (with provider-terraform) |
 | **Observability** | LGTM Stack | **Loki**, **Grafana**, **Tempo**, **Prometheus** |
 
 Here is a high-level overview of the cluster.

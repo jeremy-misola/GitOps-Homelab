@@ -3,6 +3,9 @@ kind: SecurityPolicy
 metadata:
   name: longhorn-oidc-config
   namespace: longhorn-system
+  annotations:
+    # Crossplane creates the secret, so we need to ensure it exists first
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
   targetRefs:
     - group: gateway.networking.k8s.io
@@ -11,8 +14,13 @@ spec:
   oidc:
     provider:
       issuer: "https://auth.jeremymr.dev/application/o/longhorn/"
-    clientID: "Wxqom19mHxBaVE3loYlVPsl4TgcpCupOOkmnDR5X"
+    # Client ID and Secret are now managed by Crossplane Workspace
+    # The secret is created by: manifests/infra/crossplane/workspaces/longhorn-auth.yaml
+    clientID:
+      name: longhorn-client-secret
+      key: client_id
     clientSecret:
-      name: "longhorn-client-secret"
+      name: longhorn-client-secret
+      key: client_secret
     redirectURL: "https://longhorn.jeremymr.dev/oauth2/callback"
     logoutPath: "/logout"
