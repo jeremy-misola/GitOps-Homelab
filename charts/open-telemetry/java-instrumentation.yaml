@@ -1,8 +1,9 @@
+# Template for OpenTelemetry Java auto-instrumentation
+# Update the namespace to match your target application namespace
 apiVersion: opentelemetry.io/v1alpha1
 kind: Instrumentation
 metadata:
   name: java-instrumentation
-  namespace: kleff-deployment
 spec:
   exporter:
     endpoint: http://otel-collector-opentelemetry-collector.opentelemetry-collector.svc.cluster.local:4317

@@ -48,7 +48,6 @@ To manage many different configurations, I'm using a multi-stage **ArgoCD sync c
 
 ### User-Facing Applications
 *   **[Ghost](https://ghost.jeremymr.dev/):** My personal blog platform. Engineered with a **MariaDB** backend and **Longhorn** for persistent volume management.
-*   **[Kleff](https://kleff.io):** A microservice architecture based PaaS (Vercel alternative). This serves as the testing ground for **Istio service mesh** traffic shifting and **distributed tracing with Tempo**.
 *   **Obsidian Vault Sync:** A **CouchDB** NoSQL cluster configured for cross-device synchronization of my Obsidian knowledge base.
 
 ### Infrastructure Services
@@ -74,14 +73,14 @@ A comprehensive observability stack built on the **LGTM** (Loki, Grafana, Tempo,
 | **Prometheus** | Metrics collection | Kube-Prometheus Stack with Alertmanager, ServiceMonitor CRDs |
 | **Loki** | Log aggregation | TSDB schema v13, S3 backend (Garage), OTLP ingestion via gateway |
 | **Tempo** | Distributed tracing | Backend for OpenTelemetry traces, gRPC receiver |
-| **Blackbox Exporter** | Endpoint probing | HTTP probes for external services (ArgoCD, Kleff) |
+| **Blackbox Exporter** | Endpoint probing | HTTP probes for external services (ArgoCD) |
 | **Grafana** | Unified visualization | Single pane of glass for metrics, logs, and traces |
 
 ### Data Flow
 
-1. **Metrics** — Prometheus scrapes metrics from K8s components, Envoy proxies, and Kleff microservices via `ServiceMonitor` CRDs
+1. **Metrics** — Prometheus scrapes metrics from K8s components and Envoy proxies via `ServiceMonitor` CRDs
 2. **Logs** — OpenTelemetry Collector reads from `/var/log/pods`, enriches with K8s metadata, and pushes to Loki via OTLP
-3. **Traces** — Kleff microservices auto-instrumented with Java agent emit spans to Otel Collector → Tempo
+3. **Traces** — Microservices auto-instrumented with Java agent emit spans to Otel Collector → Tempo
 4. **Storage** — Loki persists log chunks to Garage S3 for cost-effective, durable long-term storage
 5. **Visualization** — Grafana queries all three backends (Prometheus, Loki, Tempo) for correlated observability
 
