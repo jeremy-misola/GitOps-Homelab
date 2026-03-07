@@ -1,0 +1,10 @@
+extends: default
+
+ignore: |
+  docs/images/**
+
+rules:
+  comments-indentation: disable
+  document-start: disable
+  line-length: disable
+  truthy: disable

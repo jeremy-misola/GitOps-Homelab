@@ -16,9 +16,17 @@ spec:
       labels:
         app: postgres
     spec:
+      securityContext:
+        fsGroup: 999
       containers:
       - name: postgres
         image: postgres:15-alpine
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 999
+          runAsGroup: 999
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
         ports:
         - containerPort: 5432
           name: postgresql
@@ -47,6 +55,10 @@ spec:
         volumeMounts:
         - name: postgres-data
           mountPath: /var/lib/postgresql/data
+        - name: tmp
+          mountPath: /tmp
+        - name: run
+          mountPath: /var/run/postgresql
         livenessProbe:
           exec:
             command:
@@ -63,6 +75,11 @@ spec:
               - pg_isready -U "$POSTGRES_USER" -d "$POSTGRES_DB"
           initialDelaySeconds: 5
           periodSeconds: 5
+      volumes:
+      - name: tmp
+        emptyDir: {}
+      - name: run
+        emptyDir: {}
   volumeClaimTemplates:
   - metadata:
       name: postgres-data
