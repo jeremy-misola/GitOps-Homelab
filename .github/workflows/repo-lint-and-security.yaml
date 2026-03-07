@@ -1,0 +1,111 @@
+name: Repo Lint And Security
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/**/*.y*ml"
+      - "**/*.y*ml"
+      - ".yamllint.yaml"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/**/*.y*ml"
+      - "**/*.y*ml"
+      - ".yamllint.yaml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: repo-lint-and-security-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  actionlint:
+    name: actionlint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Install actionlint
+        env:
+          ACTIONLINT_VERSION: v1.7.7
+        run: |
+          set -euo pipefail
+          curl -fsSL -o actionlint.tar.gz \
+            "https://github.com/rhysd/actionlint/releases/download/${ACTIONLINT_VERSION}/actionlint_${ACTIONLINT_VERSION#v}_linux_amd64.tar.gz"
+          tar -xzf actionlint.tar.gz actionlint
+          mkdir -p "${HOME}/.local/bin"
+          mv actionlint "${HOME}/.local/bin/actionlint"
+          echo "${HOME}/.local/bin" >> "${GITHUB_PATH}"
+          actionlint -version
+
+      - name: Lint GitHub Actions workflows
+        run: actionlint -color
+
+  yamllint:
+    name: yamllint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Install yamllint
+        run: |
+          set -euo pipefail
+          python3 -m pip install --upgrade pip
+          python3 -m pip install yamllint
+
+      - name: Lint YAML
+        run: yamllint -c .yamllint.yaml .
+
+  gitleaks:
+    name: gitleaks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Install gitleaks
+        env:
+          GITLEAKS_VERSION: 8.27.2
+        run: |
+          set -euo pipefail
+          curl -fsSL -o gitleaks.tar.gz \
+            "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz"
+          tar -xzf gitleaks.tar.gz gitleaks
+          mkdir -p "${HOME}/.local/bin"
+          mv gitleaks "${HOME}/.local/bin/gitleaks"
+          echo "${HOME}/.local/bin" >> "${GITHUB_PATH}"
+          gitleaks version
+
+      - name: Scan for secrets
+        run: gitleaks detect --source . --redact --verbose --no-banner
+
+  kube-linter:
+    name: kube-linter
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Install kube-linter
+        env:
+          KUBE_LINTER_VERSION: 0.7.6
+        run: |
+          set -euo pipefail
+          curl -fsSL -o kube-linter.tar.gz \
+            "https://github.com/stackrox/kube-linter/releases/download/v${KUBE_LINTER_VERSION}/kube-linter-linux.tar.gz"
+          tar -xzf kube-linter.tar.gz kube-linter
+          mkdir -p "${HOME}/.local/bin"
+          mv kube-linter "${HOME}/.local/bin/kube-linter"
+          echo "${HOME}/.local/bin" >> "${GITHUB_PATH}"
+          kube-linter version
+
+      - name: Lint Kubernetes manifests
+        run: kube-linter lint bootstrap categories manifests
