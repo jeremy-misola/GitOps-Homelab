@@ -1,4 +1,4 @@
-name: backstage
+name: backstage-config
 namespace: backstage
 syncWave: "19"
 repoURL: https://github.com/jeremy-misola/GitOps-Homelab
