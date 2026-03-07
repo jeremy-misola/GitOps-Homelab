@@ -1,0 +1,6 @@
+name: backstage
+namespace: backstage
+syncWave: "19"
+repoURL: https://github.com/jeremy-misola/GitOps-Homelab
+targetRevision: develop
+appPath: manifests/apps/backstage

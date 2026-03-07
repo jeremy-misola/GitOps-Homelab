@@ -1,0 +1,10 @@
+name: backstage
+namespace: backstage
+syncWave: "20"
+repoURL: https://backstage.github.io/charts
+chart: backstage
+targetRevision: 2.6.3
+values: |
+  backstage:
+    extraEnvVarsSecrets:
+      - backstage-secrets
