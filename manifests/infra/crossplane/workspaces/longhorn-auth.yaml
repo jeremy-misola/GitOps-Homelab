@@ -5,6 +5,7 @@ metadata:
   namespace: crossplane-system
   annotations:
     crossplane.io/external-name: longhorn-auth
+    argocd.argoproj.io/sync-wave: "10"
 spec:
   forProvider:
     # Inline Terraform configuration for Authentik OIDC app

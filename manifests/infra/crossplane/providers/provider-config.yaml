@@ -2,6 +2,8 @@ apiVersion: tf.crossplane.io/v1alpha1
 kind: ProviderConfig
 metadata:
   name: terraform-config
+  annotations:
+    argocd.argoproj.io/sync-wave: "5"
 spec:
   configuration:
     # Terraform will run in-cluster and requires credentials for external providers
