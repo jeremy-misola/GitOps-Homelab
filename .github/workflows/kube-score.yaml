@@ -16,4 +16,4 @@ jobs:
       - name: Run kube-score analysis
         uses: piraces/kube-score-ga@v0.1.3
         with:
-          manifests-folders: "./**/*.yaml" 
+          manifests-folders: "./charts,./categories,./bootstrap"

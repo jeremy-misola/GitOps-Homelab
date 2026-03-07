@@ -1,0 +1,61 @@
+name: loki-stack
+namespace: loki
+syncWave: "9"
+repoURL: https://grafana.github.io/helm-charts
+chart: loki
+targetRevision: 6.49.0
+values: |
+  loki:
+    commonConfig:
+      replication_factor: 1
+    write:
+      replicas: 1
+    
+    schemaConfig:
+      configs:
+        - from: "2024-01-01"
+          store: tsdb
+          object_store: s3
+          schema: v13
+          index:
+            prefix: loki_index_
+            period: 24h
+
+    storage:
+      type: s3
+      bucketNames:
+        chunks: loki-chunks
+        ruler: loki-ruler
+        admin: loki-admin
+      s3:
+        endpoint: garage.garage.svc.cluster.local:3900 
+        region: garage
+        accessKeyId: ${S3_ACCESS_KEY}
+        secretAccessKey: ${S3_SECRET_KEY}
+        s3ForcePathStyle: true
+        insecure: true
+
+  write:
+    replicas: 1
+    extraArgs: ["-config.expand-env=true"]
+    extraEnv: &lokiEnv
+      - name: S3_ACCESS_KEY
+        valueFrom:
+          secretKeyRef:
+            name: garage-loki-secrets
+            key: access-key-id
+      - name: S3_SECRET_KEY
+        valueFrom:
+          secretKeyRef:
+            name: garage-loki-secrets
+            key: secret-access-key
+  read:
+    replicas: 1
+    affinity: {}
+    extraArgs: ["-config.expand-env=true"]
+    extraEnv: *lokiEnv
+  backend:
+    replicas: 1
+    affinity: {}
+    extraArgs: ["-config.expand-env=true"]
+    extraEnv: *lokiEnv

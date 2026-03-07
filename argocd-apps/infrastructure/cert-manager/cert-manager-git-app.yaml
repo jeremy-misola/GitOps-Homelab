@@ -1,0 +1,6 @@
+name: cert-manager-config
+namespace: external-secrets
+syncWave: "12"
+repoURL: https://github.com/jeremy-misola/GitOps-Homelab
+targetRevision: develop
+appPath: charts/infrastructure/cert-manager

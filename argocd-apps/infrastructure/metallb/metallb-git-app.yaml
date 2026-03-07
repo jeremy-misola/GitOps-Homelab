@@ -1,0 +1,6 @@
+name: metallb-config
+namespace: metallb
+syncWave: "1"
+repoURL: https://github.com/jeremy-misola/GitOps-Homelab
+targetRevision: develop
+appPath: charts/infrastructure/metallb

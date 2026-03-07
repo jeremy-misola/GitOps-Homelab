@@ -1,0 +1,81 @@
+name: otel-collector
+namespace: opentelemetry-collector
+syncWave: "14"
+repoURL: https://open-telemetry.github.io/opentelemetry-helm-charts
+chart: opentelemetry-collector
+targetRevision: 0.143.0
+values: |
+  image:
+    repository: "ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-k8s"
+  mode: daemonset
+  service:
+    enabled: true
+    type: ClusterIP
+
+  # 1. Provide permissions to read logs and talk to K8s API
+  presets:
+    logsCollection:
+      enabled: true
+    kubernetesAttributes:
+      enabled: true
+
+  config:
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+            endpoint: 0.0.0.0:4317
+          http:
+            endpoint: 0.0.0.0:4318
+      # filelog is automatically configured by the logsCollection preset above,
+      # but you can override it here if needed.
+      filelog:
+        include: [ /var/log/pods/*/*/*.log ]
+        # Exclude the collector's own logs to avoid loops
+        exclude: [ /var/log/pods/opentelemetry-collector_*/*/*.log ]
+        operators:
+          - type: container
+
+    processors:
+      # Adds pod_name, namespace, etc. to the logs
+      k8sattributes:
+        extract:
+          metadata:
+            - k8s.pod.name
+            - k8s.pod.uid
+            - k8s.deployment.name
+            - k8s.namespace.name
+            - k8s.node.name
+            - k8s.container.name
+        pod_association:
+          - sources:
+              - from: resource_attribute
+                name: k8s.pod.name
+          - sources:
+              - from: resource_attribute
+                name: k8s.pod.ip
+
+      batch:
+        send_batch_size: 1000
+        timeout: 10s
+
+    exporters:
+      otlphttp/loki:
+        endpoint: http://loki-stack-gateway.loki.svc.cluster.local:80/otlp
+        headers:
+          X-Scope-OrgID: "1" 
+      otlp/tempo:
+        endpoint: tempo.tempo.svc.cluster.local:4317
+        tls:
+          insecure: true
+
+    service:
+      pipelines:
+        logs:
+          receivers: [otlp, filelog]
+          processors: [k8sattributes, batch]
+          exporters: [otlphttp/loki]
+        traces:
+          receivers: [otlp]
+          processors: [k8sattributes, batch]
+          exporters: [otlp/tempo]
