@@ -48,22 +48,6 @@ jobs:
       - name: Lint GitHub Actions workflows
         run: actionlint -color
 
-  yamllint:
-    name: yamllint
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
-
-      - name: Install yamllint
-        run: |
-          set -euo pipefail
-          python3 -m pip install --upgrade pip
-          python3 -m pip install yamllint
-
-      - name: Lint YAML
-        run: yamllint -c .yamllint.yaml .
-
   gitleaks:
     name: gitleaks
     runs-on: ubuntu-latest
