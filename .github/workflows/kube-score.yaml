@@ -1,19 +1,64 @@
-name: Kube-score Check
+name: Kubeconform Check
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
+    paths:
+      - ".github/workflows/kube-score.yaml"
+      - "bootstrap/**/*.y*ml"
+      - "categories/**/*.y*ml"
+      - "manifests/**/*.y*ml"
+      - "scripts/run-kubeconform.sh"
   pull_request:
-    branches: [main]
+    branches:
+      - main
+    paths:
+      - ".github/workflows/kube-score.yaml"
+      - "bootstrap/**/*.y*ml"
+      - "categories/**/*.y*ml"
+      - "manifests/**/*.y*ml"
+      - "scripts/run-kubeconform.sh"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: kubeconform-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  kube-score:
+  kubeconform:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6 
+        uses: actions/checkout@v6
 
-      - name: Run kube-score analysis
-        uses: piraces/kube-score-ga@v0.1.3
-        with:
-          manifests-folders: "./charts,./categories,./bootstrap"
+      - name: Install kubeconform
+        env:
+          KUBECONFORM_VERSION: v0.6.7
+        run: |
+          set -euo pipefail
+          os="$(uname -s | tr '[:upper:]' '[:lower:]')"
+          arch="$(uname -m)"
+
+          case "${arch}" in
+            x86_64) arch="amd64" ;;
+            aarch64|arm64) arch="arm64" ;;
+            *)
+              echo "Unsupported architecture: ${arch}" >&2
+              exit 1
+              ;;
+          esac
+
+          curl -fsSL -o kubeconform.tar.gz \
+            "https://github.com/yannh/kubeconform/releases/download/${KUBECONFORM_VERSION}/kubeconform-${os}-${arch}.tar.gz"
+          tar -xzf kubeconform.tar.gz kubeconform
+          mkdir -p "${HOME}/.local/bin"
+          mv kubeconform "${HOME}/.local/bin/kubeconform"
+          echo "${HOME}/.local/bin" >> "${GITHUB_PATH}"
+          kubeconform -v
+
+      - name: Validate Kubernetes manifests
+        run: ./scripts/run-kubeconform.sh
