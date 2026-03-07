@@ -6,5 +6,64 @@ chart: backstage
 targetRevision: 2.6.3
 values: |
   backstage:
+    replicas: 1
+    
     extraEnvVarsSecrets:
       - backstage-secrets
+    
+    extraEnvVars:
+      - name: POSTGRES_HOST
+        value: backstage-postgresql
+      - name: POSTGRES_PORT
+        value: "5432"
+      - name: POSTGRES_USER
+        value: bn_backstage
+      - name: APP_CONFIG_backend_database_connection_host
+        value: backstage-postgresql
+      - name: APP_CONFIG_backend_database_connection_port
+        value: "5432"
+      - name: APP_CONFIG_backend_database_connection_user
+        value: bn_backstage
+    
+    appConfig:
+      app:
+        title: Developer Portal
+        baseUrl: https://devdocs.jeremymr.dev
+      backend:
+        baseUrl: https://devdocs.jeremymr.dev
+        listen:
+          port: 7007
+        csp:
+          connect-src: ["'self'", 'http:', 'https:']
+        cors:
+          origin: https://devdocs.jeremymr.dev
+          methods: [GET, HEAD, PATCH, POST, PUT, DELETE]
+          credentials: true
+        database:
+          client: pg
+          connection:
+            host: backstage-postgresql
+            port: 5432
+            user: bn_backstage
+            password: ${POSTGRES_PASSWORD}
+            ssl: false
+
+  postgresql:
+    enabled: true
+    architecture: standalone
+    auth:
+      username: bn_backstage
+      existingSecret: backstage-secrets
+      secretKeys:
+        userPasswordKey: POSTGRES_PASSWORD
+    primary:
+      persistence:
+        enabled: true
+        size: 8Gi
+
+  service:
+    type: ClusterIP
+    ports:
+      backend: 7007
+      name: http-backend
+      targetPort: backend
