@@ -3,4 +3,4 @@ namespace: ghost
 syncWave: "3"
 repoURL: https://github.com/jeremy-misola/GitOps-Homelab
 targetRevision: develop
-appPath: charts/apps/ghost
+appPath: manifests/apps/ghost

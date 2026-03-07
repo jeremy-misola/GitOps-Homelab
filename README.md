@@ -37,7 +37,7 @@ To manage many different configurations, I'm using a multi-stage **ArgoCD sync c
 1.  **`bootstrap/`**: Contains the `root-app.yaml`. This is the manual entry point.
 2.  **`categories/`**: Defines parent "Category Apps" (Infrastructure vs. Applications) that orchestrate the order of operations.
 3.  **`argocd-apps/`**: Contains individual `Application` manifests for services like `istio` or `ghost`.
-4.  **`charts/`**: The configuration source, containing Helm `values.yaml` overrides, Istio `VirtualServices`, and ESO `SecretStores`.
+4.  **`manifests/`**: The configuration source, containing Helm `values.yaml` overrides, Istio `VirtualServices`, and ESO `SecretStores`.
 
 ![ArgoCD App of Apps Architecture](./docs/images/argo-architecture.svg)
 

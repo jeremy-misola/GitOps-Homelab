@@ -3,4 +3,4 @@ namespace: portfolio
 syncWave: "11"
 repoURL: https://github.com/jeremy-misola/GitOps-Homelab
 targetRevision: develop
-appPath: charts/apps/portfolio
+appPath: manifests/apps/portfolio
