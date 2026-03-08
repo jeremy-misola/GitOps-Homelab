@@ -73,12 +73,12 @@ spec:
         policy_engine_mode = "any"
       }
 
-      # Outputs for Kubernetes secret
-      output "client_id" {
+      # Outputs for Kubernetes secret (keys must use hyphens for Envoy Gateway SecurityPolicy)
+      output "client-id" {
         value = authentik_provider_oauth2.devdocs.client_id
       }
 
-      output "client_secret" {
+      output "client-secret" {
         value     = authentik_provider_oauth2.devdocs.client_secret
         sensitive = true
       }

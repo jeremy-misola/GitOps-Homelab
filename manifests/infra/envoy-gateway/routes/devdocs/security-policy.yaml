@@ -4,7 +4,6 @@ metadata:
   name: devdocs-oidc-config
   namespace: backstage
   annotations:
-    # Crossplane creates the secret, so we need to ensure it exists first
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
   targetRefs:
@@ -14,13 +13,12 @@ spec:
   oidc:
     provider:
       issuer: "https://auth.jeremymr.dev/application/o/devdocs/"
-    # Client ID and Secret are now managed by Crossplane Workspace
+    # Client ID and Secret are managed by Crossplane Workspace
     # The secret is created by: manifests/infra/crossplane/workspaces/devdocs-auth.yaml
-    clientID:
+    # Secret keys must be "client-id" and "client-secret" (hyphens, not underscores)
+    clientIDRef:
       name: devdocs-client-secret
-      key: client_id
     clientSecret:
       name: devdocs-client-secret
-      key: client_secret
     redirectURL: "https://devdocs.jeremymr.dev/oauth2/callback"
     logoutPath: "/logout"
