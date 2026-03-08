@@ -5,9 +5,7 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-wave: "5"
 spec:
-  configuration:
-    # Terraform will run in-cluster and requires credentials for external providers
-    # Authentik credentials are injected via environment variables
+  configuration: ""
   credentials:
     - filename: authentik-token
       source: Secret
