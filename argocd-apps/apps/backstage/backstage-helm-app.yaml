@@ -45,6 +45,8 @@ values: |
       auth:
         environment: production
         providers:
+          guest:
+            userEntityRef: user:default/guest
           oidc:
             production:
               clientId: ${OIDC_CLIENT_ID}
@@ -61,22 +63,22 @@ values: |
         locations:
           # Organization and Users
           - type: url
-            target: https://github.com/jeremy-misola/GitOps-Homelab/blob/main/docs/backstage/catalog/org.yaml
+            target: https://raw.githubusercontent.com/jeremy-misola/GitOps-Homelab/main/docs/backstage/catalog/org.yaml
             rules:
               - allow: [User, Group]
           # Systems
           - type: url
-            target: https://github.com/jeremy-misola/GitOps-Homelab/blob/main/docs/backstage/catalog/systems.yaml
+            target: https://raw.githubusercontent.com/jeremy-misola/GitOps-Homelab/main/docs/backstage/catalog/systems.yaml
             rules:
               - allow: [System]
           # Components
           - type: url
-            target: https://github.com/jeremy-misola/GitOps-Homelab/blob/main/docs/backstage/catalog/components.yaml
+            target: https://raw.githubusercontent.com/jeremy-misola/GitOps-Homelab/main/docs/backstage/catalog/components.yaml
             rules:
               - allow: [Component]
           # APIs
           - type: url
-            target: https://github.com/jeremy-misola/GitOps-Homelab/blob/main/docs/backstage/catalog/apis.yaml
+            target: https://raw.githubusercontent.com/jeremy-misola/GitOps-Homelab/main/docs/backstage/catalog/apis.yaml
             rules:
               - allow: [API]
       permission:
