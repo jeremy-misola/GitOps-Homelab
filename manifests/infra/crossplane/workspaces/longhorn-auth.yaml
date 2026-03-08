@@ -53,7 +53,7 @@ spec:
       resource "authentik_application" "longhorn" {
         name              = "Longhorn"
         slug              = "longhorn"
-        provider          = authentik_provider_oauth2.longhorn.id
+        protocol_provider = authentik_provider_oauth2.longhorn.id
         policy_engine_mode = "any"
       }
 

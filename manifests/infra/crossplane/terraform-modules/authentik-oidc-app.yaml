@@ -45,7 +45,7 @@ data:
     resource "authentik_application" "app" {
       name              = var.app_name
       slug              = var.app_slug
-      provider          = authentik_provider_oauth2.oidc.id
+      protocol_provider = authentik_provider_oauth2.oidc.id
       policy_engine_mode = var.policy_engine_mode
       
       dynamic "meta_launch_url" {
