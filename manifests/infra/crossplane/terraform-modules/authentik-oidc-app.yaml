@@ -21,17 +21,29 @@ data:
       token = var.authentik_token
     }
 
+    data "authentik_flow" "authorization" {
+      slug = var.authorization_flow
+    }
+
+    data "authentik_flow" "invalidation" {
+      slug = var.invalidation_flow
+    }
+
     # Create OIDC Provider
     resource "authentik_provider_oauth2" "oidc" {
       name               = var.app_name
-      authorization_flow = var.authorization_flow
-      client_id          = var.client_id
+      authorization_flow = data.authentik_flow.authorization.id
+      invalidation_flow  = data.authentik_flow.invalidation.id
+      client_id          = var.client_id != "" ? var.client_id : var.app_slug
       
       # Client secret will be auto-generated if not provided
       client_type        = "confidential"
       
-      redirect_uris = [
-        var.redirect_uri
+      allowed_redirect_uris = [
+        {
+          matching_mode = "strict"
+          url           = var.redirect_uri
+        }
       ]
       
       property_mappings = var.property_mappings
@@ -116,7 +128,13 @@ data:
     variable "authorization_flow" {
       type        = string
       default     = "default-provider-authorization-explicit-consent"
-      description = "UUID of the authorization flow"
+      description = "Slug of the authorization flow"
+    }
+
+    variable "invalidation_flow" {
+      type        = string
+      default     = "default-provider-invalidation-flow"
+      description = "Slug of the invalidation flow"
     }
 
     variable "property_mappings" {

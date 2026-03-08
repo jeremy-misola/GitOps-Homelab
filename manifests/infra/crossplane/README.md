@@ -62,6 +62,10 @@ spec:
     vars:
       - key: authentik_url
         value: "https://auth.jeremymr.dev"
+      - key: authorization_flow
+        value: "default-provider-authorization-explicit-consent"
+      - key: invalidation_flow
+        value: "default-provider-invalidation-flow"
     env:
       - name: TF_VAR_authentik_token
         secretKeyRef:

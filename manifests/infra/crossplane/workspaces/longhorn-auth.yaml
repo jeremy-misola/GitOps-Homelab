@@ -33,19 +33,36 @@ spec:
         type = string
       }
 
+      variable "invalidation_flow" {
+        type = string
+      }
+
       provider "authentik" {
         url   = var.authentik_url
         token = var.authentik_token
       }
 
+      data "authentik_flow" "authorization" {
+        slug = var.authorization_flow
+      }
+
+      data "authentik_flow" "invalidation" {
+        slug = var.invalidation_flow
+      }
+
       # Create OIDC Provider
       resource "authentik_provider_oauth2" "longhorn" {
         name               = "Longhorn"
-        authorization_flow = var.authorization_flow
+        authorization_flow = data.authentik_flow.authorization.id
+        invalidation_flow  = data.authentik_flow.invalidation.id
         client_type        = "confidential"
-        
-        redirect_uris = [
-          "https://longhorn.jeremymr.dev/oauth2/callback"
+        client_id          = "longhorn"
+
+        allowed_redirect_uris = [
+          {
+            matching_mode = "strict"
+            url           = "https://longhorn.jeremymr.dev/oauth2/callback"
+          }
         ]
       }
 
@@ -72,6 +89,8 @@ spec:
         value: "https://auth.jeremymr.dev"
       - key: authorization_flow
         value: "default-provider-authorization-explicit-consent"
+      - key: invalidation_flow
+        value: "default-provider-invalidation-flow"
     env:
       - name: TF_VAR_authentik_token
         secretKeyRef:
