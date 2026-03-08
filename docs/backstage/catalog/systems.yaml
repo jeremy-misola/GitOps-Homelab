@@ -1,0 +1,11 @@
+# Systems
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: homelab
+  description: GitOps Homelab Infrastructure
+  tags:
+    - infrastructure
+    - kubernetes
+spec:
+  owner: team-platform

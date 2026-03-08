@@ -1,0 +1,113 @@
+# Components - Infrastructure Services
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: argocd
+  description: GitOps continuous delivery platform
+  tags:
+    - gitops
+    - argocd
+  links:
+    - url: https://argocd.jeremymr.dev
+      title: ArgoCD Dashboard
+      icon: dashboard
+spec:
+  type: service
+  lifecycle: production
+  owner: team-platform
+  system: homelab
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: authentik
+  description: Identity provider and authentication server
+  tags:
+    - authentication
+    - oidc
+    - sso
+  links:
+    - url: https://auth.jeremymr.dev
+      title: Authentik Dashboard
+      icon: dashboard
+spec:
+  type: service
+  lifecycle: production
+  owner: team-platform
+  system: homelab
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: longhorn
+  description: Cloud-native distributed block storage for Kubernetes
+  tags:
+    - storage
+    - kubernetes
+  links:
+    - url: https://longhorn.jeremymr.dev
+      title: Longhorn Dashboard
+      icon: dashboard
+spec:
+  type: service
+  lifecycle: production
+  owner: team-platform
+  system: homelab
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: grafana
+  description: Observability and monitoring dashboard
+  tags:
+    - monitoring
+    - observability
+    - grafana
+  links:
+    - url: https://grafana.jeremymr.dev
+      title: Grafana Dashboard
+      icon: dashboard
+spec:
+  type: service
+  lifecycle: production
+  owner: team-platform
+  system: homelab
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: envoy-gateway
+  description: Kubernetes ingress gateway
+  tags:
+    - networking
+    - ingress
+    - gateway
+spec:
+  type: service
+  lifecycle: production
+  owner: team-platform
+  system: homelab
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: backstage
+  description: Developer portal and service catalog
+  tags:
+    - portal
+    - catalog
+    - backstage
+  links:
+    - url: https://devdocs.jeremymr.dev
+      title: Backstage Dashboard
+      icon: dashboard
+spec:
+  type: service
+  lifecycle: production
+  owner: team-platform
+  system: homelab
