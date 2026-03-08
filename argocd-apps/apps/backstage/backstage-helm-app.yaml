@@ -50,9 +50,8 @@ values: |
         environment: production
         providers:
           guest:
-            production:
-              userEntityRef: user:default/guest
-              dangerouslyAllowOutsideDevelopment: true
+            userEntityRef: user:default/guest
+            dangerouslyAllowOutsideDevelopment: true
           oidc:
             production:
               clientId: ${OIDC_CLIENT_ID}
