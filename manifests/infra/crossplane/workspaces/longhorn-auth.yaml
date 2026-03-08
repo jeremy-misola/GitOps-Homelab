@@ -20,6 +20,19 @@ spec:
         }
       }
 
+      variable "authentik_url" {
+        type = string
+      }
+
+      variable "authentik_token" {
+        type      = string
+        sensitive = true
+      }
+
+      variable "authorization_flow" {
+        type = string
+      }
+
       provider "authentik" {
         url   = var.authentik_url
         token = var.authentik_token
@@ -54,18 +67,17 @@ spec:
         sensitive = true
       }
 
-    variables:
+    vars:
       - key: authentik_url
         value: "https://auth.jeremymr.dev"
-      - key: authentik_token
-        sensitive: true
-        valueFrom:
-          secretKeyRef:
-            namespace: crossplane-system
-            name: authentik-api-token
-            key: token
       - key: authorization_flow
         value: "default-provider-authorization-explicit-consent"
+    env:
+      - name: TF_VAR_authentik_token
+        secretKeyRef:
+          namespace: crossplane-system
+          name: authentik-api-token
+          key: token
 
   # Write outputs to a secret that can be used by SecurityPolicy
   writeConnectionSecretToRef:

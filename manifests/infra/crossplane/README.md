@@ -59,16 +59,15 @@ spec:
     source: Inline
     module: |
       # Terraform config here (see longhorn-auth.yaml for example)
-    variables:
+    vars:
       - key: authentik_url
         value: "https://auth.jeremymr.dev"
-      - key: authentik_token
-        sensitive: true
-        valueFrom:
-          secretKeyRef:
-            namespace: crossplane-system
-            name: authentik-api-token
-            key: token
+    env:
+      - name: TF_VAR_authentik_token
+        secretKeyRef:
+          namespace: crossplane-system
+          name: authentik-api-token
+          key: token
   writeConnectionSecretToRef:
     name: myapp-client-secret
     namespace: myapp-namespace
