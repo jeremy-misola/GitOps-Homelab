@@ -19,10 +19,6 @@ values: |
         value: "5432"
       - name: APP_CONFIG_backend_database_connection_user
         value: bn_backstage
-      - name: APP_CONFIG_backend_reading_allow__0
-        value: "raw.githubusercontent.com"
-      - name: APP_CONFIG_backend_reading_allow__1
-        value: "github.com"
     
     appConfig:
       app:
