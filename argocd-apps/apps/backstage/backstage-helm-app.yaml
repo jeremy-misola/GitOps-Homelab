@@ -36,8 +36,8 @@ values: |
           credentials: true
         reading:
           allow:
-            - raw.githubusercontent.com
-            - github.com
+            - host: raw.githubusercontent.com
+            - host: github.com
         database:
           client: pg
           connection:
