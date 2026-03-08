@@ -1,30 +1,66 @@
-# Organization and Teams
+# =============================================================================
+# Organization - Teams and Users
+# =============================================================================
+
 apiVersion: backstage.io/v1alpha1
 kind: Group
 metadata:
   name: default
-  description: Default organization
+  description: Homelab Organization
 spec:
   type: organization
-  children: [team-platform]
+  children:
+    - team-platform
+    - team-operations
 
 ---
 apiVersion: backstage.io/v1alpha1
 kind: Group
 metadata:
   name: team-platform
-  description: Platform Engineering Team
+  description: Platform Engineering Team - Responsible for infrastructure and platform services
 spec:
   type: team
   parent: default
   children: []
+  profile:
+    displayName: Platform Engineering
+    email: platform@jeremymr.dev
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: Group
+metadata:
+  name: team-operations
+  description: Operations Team - Responsible for monitoring and incident response
+spec:
+  type: team
+  parent: default
+  children: []
+  profile:
+    displayName: Operations
+    email: ops@jeremymr.dev
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: User
+metadata:
+  name: jeremy
+  description: Jeremy - Homelab Owner
+spec:
+  memberOf:
+    - team-platform
+    - team-operations
+  profile:
+    displayName: Jeremy Misola
+    email: jeremy@jeremymr.dev
 
 ---
 apiVersion: backstage.io/v1alpha1
 kind: User
 metadata:
   name: guest
-  description: Default guest user
+  description: Default guest user for read-only access
 spec:
   memberOf: [team-platform]
   profile:

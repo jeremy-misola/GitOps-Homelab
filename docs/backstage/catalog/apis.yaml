@@ -1,26 +1,193 @@
-# APIs
+# =============================================================================
+# APIs - Service API Definitions
+# =============================================================================
+
 apiVersion: backstage.io/v1alpha1
 kind: API
 metadata:
   name: authentik-oidc
-  description: OIDC authentication API
+  description: OIDC authentication API for single sign-on
+  tags:
+    - authentication
+    - oidc
+    - sso
 spec:
   type: openapi
   lifecycle: production
   owner: team-platform
-  system: homelab
+  system: platform-infrastructure
   definition: |
     openapi: 3.0.1
     info:
       title: Authentik OIDC API
       version: 1.0.0
-      description: OIDC authentication endpoints
+      description: OIDC authentication endpoints for SSO integration
     servers:
-      - url: https://auth.jeremymr.dev/application/o/devdocs
+      - url: https://auth.jeremymr.dev/application/o
     paths:
-      /.well-known/openid-configuration:
+      /{application}/.well-known/openid-configuration:
         get:
           summary: OpenID Connect Discovery
+          description: Returns the OpenID Connect discovery document for the application
+          parameters:
+            - name: application
+              in: path
+              required: true
+              schema:
+                type: string
           responses:
             '200':
               description: OpenID configuration document
+      /{application}/authorize/:
+        get:
+          summary: Authorization Endpoint
+          description: OIDC authorization endpoint
+      /{application}/token/:
+        post:
+          summary: Token Endpoint
+          description: OIDC token endpoint for exchanging authorization codes
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: argocd-api
+  description: ArgoCD GitOps API for managing applications and clusters
+  tags:
+    - gitops
+    - kubernetes
+    - continuous-delivery
+spec:
+  type: openapi
+  lifecycle: production
+  owner: team-platform
+  system: platform-infrastructure
+  definition: |
+    openapi: 3.0.1
+    info:
+      title: ArgoCD API
+      version: 1.0.0
+      description: ArgoCD REST API for GitOps operations
+    servers:
+      - url: https://argocd.jeremymr.dev/api/v1
+    paths:
+      /applications:
+        get:
+          summary: List Applications
+          description: List all ArgoCD applications
+      /clusters:
+        get:
+          summary: List Clusters
+          description: List all connected Kubernetes clusters
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: ghost-api
+  description: Ghost CMS Content API for blog management
+  tags:
+    - cms
+    - blog
+    - content
+spec:
+  type: openapi
+  lifecycle: production
+  owner: team-platform
+  system: applications
+  definition: |
+    openapi: 3.0.1
+    info:
+      title: Ghost Content API
+      version: 4.0.0
+      description: Ghost CMS Content API for retrieving posts, pages, and tags
+    servers:
+      - url: https://ghost.jeremymr.dev/ghost/api/v4/admin
+    paths:
+      /posts:
+        get:
+          summary: List Posts
+          description: Retrieve a list of blog posts
+      /pages:
+        get:
+          summary: List Pages
+          description: Retrieve a list of static pages
+      /tags:
+        get:
+          summary: List Tags
+          description: Retrieve a list of tags
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: garage-s3-api
+  description: S3-compatible object storage API
+  tags:
+    - storage
+    - s3
+    - object-storage
+spec:
+  type: openapi
+  lifecycle: production
+  owner: team-platform
+  system: storage-database
+  definition: |
+    openapi: 3.0.1
+    info:
+      title: Garage S3 API
+      version: 1.0.0
+      description: S3-compatible object storage API for storing and retrieving objects
+    servers:
+      - url: https://garage.garage.svc.cluster.local:3900
+    paths:
+      /{bucket}:
+        get:
+          summary: List Objects
+          description: List all objects in a bucket
+        put:
+          summary: Create Bucket
+          description: Create a new bucket
+      /{bucket}/{key}:
+        get:
+          summary: Get Object
+          description: Retrieve an object from a bucket
+        put:
+          summary: Put Object
+          description: Store an object in a bucket
+        delete:
+          summary: Delete Object
+          description: Delete an object from a bucket
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: cloudnativepg-api
+  description: CloudNativePG PostgreSQL database API
+  tags:
+    - database
+    - postgresql
+    - kubernetes
+spec:
+  type: openapi
+  lifecycle: production
+  owner: team-platform
+  system: storage-database
+  definition: |
+    openapi: 3.0.1
+    info:
+      title: CloudNativePG API
+      version: 1.0.0
+      description: PostgreSQL database service for applications
+    servers:
+      - url: postgresql://cluster-rw.cloudnativepg.svc.cluster.local:5432
+    paths:
+      /databases:
+        get:
+          summary: List Databases
+          description: List all available databases
+      /query:
+        post:
+          summary: Execute Query
+          description: Execute SQL queries against the database

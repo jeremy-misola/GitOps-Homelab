@@ -1,32 +1,41 @@
-# Components - Infrastructure Services
+# =============================================================================
+# Platform Infrastructure Components
+# =============================================================================
+
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
   name: argocd
-  description: GitOps continuous delivery platform
+  description: GitOps continuous delivery platform for Kubernetes
   tags:
     - gitops
     - argocd
+    - continuous-delivery
   links:
     - url: https://argocd.jeremymr.dev
       title: ArgoCD Dashboard
       icon: dashboard
+  annotations:
+    github.com/project-slug: jeremy-misola/GitOps-Homelab
 spec:
   type: service
   lifecycle: production
   owner: team-platform
-  system: homelab
+  system: platform-infrastructure
+  providesApis:
+    - argocd-api
 
 ---
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
   name: authentik
-  description: Identity provider and authentication server
+  description: Identity provider and authentication server with OIDC/SSO support
   tags:
     - authentication
     - oidc
     - sso
+    - identity
   links:
     - url: https://auth.jeremymr.dev
       title: Authentik Dashboard
@@ -35,7 +44,237 @@ spec:
   type: service
   lifecycle: production
   owner: team-platform
-  system: homelab
+  system: platform-infrastructure
+  providesApis:
+    - authentik-oidc
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: cert-manager
+  description: Kubernetes certificate management for TLS certificates using Let's Encrypt
+  tags:
+    - certificates
+    - tls
+    - security
+    - letsencrypt
+spec:
+  type: service
+  lifecycle: production
+  owner: team-platform
+  system: platform-infrastructure
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: external-secrets
+  description: Kubernetes operator to sync secrets from external secret stores
+  tags:
+    - secrets
+    - security
+    - vault
+spec:
+  type: service
+  lifecycle: production
+  owner: team-platform
+  system: platform-infrastructure
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: crossplane
+  description: Infrastructure as Code platform for managing cloud resources via Kubernetes
+  tags:
+    - iac
+    - crossplane
+    - infrastructure
+  links:
+    - url: https://argocd.jeremymr.dev
+      title: Crossplane Provider Status
+      icon: dashboard
+spec:
+  type: service
+  lifecycle: production
+  owner: team-platform
+  system: platform-infrastructure
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: backstage
+  description: Developer portal and service catalog for documenting infrastructure
+  tags:
+    - portal
+    - catalog
+    - backstage
+    - documentation
+  links:
+    - url: https://devdocs.jeremymr.dev
+      title: Backstage Dashboard
+      icon: dashboard
+spec:
+  type: service
+  lifecycle: production
+  owner: team-platform
+  system: platform-infrastructure
+
+# =============================================================================
+# Networking Components
+# =============================================================================
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: envoy-gateway
+  description: Kubernetes ingress gateway using Envoy for HTTP routing
+  tags:
+    - networking
+    - ingress
+    - gateway
+    - envoy
+spec:
+  type: service
+  lifecycle: production
+  owner: team-platform
+  system: networking
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: metallb
+  description: Bare metal load balancer for Kubernetes using BGP/ARP
+  tags:
+    - networking
+    - load-balancer
+    - metallb
+spec:
+  type: service
+  lifecycle: production
+  owner: team-platform
+  system: networking
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: external-dns
+  description: Kubernetes controller to manage DNS records in Cloudflare
+  tags:
+    - networking
+    - dns
+    - cloudflare
+spec:
+  type: service
+  lifecycle: production
+  owner: team-platform
+  system: networking
+
+# =============================================================================
+# Observability Components
+# =============================================================================
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: grafana
+  description: Observability and monitoring dashboard for visualizing metrics and logs
+  tags:
+    - monitoring
+    - observability
+    - grafana
+    - visualization
+  links:
+    - url: https://grafana.jeremymr.dev
+      title: Grafana Dashboard
+      icon: dashboard
+spec:
+  type: service
+  lifecycle: production
+  owner: team-platform
+  system: observability
+  dependsOn:
+    - prometheus
+    - loki
+    - tempo
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: prometheus
+  description: Monitoring system and time-series database for metrics collection
+  tags:
+    - monitoring
+    - metrics
+    - prometheus
+    - alerting
+spec:
+  type: service
+  lifecycle: production
+  owner: team-platform
+  system: observability
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: loki
+  description: Log aggregation system designed for storing and querying logs
+  tags:
+    - logging
+    - loki
+    - observability
+spec:
+  type: service
+  lifecycle: production
+  owner: team-platform
+  system: observability
+  dependsOn:
+    - garage
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: tempo
+  description: Distributed tracing backend for storing and querying trace data
+  tags:
+    - tracing
+    - tempo
+    - observability
+spec:
+  type: service
+  lifecycle: production
+  owner: team-platform
+  system: observability
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: opentelemetry-collector
+  description: Telemetry collection agent for logs, metrics, and traces
+  tags:
+    - telemetry
+    - opentelemetry
+    - observability
+    - collector
+spec:
+  type: service
+  lifecycle: production
+  owner: team-platform
+  system: observability
+
+# =============================================================================
+# Storage & Database Components
+# =============================================================================
 
 ---
 apiVersion: backstage.io/v1alpha1
@@ -45,6 +284,7 @@ metadata:
   description: Cloud-native distributed block storage for Kubernetes
   tags:
     - storage
+    - block-storage
     - kubernetes
   links:
     - url: https://longhorn.jeremymr.dev
@@ -54,60 +294,104 @@ spec:
   type: service
   lifecycle: production
   owner: team-platform
-  system: homelab
+  system: storage-database
 
 ---
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
-  name: grafana
-  description: Observability and monitoring dashboard
+  name: garage
+  description: S3-compatible distributed object storage for Kubernetes
   tags:
-    - monitoring
-    - observability
-    - grafana
+    - storage
+    - object-storage
+    - s3
+    - minio-alternative
+spec:
+  type: service
+  lifecycle: production
+  owner: team-platform
+  system: storage-database
+  providesApis:
+    - garage-s3-api
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: cloudnativepg
+  description: Kubernetes operator for managing PostgreSQL clusters
+  tags:
+    - database
+    - postgresql
+    - kubernetes-operator
+spec:
+  type: service
+  lifecycle: production
+  owner: team-platform
+  system: storage-database
+  providesApis:
+    - cloudnativepg-api
+
+# =============================================================================
+# Application Components
+# =============================================================================
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: ghost
+  description: Ghost blog platform for content publishing
+  tags:
+    - blog
+    - ghost
+    - cms
   links:
-    - url: https://grafana.jeremymr.dev
-      title: Grafana Dashboard
-      icon: dashboard
+    - url: https://ghost.jeremymr.dev
+      title: Ghost Blog
+      icon: blog
+    - url: https://ghost-admin.jeremymr.dev
+      title: Ghost Admin
+      icon: admin
 spec:
-  type: service
+  type: website
   lifecycle: production
   owner: team-platform
-  system: homelab
+  system: applications
+  providesApis:
+    - ghost-api
 
 ---
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
-  name: envoy-gateway
-  description: Kubernetes ingress gateway
+  name: ghost-saima
+  description: Saima Ghost blog instance
   tags:
-    - networking
-    - ingress
-    - gateway
+    - blog
+    - ghost
+    - cms
 spec:
-  type: service
+  type: website
   lifecycle: production
   owner: team-platform
-  system: homelab
+  system: applications
 
 ---
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
-  name: backstage
-  description: Developer portal and service catalog
+  name: portfolio
+  description: Personal portfolio website
   tags:
-    - portal
-    - catalog
-    - backstage
-  links:
-    - url: https://devdocs.jeremymr.dev
-      title: Backstage Dashboard
-      icon: dashboard
+    - website
+    - portfolio
+    - frontend
 spec:
-  type: service
+  type: website
   lifecycle: production
   owner: team-platform
-  system: homelab
+  system: applications
+  dependsOn:
+    - cloudnativepg

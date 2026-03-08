@@ -1,0 +1,127 @@
+# =============================================================================
+# Resources - Infrastructure Resources
+# =============================================================================
+
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: kubernetes-cluster
+  description: Primary Kubernetes homelab cluster
+  tags:
+    - kubernetes
+    - cluster
+    - k8s
+spec:
+  type: kubernetes-cluster
+  owner: team-platform
+  system: homelab
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: cloudflare-dns
+  description: Cloudflare DNS provider for domain management
+  tags:
+    - dns
+    - cloudflare
+    - networking
+spec:
+  type: dns-provider
+  owner: team-platform
+  system: networking
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: garage-storage
+  description: S3-compatible object storage buckets for logs and data
+  tags:
+    - storage
+    - s3
+    - object-storage
+spec:
+  type: s3-bucket
+  owner: team-platform
+  system: storage-database
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: loki-storage-bucket
+  description: S3 bucket for Loki log storage
+  tags:
+    - storage
+    - loki
+    - logs
+spec:
+  type: s3-bucket
+  owner: team-platform
+  system: storage-database
+  dependsOn:
+    - garage-storage
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: longhorn-storage
+  description: Distributed block storage for Kubernetes persistent volumes
+  tags:
+    - storage
+    - block-storage
+    - persistent-volumes
+spec:
+  type: storage
+  owner: team-platform
+  system: storage-database
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: portfolio-database
+  description: PostgreSQL database for the portfolio application
+  tags:
+    - database
+    - postgresql
+spec:
+  type: database
+  owner: team-platform
+  system: storage-database
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: ghost-database
+  description: Database storage for Ghost blog content
+  tags:
+    - database
+    - mysql
+    - ghost
+spec:
+  type: database
+  owner: team-platform
+  system: storage-database
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: github-repository
+  description: GitOps repository for infrastructure as code
+  tags:
+    - git
+    - github
+    - gitops
+  links:
+    - url: https://github.com/jeremy-misola/GitOps-Homelab
+      title: GitHub Repository
+      icon: github
+spec:
+  type: repository
+  owner: team-platform
+  system: platform-infrastructure

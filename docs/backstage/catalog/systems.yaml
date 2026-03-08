@@ -1,11 +1,85 @@
-# Systems
+# Systems - Organizational Structure
 apiVersion: backstage.io/v1alpha1
 kind: System
 metadata:
   name: homelab
-  description: GitOps Homelab Infrastructure
+  description: GitOps Homelab Infrastructure - Complete umbrella system
   tags:
     - infrastructure
     - kubernetes
+    - gitops
 spec:
   owner: team-platform
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: platform-infrastructure
+  description: Core platform infrastructure services including GitOps, secrets, certificates, and IaC
+  tags:
+    - platform
+    - gitops
+    - security
+spec:
+  owner: team-platform
+  parent: homelab
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: observability
+  description: Monitoring, logging, tracing, and observability stack
+  tags:
+    - monitoring
+    - logging
+    - tracing
+    - observability
+spec:
+  owner: team-platform
+  parent: homelab
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: networking
+  description: Network infrastructure including ingress, load balancing, and DNS
+  tags:
+    - networking
+    - ingress
+    - dns
+    - load-balancer
+spec:
+  owner: team-platform
+  parent: homelab
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: storage-database
+  description: Storage and database services including block storage, object storage, and databases
+  tags:
+    - storage
+    - database
+    - postgresql
+    - s3
+spec:
+  owner: team-platform
+  parent: homelab
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: applications
+  description: User-facing applications and websites
+  tags:
+    - applications
+    - websites
+    - blogs
+spec:
+  owner: team-platform
+  parent: homelab
