@@ -10,6 +10,7 @@ spec:
       backend "kubernetes" {
         namespace = "crossplane-system"
         secret_suffix = "tfstate"
+        in_cluster_config = true
       }
     }
   credentials:
