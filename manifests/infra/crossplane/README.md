@@ -49,7 +49,7 @@ Git Push → ArgoCD Sync → Crossplane creates Workspace
 Create a new Workspace in `workspaces/`:
 
 ```yaml
-apiVersion: tf.crossplane.io/v1alpha1
+apiVersion: tf.upbound.io/v1beta1
 kind: Workspace
 metadata:
   name: myapp-auth
