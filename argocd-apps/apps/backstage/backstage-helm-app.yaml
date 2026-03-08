@@ -34,6 +34,10 @@ values: |
           origin: https://devdocs.jeremymr.dev
           methods: [GET, HEAD, PATCH, POST, PUT, DELETE]
           credentials: true
+        reading:
+          allow:
+            - raw.githubusercontent.com
+            - github.com
         database:
           client: pg
           connection:
