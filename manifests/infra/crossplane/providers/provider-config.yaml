@@ -5,7 +5,13 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-wave: "5"
 spec:
-  configuration: ""
+  configuration: |
+    terraform {
+      backend "kubernetes" {
+        namespace = "crossplane-system"
+        secret_suffix = "tfstate"
+      }
+    }
   credentials:
     - filename: authentik-token
       source: Secret
