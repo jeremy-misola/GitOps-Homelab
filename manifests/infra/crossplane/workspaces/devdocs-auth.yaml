@@ -61,6 +61,10 @@ spec:
           {
             matching_mode = "strict"
             url           = "https://devdocs.jeremymr.dev/oauth2/callback"
+          },
+          {
+            matching_mode = "strict"
+            url           = "https://devdocs.jeremymr.dev/api/auth/oidc/handler/frame"
           }
         ]
       }
@@ -73,12 +77,23 @@ spec:
         policy_engine_mode = "any"
       }
 
-      # Outputs for Kubernetes secret (keys must use hyphens for Envoy Gateway SecurityPolicy)
+      # Outputs for Kubernetes secret
+      # Keys with hyphens for Envoy Gateway SecurityPolicy
       output "client-id" {
         value = authentik_provider_oauth2.devdocs.client_id
       }
 
       output "client-secret" {
+        value     = authentik_provider_oauth2.devdocs.client_secret
+        sensitive = true
+      }
+
+      # Keys with underscores for Backstage environment variables
+      output "OIDC_CLIENT_ID" {
+        value = authentik_provider_oauth2.devdocs.client_id
+      }
+
+      output "OIDC_CLIENT_SECRET" {
         value     = authentik_provider_oauth2.devdocs.client_secret
         sensitive = true
       }

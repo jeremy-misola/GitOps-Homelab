@@ -10,6 +10,7 @@ values: |
     
     extraEnvVarsSecrets:
       - backstage-secrets
+      - devdocs-client-secret
     
     extraEnvVars:
       - name: APP_CONFIG_backend_database_connection_host
@@ -41,6 +42,16 @@ values: |
             user: bn_backstage
             password: ${POSTGRES_PASSWORD}
             ssl: false
+      auth:
+        environment: production
+        providers:
+          oidc:
+            production:
+              clientId: ${OIDC_CLIENT_ID}
+              clientSecret: ${OIDC_CLIENT_SECRET}
+              metadataUrl: https://auth.jeremymr.dev/application/o/devdocs/.well-known/openid-configuration
+              callbackUrl: https://devdocs.jeremymr.dev/api/auth/oidc/handler/frame
+              prompt: auto
 
   postgresql:
     enabled: true
