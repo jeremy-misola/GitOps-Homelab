@@ -4,7 +4,6 @@ metadata:
   name: longhorn-auth
   namespace: crossplane-system
   annotations:
-    crossplane.io/external-name: longhorn-auth
     argocd.argoproj.io/sync-wave: "10"
 spec:
   forProvider:
