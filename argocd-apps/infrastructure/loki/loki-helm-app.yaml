@@ -42,12 +42,12 @@ values: |
       - name: S3_ACCESS_KEY
         valueFrom:
           secretKeyRef:
-            name: garage-loki-secrets
+            name: loki-s3-credentials
             key: access-key-id
       - name: S3_SECRET_KEY
         valueFrom:
           secretKeyRef:
-            name: garage-loki-secrets
+            name: loki-s3-credentials
             key: secret-access-key
   read:
     replicas: 1
