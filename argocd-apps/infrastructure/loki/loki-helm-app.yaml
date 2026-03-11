@@ -7,9 +7,9 @@ targetRevision: 6.49.0
 values: |
   loki:
     commonConfig:
-      replication_factor: 1
+      replication_factor: 3
     write:
-      replicas: 1
+      replicas: 3
     
     schemaConfig:
       configs:
@@ -36,7 +36,7 @@ values: |
         insecure: true
 
   write:
-    replicas: 1
+    replicas: 3
     extraArgs: ["-config.expand-env=true"]
     extraEnv: &lokiEnv
       - name: S3_ACCESS_KEY
@@ -50,12 +50,12 @@ values: |
             name: loki-s3-credentials
             key: secret-access-key
   read:
-    replicas: 1
+    replicas: 3
     affinity: {}
     extraArgs: ["-config.expand-env=true"]
     extraEnv: *lokiEnv
   backend:
-    replicas: 1
+    replicas: 3
     affinity: {}
     extraArgs: ["-config.expand-env=true"]
     extraEnv: *lokiEnv
