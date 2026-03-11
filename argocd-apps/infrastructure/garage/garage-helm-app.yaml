@@ -10,7 +10,7 @@ values: |
   garage:
     secret:
       create: false
-      name: garage-admin-crendentials
+      name: garage-admin-credentials
 
   clusterConfig:
     enabled: true

@@ -22,19 +22,47 @@ crossplane/
 
 ## Prerequisites
 
-1. **Add Authentik API Token to Doppler**:
-   - Generate a token in Authentik Admin → Directory → Tokens
-   - Add it to Doppler with key `AUTHENTIK_API_TOKEN`
+### Authentik Bootstrap Configuration
 
-2. **Add Garage Admin Token to Doppler**:
-   - Get the admin token from your Garage deployment
-   - Add it to Doppler with key `GARAGE_ADMIN_TOKEN`
-   - Also add `GARAGE_API_URL` (e.g., `garage.garage.svc:3903`)
+Authentik is configured with **bootstrap environment variables** that automatically create the admin account and API token on first run. This eliminates the need for manual setup.
 
-3. **Ensure Crossplane is running**:
-   ```bash
-   kubectl get pods -n crossplane-system
-   ```
+**Required Doppler Secrets for Authentik:**
+
+| Key | Description | Example |
+|-----|-------------|---------|
+| `AUTHENTIK_SECRET_KEY` | Secret key for session encryption | Generate with `openssl rand -hex 32` |
+| `AUTHENTIK_BOOTSTRAP_PASSWORD` | Initial admin password | Strong password |
+| `AUTHENTIK_BOOTSTRAP_TOKEN` | API token for Crossplane | Generate with `openssl rand -hex 32` |
+| `SMTP_HOST` | SMTP server hostname | `smtp.resend.com` |
+| `SMTP_PORT` | SMTP server port | `587` |
+| `SMTP_USERNAME` | SMTP authentication username | `resend` |
+| `SMTP_PASSWORD` | SMTP authentication password | Your SMTP API key |
+| `DB_PASSWORD` | PostgreSQL password | Strong password |
+| `REDIS_PASSWORD` | Redis password | Strong password |
+
+**Bootstrap Flow:**
+```
+1. Authentik starts for the first time
+2. AUTHENTIK_BOOTSTRAP_EMAIL creates admin account
+3. AUTHENTIK_BOOTSTRAP_PASSWORD sets admin password
+4. AUTHENTIK_BOOTSTRAP_TOKEN creates API token automatically
+5. Crossplane uses the same token from Doppler
+```
+
+### Garage Configuration
+
+**Required Doppler Secrets for Garage:**
+
+| Key | Description |
+|-----|-------------|
+| `GARAGE_ADMIN_TOKEN` | Garage admin API token |
+| `GARAGE_API_URL` | Garage API URL (e.g., `garage.garage.svc:3903`) |
+
+### Verify Crossplane is Running
+
+```bash
+kubectl get pods -n crossplane-system
+```
 
 ## How It Works
 

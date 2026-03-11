@@ -16,6 +16,7 @@ values: |
 
   server:
     env:
+      # Core secrets
       - name: AUTHENTIK_SECRET_KEY
         valueFrom:
           secretKeyRef:
@@ -31,9 +32,50 @@ values: |
           secretKeyRef:
             name: authentik-secrets
             key: REDIS_PASSWORD
+      
+      # Bootstrap configuration - creates admin account and token on first run
+      - name: AUTHENTIK_BOOTSTRAP_EMAIL
+        value: "admin@jeremymr.dev"
+      - name: AUTHENTIK_BOOTSTRAP_PASSWORD
+        valueFrom:
+          secretKeyRef:
+            name: authentik-secrets
+            key: BOOTSTRAP_PASSWORD
+      - name: AUTHENTIK_BOOTSTRAP_TOKEN
+        valueFrom:
+          secretKeyRef:
+            name: authentik-secrets
+            key: BOOTSTRAP_TOKEN
+      
+      # Email configuration
+      - name: AUTHENTIK_EMAIL__HOST
+        valueFrom:
+          secretKeyRef:
+            name: authentik-secrets
+            key: SMTP_HOST
+      - name: AUTHENTIK_EMAIL__PORT
+        valueFrom:
+          secretKeyRef:
+            name: authentik-secrets
+            key: SMTP_PORT
+      - name: AUTHENTIK_EMAIL__USERNAME
+        valueFrom:
+          secretKeyRef:
+            name: authentik-secrets
+            key: SMTP_USERNAME
+      - name: AUTHENTIK_EMAIL__PASSWORD
+        valueFrom:
+          secretKeyRef:
+            name: authentik-secrets
+            key: SMTP_PASSWORD
+      - name: AUTHENTIK_EMAIL__USE_TLS
+        value: "true"
+      - name: AUTHENTIK_EMAIL__FROM
+        value: "authentik@jeremymr.dev"
 
   worker:
     env:
+      # Core secrets
       - name: AUTHENTIK_SECRET_KEY
         valueFrom:
           secretKeyRef:
@@ -49,6 +91,32 @@ values: |
           secretKeyRef:
             name: authentik-secrets
             key: REDIS_PASSWORD
+      
+      # Email configuration (worker sends emails)
+      - name: AUTHENTIK_EMAIL__HOST
+        valueFrom:
+          secretKeyRef:
+            name: authentik-secrets
+            key: SMTP_HOST
+      - name: AUTHENTIK_EMAIL__PORT
+        valueFrom:
+          secretKeyRef:
+            name: authentik-secrets
+            key: SMTP_PORT
+      - name: AUTHENTIK_EMAIL__USERNAME
+        valueFrom:
+          secretKeyRef:
+            name: authentik-secrets
+            key: SMTP_USERNAME
+      - name: AUTHENTIK_EMAIL__PASSWORD
+        valueFrom:
+          secretKeyRef:
+            name: authentik-secrets
+            key: SMTP_PASSWORD
+      - name: AUTHENTIK_EMAIL__USE_TLS
+        value: "true"
+      - name: AUTHENTIK_EMAIL__FROM
+        value: "authentik@jeremymr.dev"
 
   postgresql:
     enabled: true
