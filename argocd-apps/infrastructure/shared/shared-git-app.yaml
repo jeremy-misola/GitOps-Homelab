@@ -1,6 +1,6 @@
 name: shared-secrets
 namespace: external-secrets
-syncWave: "11"
+syncWave: "3"
 repoURL: https://github.com/jeremy-misola/GitOps-Homelab
 targetRevision: develop
 appPath: manifests/shared

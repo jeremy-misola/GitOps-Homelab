@@ -1,6 +1,6 @@
 name: crossplane-config
 namespace: crossplane-system
-syncWave: "10"
+syncWave: "11"
 repoURL: https://github.com/jeremy-misola/GitOps-Homelab
 targetRevision: develop
 appPath: manifests/infra/crossplane

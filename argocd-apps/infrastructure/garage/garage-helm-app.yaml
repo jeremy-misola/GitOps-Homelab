@@ -1,6 +1,6 @@
 name: garage
 namespace: garage
-syncWave: "8"
+syncWave: "7"
 repoURL: https://datahub-local.github.io/garage-helm
 chart: garage
 targetRevision: 0.2.1
