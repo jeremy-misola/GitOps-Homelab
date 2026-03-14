@@ -9,7 +9,7 @@ spec:
   gatewayClassName: envoy
   addresses:
   - type: IPAddress
-    value: 192.168.0.241
+    value: 192.168.0.243
   infrastructure:
     labels:
       gateway: envoy
