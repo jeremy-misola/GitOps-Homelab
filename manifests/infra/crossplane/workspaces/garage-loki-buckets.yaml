@@ -4,7 +4,7 @@ metadata:
   name: garage-loki-buckets
   namespace: crossplane-system
   annotations:
-    argocd.argoproj.io/sync-wave: "12"
+    argocd.argoproj.io/sync-wave: "17"
 spec:
   forProvider:
     source: Inline

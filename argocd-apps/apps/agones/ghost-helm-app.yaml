@@ -1,0 +1,11 @@
+name: agones
+namespace: agones-system
+syncWave: "20"
+repoURL: https://agones.dev/chart/stable
+chart: agones
+targetRevision: 1.56.0
+values: |
+  extraEnvVars:
+  gameservers:
+    namespaces:
+    - gameservers

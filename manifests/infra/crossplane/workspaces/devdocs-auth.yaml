@@ -4,7 +4,7 @@ metadata:
   name: devdocs-auth
   namespace: crossplane-system
   annotations:
-    argocd.argoproj.io/sync-wave: "12"
+    argocd.argoproj.io/sync-wave: "17"
 spec:
   forProvider:
     # Inline Terraform configuration for Authentik OIDC app

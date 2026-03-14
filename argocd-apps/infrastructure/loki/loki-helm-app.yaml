@@ -1,6 +1,6 @@
 name: loki-stack
 namespace: loki
-syncWave: "13"
+syncWave: "18"
 repoURL: https://grafana.github.io/helm-charts
 chart: loki
 targetRevision: 6.49.0
