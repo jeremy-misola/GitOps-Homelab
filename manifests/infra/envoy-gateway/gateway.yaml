@@ -33,3 +33,10 @@ spec:
     allowedRoutes:
       namespaces:
         from: All
+    
+  - name: mc-tcp-listener
+    protocol: TCP
+    port: 25565
+    allowedRoutes:
+      namespaces:
+        from: All

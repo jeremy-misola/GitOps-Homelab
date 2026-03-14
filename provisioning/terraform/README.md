@@ -19,7 +19,7 @@ This configuration uses Doppler to manage sensitive credentials. Add the followi
 |-------------|-------------|---------|
 | `PM_API_TOKEN_ID` | Proxmox API token ID | `root@pam!terraform` |
 | `PM_API_TOKEN_SECRET` | Proxmox API token secret | `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx` |
-| `TF_VAR_k3s_token` | K3s cluster token for node authentication | Generate with `openssl rand -base64 64` |
+| `K3S_TOKEN` | K3s cluster token for node authentication | Generate with `openssl rand -base64 64` |
 
 ### Setting up Doppler secrets
 
@@ -37,12 +37,12 @@ doppler setup
 # Add secrets (you'll be prompted for values)
 doppler secrets set PM_API_TOKEN_ID
 doppler secrets set PM_API_TOKEN_SECRET
-doppler secrets set TF_VAR_k3s_token
+doppler secrets set K3S_TOKEN
 
 # Or set with values directly
 doppler secrets set PM_API_TOKEN_ID="root@pam!terraform"
 doppler secrets set PM_API_TOKEN_SECRET="your-secret-here"
-doppler secrets set TF_VAR_k3s_token="$(openssl rand -base64 64)"
+doppler secrets set K3S_TOKEN="$(openssl rand -base64 64)"
 ```
 
 **Alternative:** Use the Doppler dashboard at https://dashboard.doppler.com to add secrets via the web UI.
@@ -54,14 +54,16 @@ doppler secrets set TF_VAR_k3s_token="$(openssl rand -base64 64)"
 terraform init
 
 # Preview changes (secrets injected from Doppler)
-doppler run -- terraform plan
+doppler run -- sh -c 'TF_VAR_k3s_token=$K3S_TOKEN terraform plan'
 
 # Apply configuration (automatically runs Ansible after VMs are ready)
-doppler run -- terraform apply
+doppler run -- sh -c 'TF_VAR_k3s_token=$K3S_TOKEN terraform apply'
 
 # Destroy resources
-doppler run -- terraform destroy
+doppler run -- sh -c 'TF_VAR_k3s_token=$K3S_TOKEN terraform destroy'
 ```
+
+**Note:** Doppler secret names must be uppercase (A-Z, 0-9, _). Since `TF_VAR_k3s_token` contains lowercase characters, we use `K3S_TOKEN` in Doppler and map it to `TF_VAR_k3s_token` in the shell command. This ensures Terraform receives the token correctly via its `TF_VAR_*` environment variable convention.
 
 ### Automated Ansible Integration
 

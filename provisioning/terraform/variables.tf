@@ -2,8 +2,9 @@
 # Credentials are read from environment variables set by Doppler:
 #   PM_API_TOKEN_ID     - Proxmox API token ID
 #   PM_API_TOKEN_SECRET - Proxmox API token secret
-#   K3S_TOKEN           - K3s cluster token for node authentication
-# Run: doppler run -- terraform apply
+#   K3S_TOKEN           - K3s cluster token (mapped to TF_VAR_k3s_token)
+#
+# Run: doppler run -- sh -c 'TF_VAR_k3s_token=$K3S_TOKEN terraform apply'
 
 variable "pm_api_url" {
   description = "The URL of the Proxmox API"
@@ -125,7 +126,7 @@ variable "worker_ips" {
 
 # K3s Cluster Variables
 variable "k3s_token" {
-  description = "K3s cluster token for node authentication (injected from Doppler K3S_TOKEN)"
+  description = "K3s cluster token for node authentication (injected via TF_VAR_k3s_token from Doppler K3S_TOKEN)"
   type        = string
   sensitive   = true
 }
