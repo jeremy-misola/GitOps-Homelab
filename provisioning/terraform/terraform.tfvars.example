@@ -1,0 +1,52 @@
+# Proxmox Connection (non-sensitive)
+pm_api_url      = "https://192.168.0.230:8006/api2/json"
+pm_tls_insecure = true
+target_node     = "pve"
+
+# Template Configuration
+template_name = "ubuntu-2404-template"
+storage_pool  = "local-lvm"
+
+# Network Configuration
+network_bridge = "vmbr0"
+gateway        = "192.168.0.1"
+nameserver     = "192.168.0.1"
+
+# Cloud-Init Configuration
+ci_user = "jurassicjey"
+ssh_public_keys = <<EOF
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPePe7odIztvlzr5RQJ8fyV9kxfHcyzwYmQDxDtYtHw0 jeremy@Jeremys-Mac-mini.local
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFRgisKGZLdiAvV9c2mn+eFtZ6tZMO28futLysncYvBV jurassicjey@archlinux
+EOF
+
+# Control Plane Configuration (3 nodes: 8GB RAM, 100GB disk each)
+control_plane_cores     = 2
+control_plane_memory    = 8192
+control_plane_disk_size = "100G"
+control_plane_ips = [
+  "192.168.0.210",
+  "192.168.0.211",
+  "192.168.0.212"
+]
+
+# Worker Configuration (3 nodes: 32GB RAM, 200GB disk each)
+worker_cores      = 4
+worker_memory     = 32768
+worker_disk_size  = "200G"
+worker_ips = [
+  "192.168.0.213",
+  "192.168.0.214",
+  "192.168.0.215"
+]
+
+# ==============================================================================
+# SENSITIVE VARIABLES - Set via Doppler
+# ==============================================================================
+# The following environment variables must be set in Doppler:
+#
+#   PM_API_TOKEN_ID     = "root@pam!your-token-id"
+#   PM_API_TOKEN_SECRET = "your-token-secret"
+#   TF_VAR_k3s_token    = "your-k3s-cluster-token" (generate with: openssl rand -base64 64)
+#
+# Run Terraform with: doppler run -- terraform apply
+# ==============================================================================

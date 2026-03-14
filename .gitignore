@@ -1,5 +1,8 @@
 .env
 
+# Ansible Vault
+provisioning/argocd-bootstrap/vault.yml
+
 # Terraform
 # Local .terraform directories
 .terraform/
@@ -16,6 +19,7 @@ crash.*.log
 *.tfvars
 *.tfvars.json
 !*.example.tfvars
+!**/*.tfvars.example
 
 # Override files
 override.tf

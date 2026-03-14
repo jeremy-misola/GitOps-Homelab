@@ -35,7 +35,7 @@ values: |
       
       # Bootstrap configuration - creates admin account and token on first run
       - name: AUTHENTIK_BOOTSTRAP_EMAIL
-        value: "admin@jeremymr.dev"
+        value: "misolarellinj06@gmail.com"
       - name: AUTHENTIK_BOOTSTRAP_PASSWORD
         valueFrom:
           secretKeyRef:
@@ -71,7 +71,7 @@ values: |
       - name: AUTHENTIK_EMAIL__USE_TLS
         value: "true"
       - name: AUTHENTIK_EMAIL__FROM
-        value: "authentik@jeremymr.dev"
+        value: "misolarellinj06@gmail.com"
 
   worker:
     env:
