@@ -14,60 +14,16 @@ values: |
     redis:
       password: ""
 
+  # Use global.envFrom to inject all secrets including bootstrap credentials
+  # This is the recommended way to pass bootstrap env vars according to Authentik docs
+  global:
+    envFrom:
+      - secretRef:
+          name: authentik-secrets
+
   server:
     env:
-      # Core secrets
-      - name: AUTHENTIK_SECRET_KEY
-        valueFrom:
-          secretKeyRef:
-            name: authentik-secrets
-            key: AUTHENTIK_SECRET_KEY
-      - name: AUTHENTIK_POSTGRESQL__PASSWORD
-        valueFrom:
-          secretKeyRef:
-            name: authentik-secrets
-            key: POSTGRESQL_PASSWORD
-      - name: AUTHENTIK_REDIS__PASSWORD
-        valueFrom:
-          secretKeyRef:
-            name: authentik-secrets
-            key: REDIS_PASSWORD
-      
-      # Bootstrap configuration - creates admin account and token on first run
-      - name: AUTHENTIK_BOOTSTRAP_EMAIL
-        value: "misolarellinj06@gmail.com"
-      - name: AUTHENTIK_BOOTSTRAP_PASSWORD
-        valueFrom:
-          secretKeyRef:
-            name: authentik-secrets
-            key: BOOTSTRAP_PASSWORD
-      - name: AUTHENTIK_BOOTSTRAP_TOKEN
-        valueFrom:
-          secretKeyRef:
-            name: authentik-secrets
-            key: BOOTSTRAP_TOKEN
-      
-      # Email configuration
-      - name: AUTHENTIK_EMAIL__HOST
-        valueFrom:
-          secretKeyRef:
-            name: authentik-secrets
-            key: SMTP_HOST
-      - name: AUTHENTIK_EMAIL__PORT
-        valueFrom:
-          secretKeyRef:
-            name: authentik-secrets
-            key: SMTP_PORT
-      - name: AUTHENTIK_EMAIL__USERNAME
-        valueFrom:
-          secretKeyRef:
-            name: authentik-secrets
-            key: SMTP_USERNAME
-      - name: AUTHENTIK_EMAIL__PASSWORD
-        valueFrom:
-          secretKeyRef:
-            name: authentik-secrets
-            key: SMTP_PASSWORD
+      # Email configuration (overriding defaults)
       - name: AUTHENTIK_EMAIL__USE_TLS
         value: "true"
       - name: AUTHENTIK_EMAIL__FROM
@@ -75,44 +31,7 @@ values: |
 
   worker:
     env:
-      # Core secrets
-      - name: AUTHENTIK_SECRET_KEY
-        valueFrom:
-          secretKeyRef:
-            name: authentik-secrets
-            key: AUTHENTIK_SECRET_KEY
-      - name: AUTHENTIK_POSTGRESQL__PASSWORD
-        valueFrom:
-          secretKeyRef:
-            name: authentik-secrets
-            key: POSTGRESQL_PASSWORD
-      - name: AUTHENTIK_REDIS__PASSWORD
-        valueFrom:
-          secretKeyRef:
-            name: authentik-secrets
-            key: REDIS_PASSWORD
-      
-      # Email configuration (worker sends emails)
-      - name: AUTHENTIK_EMAIL__HOST
-        valueFrom:
-          secretKeyRef:
-            name: authentik-secrets
-            key: SMTP_HOST
-      - name: AUTHENTIK_EMAIL__PORT
-        valueFrom:
-          secretKeyRef:
-            name: authentik-secrets
-            key: SMTP_PORT
-      - name: AUTHENTIK_EMAIL__USERNAME
-        valueFrom:
-          secretKeyRef:
-            name: authentik-secrets
-            key: SMTP_USERNAME
-      - name: AUTHENTIK_EMAIL__PASSWORD
-        valueFrom:
-          secretKeyRef:
-            name: authentik-secrets
-            key: SMTP_PASSWORD
+      # Email configuration (overriding defaults, worker sends emails)
       - name: AUTHENTIK_EMAIL__USE_TLS
         value: "true"
       - name: AUTHENTIK_EMAIL__FROM
