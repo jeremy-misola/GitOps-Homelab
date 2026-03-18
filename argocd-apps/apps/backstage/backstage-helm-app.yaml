@@ -86,22 +86,6 @@ values: |
             target: https://raw.githubusercontent.com/jeremy-misola/GitOps-Homelab/main/docs/backstage/catalog/apis.yaml
             rules:
               - allow: [API]
-          # Resources
-          - type: url
-            target: https://raw.githubusercontent.com/jeremy-misola/GitOps-Homelab/main/docs/backstage/catalog/resources.yaml
-            rules:
-              - allow: [Resource]
-          # TechDocs catalog-info
-          - type: url
-            target: https://raw.githubusercontent.com/jeremy-misola/GitOps-Homelab/main/catalog-info.yaml
-            rules:
-              - allow: [Component]
-      techdocs:
-        builder: 'local'
-        generator:
-          runIn: 'local'
-        publisher:
-          type: 'local'
       permission:
         enabled: false
 

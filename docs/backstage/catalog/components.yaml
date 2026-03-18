@@ -17,7 +17,6 @@ metadata:
       icon: dashboard
   annotations:
     github.com/project-slug: jeremy-misola/GitOps-Homelab
-    backstage.io/techdocs-ref: dir:docs/backstage/techdocs
 spec:
   type: service
   lifecycle: production
@@ -41,9 +40,6 @@ metadata:
     - url: https://auth.jeremymr.dev
       title: Authentik Dashboard
       icon: dashboard
-  annotations:
-    github.com/project-slug: jeremy-misola/GitOps-Homelab
-    backstage.io/techdocs-ref: dir:docs/backstage/techdocs
 spec:
   type: service
   lifecycle: production
