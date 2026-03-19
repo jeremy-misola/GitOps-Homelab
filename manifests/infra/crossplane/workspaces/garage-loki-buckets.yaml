@@ -1,0 +1,125 @@
+apiVersion: tf.upbound.io/v1beta1
+kind: Workspace
+metadata:
+  name: garage-loki-buckets
+  namespace: crossplane-system
+  annotations:
+    argocd.argoproj.io/sync-wave: "17"
+spec:
+  forProvider:
+    source: Inline
+    module: |
+      terraform {
+        required_providers {
+          garage = {
+            source  = "arsolitt/garagehq"
+            version = ">= 0.0.1"
+          }
+        }
+      }
+
+      variable "garage_host" {
+        type = string
+      }
+
+      variable "garage_scheme" {
+        type    = string
+        default = "http"
+      }
+
+      variable "garage_token" {
+        type      = string
+        sensitive = true
+      }
+
+      provider "garage" {
+        host   = var.garage_host
+        scheme = var.garage_scheme
+        token  = var.garage_token
+      }
+
+      # Create Loki buckets
+      resource "garage_bucket" "loki_chunks" {
+        global_alias = "loki-chunks"
+      }
+
+      resource "garage_bucket" "loki_ruler" {
+        global_alias = "loki-ruler"
+      }
+
+      resource "garage_bucket" "loki_admin" {
+        global_alias = "loki-admin"
+      }
+
+      # Create a single access key for Loki
+      resource "garage_key" "loki" {
+        name = "loki-key"
+      }
+
+      # Grant access to all buckets
+      resource "garage_bucket_key" "loki_chunks" {
+        bucket_id     = garage_bucket.loki_chunks.id
+        access_key_id = garage_key.loki.access_key_id
+        read          = true
+        write         = true
+        owner         = false
+      }
+
+      resource "garage_bucket_key" "loki_ruler" {
+        bucket_id     = garage_bucket.loki_ruler.id
+        access_key_id = garage_key.loki.access_key_id
+        read          = true
+        write         = true
+        owner         = false
+      }
+
+      resource "garage_bucket_key" "loki_admin" {
+        bucket_id     = garage_bucket.loki_admin.id
+        access_key_id = garage_key.loki.access_key_id
+        read          = true
+        write         = true
+        owner         = false
+      }
+
+      # Outputs for Kubernetes secret (keys must use hyphens for compatibility)
+      output "access-key-id" {
+        value = garage_key.loki.access_key_id
+      }
+
+      output "secret-access-key" {
+        value     = garage_key.loki.secret_access_key
+        sensitive = true
+      }
+
+      output "bucket-chunks" {
+        value = garage_bucket.loki_chunks.id
+      }
+
+      output "bucket-ruler" {
+        value = garage_bucket.loki_ruler.id
+      }
+
+      output "bucket-admin" {
+        value = garage_bucket.loki_admin.id
+      }
+
+    vars:
+      - key: garage_host
+        value: "garage.garage.svc:3903"
+      - key: garage_scheme
+        value: "http"
+
+    env:
+      - name: TF_VAR_garage_token
+        secretKeyRef:
+          namespace: crossplane-system
+          name: garage-admin-credentials
+          key: garage-admin-token
+
+  # Write outputs to a secret that can be used by Loki
+  writeConnectionSecretToRef:
+    name: loki-s3-credentials
+    namespace: loki
+
+  providerConfigRef:
+    name: terraform-config

@@ -1,6 +1,6 @@
 name: longhorn
 namespace: longhorn-system
-syncWave: "4"
+syncWave: "3"
 repoURL: https://charts.longhorn.io
 chart: longhorn
 targetRevision: 1.10.1

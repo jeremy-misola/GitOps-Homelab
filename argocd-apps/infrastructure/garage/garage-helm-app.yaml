@@ -1,11 +1,16 @@
 name: garage
 namespace: garage
-syncWave: "8"
+syncWave: "7"
 repoURL: https://datahub-local.github.io/garage-helm
 chart: garage
 targetRevision: 0.2.1
 values: |
   fullnameOverride: "garage"
+
+  garage:
+    secret:
+      create: false
+      name: garage-admin-token
 
   clusterConfig:
     enabled: true
@@ -13,16 +18,6 @@ values: |
       enabled: true
       zone: dc1
       capacity: "10Gi"
-    
-    buckets:
-      - name: loki-chunks
-      - name: loki-ruler
-      - name: loki-admin
-    
-    keys: {}
 
-    extraCommands:
-      - "key create loki-key"
-      - "bucket allow loki-chunks --key loki-key --read --write"
-      - "bucket allow loki-ruler --key loki-key --read --write"
-      - "bucket allow loki-admin --key loki-key --read --write"
+  # Buckets and keys are now managed via Crossplane
+  # See manifests/infra/crossplane/workspaces/garage-loki-buckets.yaml

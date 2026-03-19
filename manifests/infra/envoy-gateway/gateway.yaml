@@ -9,7 +9,7 @@ spec:
   gatewayClassName: envoy
   addresses:
   - type: IPAddress
-    value: 192.168.0.241
+    value: 192.168.0.243
   infrastructure:
     labels:
       gateway: envoy
@@ -28,8 +28,16 @@ spec:
       mode: Terminate
       certificateRefs:
         - name: homelab-cert
+          namespace: envoy-gateway-system
         - name: saima-cert
           namespace: envoy-gateway-system
+    allowedRoutes:
+      namespaces:
+        from: All
+    
+  - name: mc-tcp-listener
+    protocol: TCP
+    port: 25565
     allowedRoutes:
       namespaces:
         from: All

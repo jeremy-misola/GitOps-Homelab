@@ -1,6 +1,6 @@
 name: ghost
 namespace: ghost
-syncWave: "2"
+syncWave: "20"
 repoURL: oci://registry-1.docker.io/cloudpirates/ghost
 chart: ghost
 targetRevision: 0.6.5

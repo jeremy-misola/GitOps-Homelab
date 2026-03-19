@@ -1,6 +1,6 @@
 name: authentik
 namespace: authentik
-syncWave: "10"
+syncWave: "8"
 repoURL: https://charts.goauthentik.io/
 chart: authentik
 targetRevision: 2025.10.3
@@ -14,41 +14,28 @@ values: |
     redis:
       password: ""
 
+  # Use global.envFrom to inject all secrets including bootstrap credentials
+  # This is the recommended way to pass bootstrap env vars according to Authentik docs
+  global:
+    envFrom:
+      - secretRef:
+          name: authentik-secrets
+
   server:
     env:
-      - name: AUTHENTIK_SECRET_KEY
-        valueFrom:
-          secretKeyRef:
-            name: authentik-secrets
-            key: AUTHENTIK_SECRET_KEY
-      - name: AUTHENTIK_POSTGRESQL__PASSWORD
-        valueFrom:
-          secretKeyRef:
-            name: authentik-secrets
-            key: POSTGRESQL_PASSWORD
-      - name: AUTHENTIK_REDIS__PASSWORD
-        valueFrom:
-          secretKeyRef:
-            name: authentik-secrets
-            key: REDIS_PASSWORD
+      # Email configuration (overriding defaults)
+      - name: AUTHENTIK_EMAIL__USE_TLS
+        value: "true"
+      - name: AUTHENTIK_EMAIL__FROM
+        value: "misolarellinj06@gmail.com"
 
   worker:
     env:
-      - name: AUTHENTIK_SECRET_KEY
-        valueFrom:
-          secretKeyRef:
-            name: authentik-secrets
-            key: AUTHENTIK_SECRET_KEY
-      - name: AUTHENTIK_POSTGRESQL__PASSWORD
-        valueFrom:
-          secretKeyRef:
-            name: authentik-secrets
-            key: POSTGRESQL_PASSWORD
-      - name: AUTHENTIK_REDIS__PASSWORD
-        valueFrom:
-          secretKeyRef:
-            name: authentik-secrets
-            key: REDIS_PASSWORD
+      # Email configuration (overriding defaults, worker sends emails)
+      - name: AUTHENTIK_EMAIL__USE_TLS
+        value: "true"
+      - name: AUTHENTIK_EMAIL__FROM
+        value: "authentik@jeremymr.dev"
 
   postgresql:
     enabled: true

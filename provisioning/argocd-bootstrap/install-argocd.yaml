@@ -1,0 +1,193 @@
+---
+- name: Install ArgoCD on k3s cluster
+  hosts: server[0]
+  become: true
+  gather_facts: true
+
+  vars:
+    argocd_version: v2.14.13
+    argocd_namespace: argocd
+    kubeconfig_path: /etc/rancher/k3s/k3s.yaml
+    bootstrap_app_url: https://raw.githubusercontent.com/jeremy-misola/GitOps-Homelab/develop/bootstrap/root-app.yaml
+    # Set to true to skip bootstrap application
+    skip_bootstrap: false
+    # Doppler configuration for fetching ESO token
+    # Store this in Ansible Vault for security
+    doppler_bootstrap_token: ""
+    # Name of the secret in Doppler that contains the ESO token
+    doppler_eso_token_name: ESO_TOKEN
+
+  tasks:
+    - name: Wait for k3s to be ready
+      ansible.builtin.command:
+        cmd: kubectl --kubeconfig {{ kubeconfig_path }} get nodes
+      register: k3s_status
+      until: k3s_status.rc == 0
+      retries: 30
+      delay: 10
+      changed_when: false
+
+    - name: Create argocd namespace
+      ansible.builtin.command:
+        cmd: kubectl --kubeconfig {{ kubeconfig_path }} create namespace {{ argocd_namespace }}
+      register: namespace_create
+      changed_when: "'created' in namespace_create.stdout"
+      failed_when: 
+        - namespace_create.rc != 0
+        - "'AlreadyExists' not in namespace_create.stderr"
+
+    - name: Install ArgoCD
+      ansible.builtin.command:
+        cmd: >
+          kubectl --kubeconfig {{ kubeconfig_path }} apply -n {{ argocd_namespace }}
+          -f https://raw.githubusercontent.com/argoproj/argo-cd/{{ argocd_version }}/manifests/install.yaml
+      register: argocd_install
+      changed_when: "'configured' in argocd_install.stdout or 'created' in argocd_install.stdout"
+
+    - name: Wait for ArgoCD API server to be ready
+      ansible.builtin.command:
+        cmd: >
+          kubectl --kubeconfig {{ kubeconfig_path }} wait --for=condition=available
+          --timeout=600s deployment/argocd-server -n {{ argocd_namespace }}
+      register: argocd_ready
+      changed_when: false
+
+    - name: Wait for ArgoCD repo server to be ready
+      ansible.builtin.command:
+        cmd: >
+          kubectl --kubeconfig {{ kubeconfig_path }} wait --for=condition=available
+          --timeout=300s deployment/argocd-repo-server -n {{ argocd_namespace }}
+      register: repo_ready
+      changed_when: false
+
+    - name: Wait for ArgoCD application controller to be ready
+      ansible.builtin.command:
+        cmd: >
+          kubectl --kubeconfig {{ kubeconfig_path }} wait --for=condition=available
+          --timeout=300s deployment/argocd-application-controller -n {{ argocd_namespace }}
+      register: controller_ready
+      changed_when: false
+
+    - name: Get ArgoCD initial admin password
+      ansible.builtin.command:
+        cmd: >
+          kubectl --kubeconfig {{ kubeconfig_path }} -n {{ argocd_namespace }}
+          get secret argocd-initial-admin-secret -o jsonpath="{.data.password}"
+      register: argocd_password_encoded
+      changed_when: false
+      no_log: true
+
+    - name: Decode admin password
+      ansible.builtin.set_fact:
+        argocd_admin_password: "{{ argocd_password_encoded.stdout | b64decode }}"
+      no_log: true
+
+    - name: Display ArgoCD admin password
+      ansible.builtin.debug:
+        msg: |
+          ============================================
+          ArgoCD Installation Complete!
+          ============================================
+          
+          Initial Admin Password: {{ argocd_admin_password }}
+          
+          To access ArgoCD UI, run:
+            kubectl port-forward svc/argocd-server -n argocd 8080:443
+          
+          Then access: https://localhost:8080
+          Username: admin
+          ============================================
+      when: not skip_bootstrap
+
+    # Bootstrap External Secrets Operator token
+    - name: Check if Doppler CLI is installed
+      ansible.builtin.command:
+        cmd: which doppler
+      register: doppler_cli_check
+      changed_when: false
+      failed_when: false
+
+    - name: Install Doppler CLI
+      ansible.builtin.shell:
+        cmd: curl -Ls https://cli.doppler.com/install.sh | sh
+      when: 
+        - not skip_bootstrap
+        - doppler_bootstrap_token | length > 0
+        - doppler_cli_check.rc != 0
+      changed_when: true
+
+    - name: Create external-secrets namespace
+      ansible.builtin.command:
+        cmd: kubectl --kubeconfig {{ kubeconfig_path }} create namespace external-secrets
+      register: eso_namespace_create
+      changed_when: "'created' in eso_namespace_create.stdout"
+      failed_when: 
+        - eso_namespace_create.rc != 0
+        - "'AlreadyExists' not in eso_namespace_create.stderr"
+      when: 
+        - not skip_bootstrap
+        - doppler_bootstrap_token | length > 0
+
+    - name: Fetch ESO token from Doppler
+      ansible.builtin.command:
+        cmd: doppler secrets get {{ doppler_eso_token_name }} --plain
+      environment:
+        DOPPLER_TOKEN: "{{ doppler_bootstrap_token }}"
+      register: eso_token_value
+      changed_when: false
+      no_log: true
+      when: 
+        - not skip_bootstrap
+        - doppler_bootstrap_token | length > 0
+
+    - name: Create doppler-token-auth-api secret
+      ansible.builtin.shell:
+        cmd: >
+          HISTIGNORE='*kubectl*' kubectl --kubeconfig {{ kubeconfig_path }} create secret generic
+          doppler-token-auth-api --from-literal=dopplerToken={{ eso_token_value.stdout }} -n external-secrets
+      register: doppler_secret_create
+      changed_when: "'created' in doppler_secret_create.stdout"
+      failed_when: 
+        - doppler_secret_create.rc != 0
+        - "'AlreadyExists' not in doppler_secret_create.stderr"
+      no_log: true
+      when: 
+        - not skip_bootstrap
+        - doppler_bootstrap_token | length > 0
+
+    - name: Display ESO bootstrap status
+      ansible.builtin.debug:
+        msg: |
+          ============================================
+          External Secrets Operator Bootstrap
+          ============================================
+          
+          doppler-token-auth-api secret created in external-secrets namespace.
+          ClusterSecretStore can now authenticate with Doppler.
+          ============================================
+      when: 
+        - not skip_bootstrap
+        - doppler_bootstrap_token | length > 0
+
+    - name: Apply bootstrap application (root-app)
+      ansible.builtin.command:
+        cmd: kubectl --kubeconfig {{ kubeconfig_path }} apply -f {{ bootstrap_app_url }}
+      register: bootstrap_apply
+      changed_when: "'configured' in bootstrap_apply.stdout or 'created' in bootstrap_apply.stdout"
+      when: not skip_bootstrap
+
+    - name: Display bootstrap status
+      ansible.builtin.debug:
+        msg: |
+          ============================================
+          GitOps Bootstrap Complete!
+          ============================================
+          
+          The root-app has been applied and will sync:
+            - categories/infrastructure.yaml → Infrastructure Apps
+            - categories/applications.yaml → Application Workloads
+          
+          Monitor progress in ArgoCD UI or run:
+            kubectl get applications -n argocd
+          ============================================
+      when: not skip_bootstrap

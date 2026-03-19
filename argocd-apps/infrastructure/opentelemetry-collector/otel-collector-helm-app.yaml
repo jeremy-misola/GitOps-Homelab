@@ -1,6 +1,6 @@
 name: otel-collector
 namespace: opentelemetry-collector
-syncWave: "14"
+syncWave: "19"
 repoURL: https://open-telemetry.github.io/opentelemetry-helm-charts
 chart: opentelemetry-collector
 targetRevision: 0.143.0

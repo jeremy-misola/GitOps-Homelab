@@ -7,7 +7,6 @@ on:
     paths:
       - ".github/workflows/**/*.y*ml"
       - "**/*.y*ml"
-      - ".yamllint.yaml"
   pull_request:
     branches:
       - main
