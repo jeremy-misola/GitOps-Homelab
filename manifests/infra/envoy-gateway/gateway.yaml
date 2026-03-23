@@ -4,7 +4,8 @@ metadata:
   name: prod-web
   namespace: envoy-gateway-system
   annotations:
-    external-dns.alpha.kubernetes.io/target: 66.130.187.229
+    gateway.envoyproxy.io/envoy-proxy-config: prod-web-config
+
 spec:
   gatewayClassName: envoy
   addresses:
