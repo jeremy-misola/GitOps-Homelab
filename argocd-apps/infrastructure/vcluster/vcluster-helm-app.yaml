@@ -1,0 +1,7 @@
+name: vcluster
+namespace: vcluster
+syncWave: "20"
+repoURL: https://charts.loft.sh
+chart: vcluster
+targetRevision: 0.33.0
+values: ""
