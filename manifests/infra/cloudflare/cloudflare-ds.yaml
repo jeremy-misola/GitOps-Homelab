@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: cloudflared
+  namespace: cloudflare
+  labels:
+    app: cloudflared
+spec:
+  selector:
+    matchLabels:
+      app: cloudflared
+  template:
+    metadata:
+      labels:
+        app: cloudflared
+    spec:
+      tolerations:
+      # these tolerations are to have the daemonset runnable on control plane nodes
+      - key: node-role.kubernetes.io/control-plane
+        operator: Exists
+        effect: NoSchedule
+      - key: node-role.kubernetes.io/master
+        operator: Exists
+        effect: NoSchedule
+      containers:
+      - name: cloudflared
+        image: cloudflare/cloudflared:latest
+        args:
+        - tunnel
+        - run
+        - --token
+        - $(CLOUDFLARED_TOKEN)
+        env:
+        - name: CLOUDFLARED_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: cloudflared-token
+              key: token
+        resources:
+          limits:
+            memory: 256Mi
+          requests:
+            cpu: 50m
+            memory: 128Mi
+        livenessProbe:
+          httpGet:
+            path: /ready
+            port: 20241
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 20241
+          initialDelaySeconds: 5
+          periodSeconds: 10
+      terminationGracePeriodSeconds: 30

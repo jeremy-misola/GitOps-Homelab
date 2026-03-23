@@ -4,15 +4,18 @@ metadata:
   name: prod-web
   namespace: envoy-gateway-system
   annotations:
-    external-dns.alpha.kubernetes.io/target: 66.130.187.229
 spec:
+  infrastructure:
+    labels:
+      gateway: envoy
+    parametersRef:
+      group: gateway.envoyproxy.io
+      kind: EnvoyProxy
+      name: prod-web-config
   gatewayClassName: envoy
   addresses:
   - type: IPAddress
     value: 192.168.0.243
-  infrastructure:
-    labels:
-      gateway: envoy
   listeners:
   - name: http
     protocol: HTTP
