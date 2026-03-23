@@ -28,8 +28,8 @@ spec:
         args:
         - tunnel
         - --token
-        - $(CLOUDFLARED_TOKEN)
         - run
+        - $(CLOUDFLARED_TOKEN)
         env:
         - name: CLOUDFLARED_TOKEN
           valueFrom:
