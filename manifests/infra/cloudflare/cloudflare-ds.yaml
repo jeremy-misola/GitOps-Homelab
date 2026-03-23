@@ -27,8 +27,8 @@ spec:
         image: cloudflare/cloudflared:latest
         args:
         - tunnel
-        - --token
         - run
+        - --token
         - $(CLOUDFLARED_TOKEN)
         env:
         - name: CLOUDFLARED_TOKEN
