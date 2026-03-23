@@ -12,7 +12,6 @@ spec:
       group: gateway.envoyproxy.io
       kind: EnvoyProxy
       name: prod-web-config
-      namespace: envoy-gateway-system
   gatewayClassName: envoy
   addresses:
   - type: IPAddress
