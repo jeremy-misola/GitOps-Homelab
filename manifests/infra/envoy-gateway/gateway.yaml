@@ -7,6 +7,11 @@ metadata:
     gateway.envoyproxy.io/envoy-proxy-config: prod-web-config
 
 spec:
+  infrastructure:
+    parametersRef:
+      group: gateway.envoyproxy.io
+      kind: EnvoyProxy
+      name: prod-web-config
   gatewayClassName: envoy
   addresses:
   - type: IPAddress
