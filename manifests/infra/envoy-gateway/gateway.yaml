@@ -4,14 +4,13 @@ metadata:
   name: prod-web
   namespace: envoy-gateway-system
   annotations:
-    gateway.envoyproxy.io/envoy-proxy-config: prod-web-config
-
 spec:
   infrastructure:
     parametersRef:
       group: gateway.envoyproxy.io
       kind: EnvoyProxy
       name: prod-web-config
+      namespace: envoy-gateway-system
   gatewayClassName: envoy
   addresses:
   - type: IPAddress
