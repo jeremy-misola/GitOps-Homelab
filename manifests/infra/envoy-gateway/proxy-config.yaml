@@ -8,5 +8,7 @@ spec:
     type: Kubernetes
     kubernetes:
       envoyService:
-        name: prod-web-gateway-service
+        name: "prod-web-gateway-service"
+        annotations:
+          test-annotation: "test-value"
           
