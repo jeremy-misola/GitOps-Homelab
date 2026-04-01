@@ -11,4 +11,3 @@ spec:
   dnsNames:
   - "jeremymr.dev"
   - "*.jeremymr.dev"
-  - "*.ghost.jeremymr.dev"

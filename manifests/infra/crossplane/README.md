@@ -8,16 +8,26 @@ This directory contains Crossplane configurations for declarative infrastructure
 crossplane/
 ├── providers/                    # Crossplane providers
 │   ├── provider-terraform.yaml   # Terraform provider
-│   └── provider-config.yaml      # Provider configuration
+│   ├── provider-kubernetes.yaml  # Kubernetes provider
+│   ├── provider-helm.yaml        # Helm provider
+│   ├── provider-kubernetes-config.yaml  # Kubernetes + Helm provider configs
+│   ├── provider-kubernetes-rbac.yaml    # Provider RBAC bindings
+│   └── provider-config.yaml      # Terraform provider configuration
 ├── secrets/                      # ExternalSecrets for Crossplane
 │   ├── authentik-api-token.yaml  # Authentik API token
 │   └── garage-admin-credentials.yaml  # Garage admin token
 ├── terraform-modules/            # Reusable Terraform modules
 │   ├── authentik-oidc-app.yaml   # OIDC application module
 │   └── garage-bucket.yaml        # Garage bucket module
+├── functions/                    # Crossplane composition functions
+│   ├── function-patch-and-transform.yaml
+│   └── function-auto-ready.yaml
 └── workspaces/                   # Workspace resources
     ├── longhorn-auth.yaml        # Longhorn Authentik app
     └── garage-loki-buckets.yaml  # Loki S3 buckets
+└── kubesandbox/                  # KubeSandbox session XRD and composition
+    ├── kubesandbox-session-xrd.yaml
+    ├── kubesandbox-session-composition.yaml
 ```
 
 ## Prerequisites
@@ -130,6 +140,29 @@ spec:
     clientSecret:
       name: "myapp-client-secret"
 ```
+
+### KubeSandbox Sessions
+
+KubeSandbox uses a Crossplane composite resource to model one sandbox session as one declarative object.
+
+- The claim kind is `KubeSandboxSession`
+- The composite kind is `XKubeSandboxSession`
+- The composition directly creates:
+  - a session namespace
+  - a `vcluster` Helm release
+  - a default-deny NetworkPolicy
+  - a long-running shell Pod
+This is the session-first model, so the backend only needs to create and watch one Crossplane resource per session.
+
+#### Connecting to the vCluster API
+
+The current composition creates the vCluster control plane and mounts the generated kubeconfig into the shell Pod.
+
+- vCluster writes a kubeconfig secret named `vc-<release>` into the session namespace.
+- The shell Pod mounts that secret at `/kubeconfig` and uses `/kubeconfig/config` as `KUBECONFIG`.
+- The kubeconfig now points at the vCluster service DNS name inside the session namespace, so the shell can talk to the vCluster API directly.
+
+If you want a browser-friendly or external endpoint, we can still add an Ingress or LoadBalancer later, but it is no longer required for the in-cluster shell workflow.
 
 ## Garage Bucket Management
 

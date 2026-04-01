@@ -1,0 +1,96 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: xkubesandboxsessions.platform.kubesandbox.com
+  annotations:
+    argocd.argoproj.io/sync-wave: "18"
+spec:
+  group: platform.kubesandbox.com
+  names:
+    kind: XKubeSandboxSession
+    plural: xkubesandboxsessions
+    singular: xkubesandboxsession
+  claimNames:
+    kind: KubeSandboxSession
+    plural: kubesandboxsessions
+    singular: kubesandboxsession
+  defaultCompositionRef:
+    name: kubesandbox-session
+  versions:
+    - name: v1alpha1
+      served: true
+      referenceable: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              required:
+                - tenantRef
+                - ownerRef
+                - profile
+              properties:
+                tenantRef:
+                  type: string
+                  description: Logical tenant that owns the session.
+                ownerRef:
+                  type: string
+                  description: User identifier from Authentik or the application database.
+                profile:
+                  type: string
+                  description: Session profile that controls the default resource shape.
+                  enum:
+                    - starter
+                    - standard
+                    - advanced
+                ttlMinutes:
+                  type: integer
+                  minimum: 15
+                  default: 60
+                  description: How long the session should live before cleanup.
+                workspaceImage:
+                  type: string
+                  default: jurassicjey/ttyd-k8s:ttyd
+                  description: Container image used for the user workspace. It must include a web terminal server such as ttyd or code-server.
+                starterLabRef:
+                  type: string
+                  default: ""
+                  description: Optional starter lab identifier or template name.
+                resources:
+                  type: object
+                  properties:
+                    cpu:
+                      type: string
+                      default: 500m
+                    memory:
+                      type: string
+                      default: 512Mi
+                    storage:
+                      type: string
+                      default: 2Gi
+            status:
+              type: object
+              properties:
+                phase:
+                  type: string
+                  description: Human readable lifecycle phase for the session.
+                message:
+                  type: string
+                  description: Latest reconcile or provisioning message.
+                expiresAt:
+                  type: string
+                  format: date-time
+                  description: When the session should be cleaned up.
+                sessionNamespace:
+                  type: string
+                  description: Namespace created for the session.
+                vclusterRelease:
+                  type: string
+                  description: Name of the Helm release that installs vcluster.
+                workspacePod:
+                  type: string
+                  description: Name of the shell pod that the browser terminal targets.
+                workspaceReady:
+                  type: boolean
+                  description: Whether the composed workspace stack is ready.
