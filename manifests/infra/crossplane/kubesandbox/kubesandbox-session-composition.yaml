@@ -75,12 +75,7 @@ spec:
                   namespace: placeholder
                   skipCreateNamespace: true
                   values:
-                    service:
-                      enabled: true
-                      spec:
-                        type: ClusterIP
-                    exportKubeConfig:
-                      server: https://placeholder
+                    {}
             patches:
               - type: CombineFromComposite
                 combine:
