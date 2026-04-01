@@ -3,5 +3,5 @@ namespace: envoy-gateway-system
 syncWave: "9"
 repoURL: oci://docker.io/envoyproxy/gateway-helm
 chart: gateway-helm
-targetRevision: 1.6.2
+targetRevision: 1.7.1
 values: ""
