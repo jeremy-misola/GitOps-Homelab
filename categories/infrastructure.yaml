@@ -3,8 +3,6 @@ kind: ApplicationSet
 metadata:
   name: infrastructure-helm
   namespace: argocd
-  annotations:
-    argocd.argoproj.io/sync-wave: "-5"
 spec:
   generators:
   - git:
@@ -36,14 +34,19 @@ spec:
         syncOptions:
           - CreateNamespace=true
           - ServerSideApply=true
+      # Infrastructure apps depend on base services (cert-manager, external-secrets)
+      # but some apps might not need all dependencies - using shared-git as a safe base
+      ignoreDifferences:
+        - group: argoproj.io
+          kind: ApplicationSet
+          jsonPointers:
+            - /status
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
   name: infrastructure-git
   namespace: argocd
-  annotations:
-    argocd.argoproj.io/sync-wave: "-5"
 spec:
   generators:
   - git:
@@ -74,3 +77,10 @@ spec:
         syncOptions:
           - CreateNamespace=true
           - ServerSideApply=true
+      # Infrastructure apps depend on base services (cert-manager, external-secrets)
+      # but some apps might not need all dependencies - using shared-git as a safe base
+      ignoreDifferences:
+        - group: argoproj.io
+          kind: ApplicationSet
+          jsonPointers:
+            - /status
