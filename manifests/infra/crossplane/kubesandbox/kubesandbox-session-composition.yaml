@@ -104,7 +104,7 @@ spec:
                     - fromFieldPath: metadata.labels[crossplane.io/claim-name]
                   strategy: string
                   string:
-                    fmt: "https://%s-%s-vcluster.%s-%s.svc:443"
+                    fmt: "https://%s-%s-vcluster.%s-%s:443"
                 toFieldPath: spec.forProvider.values.exportKubeConfig.server
               - type: ToCompositeFieldPath
                 fromFieldPath: metadata.name
@@ -151,6 +151,17 @@ spec:
                           ports:
                             - protocol: TCP
                               port: 443
+                            - protocol: TCP
+                              port: 8443
+                        - to:
+                            - namespaceSelector:
+                                matchLabels:
+                                  kubernetes.io/metadata.name: placeholder
+                          ports:
+                            - protocol: TCP
+                              port: 53
+                            - protocol: UDP
+                              port: 53
                         - to:
                             - namespaceSelector:
                                 matchLabels:
