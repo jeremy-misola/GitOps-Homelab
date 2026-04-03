@@ -72,10 +72,6 @@ spec:
                       type: string
                       default: 512Mi
                       description: Memory request and limit for the shell pod.
-                    storage:
-                      type: string
-                      default: 2Gi
-                      description: Writable workspace storage for the shell pod.
             status:
               type: object
               properties:

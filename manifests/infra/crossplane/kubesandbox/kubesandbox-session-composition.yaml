@@ -315,18 +315,16 @@ spec:
                           command:
                             - sh
                             - -lc
-                            - cd /workspace && exec ttyd -W -p 8080 sh
+                            - cd /tmp && exec ttyd -W -p 8080 sh
                           env:
                             - name: HOME
-                              value: /workspace
+                              value: /tmp
                             - name: KUBECONFIG
                               value: /kubeconfig/config
                           volumeMounts:
                             - name: vcluster-kubeconfig
                               mountPath: /kubeconfig
                               readOnly: true
-                            - name: workspace
-                              mountPath: /workspace
                             - name: tmp
                               mountPath: /tmp
                           ports:
@@ -337,9 +335,6 @@ spec:
                         - name: vcluster-kubeconfig
                           secret:
                             secretName: placeholder
-                        - name: workspace
-                          persistentVolumeClaim:
-                            claimName: placeholder
                         - name: tmp
                           emptyDir: {}
             patches:
@@ -447,55 +442,6 @@ spec:
               - type: MatchString
                 fieldPath: status.atProvider.manifest.status.phase
                 matchString: Running
-
-          - name: shell-workspace
-            base:
-              apiVersion: kubernetes.crossplane.io/v1alpha2
-              kind: Object
-              metadata:
-                name: placeholder
-                annotations:
-                  argocd.argoproj.io/sync-wave: "18"
-              spec:
-                providerConfigRef:
-                  name: kubernetes-incluster
-                forProvider:
-                  manifest:
-                    apiVersion: v1
-                    kind: PersistentVolumeClaim
-                    metadata:
-                      name: workspace
-                      namespace: placeholder
-                    spec:
-                      accessModes:
-                        - ReadWriteOnce
-                      resources:
-                        requests:
-                          storage: 2Gi
-            patches:
-              - type: CombineFromComposite
-                combine:
-                  variables:
-                    - fromFieldPath: metadata.labels[crossplane.io/claim-namespace]
-                    - fromFieldPath: metadata.labels[crossplane.io/claim-name]
-                  strategy: string
-                  string:
-                    fmt: "%s-%s-workspace"
-                toFieldPath: metadata.name
-              - type: CombineFromComposite
-                combine:
-                  variables:
-                    - fromFieldPath: metadata.labels[crossplane.io/claim-namespace]
-                    - fromFieldPath: metadata.labels[crossplane.io/claim-name]
-                  strategy: string
-                  string:
-                    fmt: "%s-%s"
-                toFieldPath: spec.forProvider.manifest.metadata.namespace
-              - type: FromCompositeFieldPath
-                fromFieldPath: spec.resources.storage
-                toFieldPath: spec.forProvider.manifest.spec.resources.requests.storage
-                policy:
-                  fromFieldPath: Optional
 
           - name: shell-service
             base:

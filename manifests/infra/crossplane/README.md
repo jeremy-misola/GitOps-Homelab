@@ -155,11 +155,10 @@ KubeSandbox uses a Crossplane composite resource to model one sandbox session as
   - a `vcluster` Helm release
   - a default-deny NetworkPolicy
   - a hardened shell Pod
-  - a writable PVC-backed workspace for the shell
 This is the session-first model, so the backend only needs to create and watch one Crossplane resource per session.
 
 - The shell pod intentionally does not get a service account token.
-- The browser terminal still uses your custom `ttyd` image, but the container now runs with a restricted security context and mounts a writable workspace volume.
+- The browser terminal still uses your custom `ttyd` image, but the container now runs with a restricted security context and uses ephemeral scratch space only.
 - `ttlMinutes` is a contract for the backend/frontend today; the manifests cap it, but cleanup still needs to be enforced by your session service or a future controller.
 
 #### Connecting to the vCluster API
