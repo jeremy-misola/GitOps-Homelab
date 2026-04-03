@@ -26,6 +26,7 @@ crossplane/
     ├── longhorn-auth.yaml        # Longhorn Authentik app
     └── garage-loki-buckets.yaml  # Loki S3 buckets
 └── kubesandbox/                  # KubeSandbox session XRD and composition
+    ├── kubesandbox-session-rbac.yaml
     ├── kubesandbox-session-xrd.yaml
     ├── kubesandbox-session-composition.yaml
 ```
@@ -147,12 +148,19 @@ KubeSandbox uses a Crossplane composite resource to model one sandbox session as
 
 - The claim kind is `KubeSandboxSession`
 - The composite kind is `XKubeSandboxSession`
+- `kubesandbox-session-rbac.yaml` aggregates the required RBAC rules into the core Crossplane controller so it can reconcile and delete the claim and XR types cluster-wide.
 - The composition directly creates:
   - a session namespace
+  - a namespace `ResourceQuota`
   - a `vcluster` Helm release
   - a default-deny NetworkPolicy
-  - a long-running shell Pod
+  - a hardened shell Pod
+  - a writable PVC-backed workspace for the shell
 This is the session-first model, so the backend only needs to create and watch one Crossplane resource per session.
+
+- The shell pod intentionally does not get a service account token.
+- The browser terminal still uses your custom `ttyd` image, but the container now runs with a restricted security context and mounts a writable workspace volume.
+- `ttlMinutes` is a contract for the backend/frontend today; the manifests cap it, but cleanup still needs to be enforced by your session service or a future controller.
 
 #### Connecting to the vCluster API
 

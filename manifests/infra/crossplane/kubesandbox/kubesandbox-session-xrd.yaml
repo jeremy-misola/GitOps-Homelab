@@ -47,28 +47,35 @@ spec:
                 ttlMinutes:
                   type: integer
                   minimum: 15
+                  maximum: 1440
                   default: 60
-                  description: How long the session should live before cleanup.
+                  description: How long the session should live before cleanup. The backend should still enforce deletion when the TTL expires.
                 workspaceImage:
                   type: string
                   default: jurassicjey/ttyd-k8s:ttyd
+                  maxLength: 255
                   description: Container image used for the user workspace. It must include a web terminal server such as ttyd or code-server.
                 starterLabRef:
                   type: string
                   default: ""
+                  maxLength: 128
                   description: Optional starter lab identifier or template name.
                 resources:
                   type: object
+                  default: {}
                   properties:
                     cpu:
                       type: string
                       default: 500m
+                      description: CPU request and limit for the shell pod.
                     memory:
                       type: string
                       default: 512Mi
+                      description: Memory request and limit for the shell pod.
                     storage:
                       type: string
                       default: 2Gi
+                      description: Writable workspace storage for the shell pod.
             status:
               type: object
               properties:
