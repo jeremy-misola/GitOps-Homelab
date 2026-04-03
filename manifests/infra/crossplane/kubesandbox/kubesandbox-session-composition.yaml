@@ -95,7 +95,6 @@ spec:
                         services: "20"
                         configmaps: "20"
                         secrets: "20"
-                        persistentvolumeclaims: "1"
                         requests.cpu: "4"
                         requests.memory: 8Gi
                         limits.cpu: "4"
@@ -138,7 +137,11 @@ spec:
                   namespace: placeholder
                   skipCreateNamespace: true
                   values:
-                    {}
+                    controlPlane:
+                      statefulSet:
+                        persistence:
+                          volumeClaim:
+                            enabled: false
             patches:
               - type: CombineFromComposite
                 combine:
@@ -315,12 +318,12 @@ spec:
                           command:
                             - sh
                             - -lc
-                            - cd /tmp && exec ttyd -W -p 8080 sh
+                            - cp /kubeconfig/config /tmp/kubeconfig && export KUBECONFIG=/tmp/kubeconfig && (kubectl config set-context --current --namespace=default >/dev/null 2>&1 || true) && cd /tmp && exec ttyd -W -p 8080 sh
                           env:
                             - name: HOME
                               value: /tmp
                             - name: KUBECONFIG
-                              value: /kubeconfig/config
+                              value: /tmp/kubeconfig
                           volumeMounts:
                             - name: vcluster-kubeconfig
                               mountPath: /kubeconfig
@@ -390,15 +393,6 @@ spec:
                   string:
                     fmt: "vc-%s-%s-vcluster"
                 toFieldPath: spec.forProvider.manifest.spec.volumes[0].secret.secretName
-              - type: CombineFromComposite
-                combine:
-                  variables:
-                    - fromFieldPath: metadata.labels[crossplane.io/claim-namespace]
-                    - fromFieldPath: metadata.labels[crossplane.io/claim-name]
-                  strategy: string
-                  string:
-                    fmt: "%s-%s-workspace"
-                toFieldPath: spec.forProvider.manifest.spec.volumes[1].persistentVolumeClaim.claimName
               - type: ToCompositeFieldPath
                 fromFieldPath: metadata.name
                 toFieldPath: status.workspacePod
