@@ -1,6 +1,6 @@
-name: kubesandbox-frontend
+name: kubesandbox
 namespace: kubesandbox
 syncWave: "20"
 repoURL: https://github.com/jeremy-misola/kubesandbox
-chart: helm
 targetRevision: main
+appPath: helm
