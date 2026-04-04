@@ -3,8 +3,6 @@ kind: ApplicationSet
 metadata:
   name: applications-helm
   namespace: argocd
-  annotations:
-    argocd.argoproj.io/sync-wave: "0"
 spec:
   generators:
   - git:
@@ -36,14 +34,18 @@ spec:
         syncOptions:
           - CreateNamespace=true
           - ServerSideApply=true
+      # Applications depend on all infrastructure apps being healthy first
+      ignoreDifferences:
+        - group: argoproj.io
+          kind: ApplicationSet
+          jsonPointers:
+            - /status
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
   name: applications-git
   namespace: argocd
-  annotations:
-    argocd.argoproj.io/sync-wave: "0"
 spec:
   generators:
   - git:
@@ -74,3 +76,9 @@ spec:
         syncOptions:
           - CreateNamespace=true
           - ServerSideApply=true
+      # Applications depend on all infrastructure apps being healthy first
+      ignoreDifferences:
+        - group: argoproj.io
+          kind: ApplicationSet
+          jsonPointers:
+            - /status

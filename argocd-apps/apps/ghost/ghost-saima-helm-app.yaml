@@ -3,7 +3,7 @@ namespace: ghost-saima
 syncWave: "20"
 repoURL: oci://registry-1.docker.io/cloudpirates/ghost
 chart: ghost
-targetRevision: 0.6.5
+targetRevision: 0.16.3
 values: |
   extraEnvVars:
     - name: url
