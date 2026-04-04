@@ -3,5 +3,5 @@ namespace: kubesandbox
 syncWave: "20"
 repoURL: https://jeremy-misola.github.io/kubesandbox/
 chart: kubesandbox-frontend
-targetRevision: 0.1.4
+targetRevision: 0.1.5
 values: |
