@@ -2,6 +2,6 @@ name: kubesandbox-frontend
 namespace: kubesandbox
 syncWave: "20"
 repoURL: https://jeremy-misola.github.io/kubesandbox/
-chart: ghost
+chart: kubesandbox-frontend
 targetRevision: 0.1.1
 values: |
