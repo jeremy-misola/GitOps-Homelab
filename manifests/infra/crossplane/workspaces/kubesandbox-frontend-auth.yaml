@@ -101,7 +101,7 @@ spec:
   # Write outputs to a secret that can be used by SecurityPolicy
   writeConnectionSecretToRef:
     name: kubesandbox-frontend-client-secret
-    namespace: envoy-gateway-system
+    namespace: kubesandbox
 
   providerConfigRef:
     name: terraform-config
