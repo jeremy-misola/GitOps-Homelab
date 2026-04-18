@@ -60,7 +60,7 @@ spec:
         allowed_redirect_uris = [
           {
             matching_mode = "strict"
-            url           = "https://grafana.jeremymr.dev/login/generic-oauth/"
+            url           = "https://grafana.jeremymr.dev/login/generic-oauth"
           }
         ]
       }
