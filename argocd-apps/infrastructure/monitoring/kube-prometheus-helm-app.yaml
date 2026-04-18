@@ -6,7 +6,31 @@ chart: kube-prometheus-stack
 targetRevision: 80.13.3
 values: |
   grafana:
+    envValueFrom:
+      GF_AUTH_GENERIC_OAUTH_CLIENT_ID:
+        secretKeyRef:
+          name: grafana-client-secret
+          key: client-id
+      GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET:
+        secretKeyRef:
+          name: grafana-client-secret
+          key: client-secret
     admin:
       existingSecret: "grafana-secret"
       userKey: admin-user
       passwordKey: admin-password
+    grafana.ini:
+      auth:
+        signout_redirect_url: "https://auth.jeremymr.dev/application/o/grafana/end-session/"
+        oauth_auto_login: true
+      auth.generic_oauth:
+        name: authentik
+        enabled: true
+        client_id: "${GF_AUTH_GENERIC_OAUTH_CLIENT_ID}"
+        client_secret: "${GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET}"
+        scopes: "openid profile email"
+        auth_url: "https://auth.jeremymr.dev/application/o/authorize/"
+        token_url: "https://auth.jeremymr.dev/application/o/token/"
+        api_url: "https://auth.jeremymr.dev/application/o/userinfo/"
+        # Optionally map user groups to Grafana roles
+        role_attribute_path: contains(groups, 'Grafana Admins') && 'Admin' || contains(groups, 'Grafana Editors') && 'Editor' || 'Viewer'

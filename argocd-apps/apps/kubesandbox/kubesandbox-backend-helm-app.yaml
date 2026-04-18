@@ -1,0 +1,7 @@
+name: kubesandbox-backend
+namespace: kubesandbox
+syncWave: "20"
+repoURL: https://jeremy-misola.github.io/kubesandbox/
+chart: kubesandbox-backend
+targetRevision: 0.1.5
+values: |

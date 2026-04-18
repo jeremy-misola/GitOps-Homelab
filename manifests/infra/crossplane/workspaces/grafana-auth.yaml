@@ -1,7 +1,7 @@
 apiVersion: tf.upbound.io/v1beta1
 kind: Workspace
 metadata:
-  name: kubesandbox-frontend-auth
+  name: grafana-auth
   namespace: crossplane-system
   annotations:
     argocd.argoproj.io/sync-wave: "17"
@@ -50,37 +50,47 @@ spec:
       }
 
       # Create OIDC Provider
-      resource "authentik_provider_oauth2" "kubesandbox_frontend" {
-        name               = "KubeSandbox Frontend"
+      resource "authentik_provider_oauth2" "grafana" {
+        name               = "Grafana"
         authorization_flow = data.authentik_flow.authorization.id
         invalidation_flow  = data.authentik_flow.invalidation.id
         client_type        = "confidential"
-        client_id          = "kubesandbox-frontend"
+        client_id          = "grafana"
 
         allowed_redirect_uris = [
           {
             matching_mode = "strict"
-            url           = "https://kubesandbox.com/auth/callback"
+            url           = "https://grafana.jeremymr.dev/login/generic-oauth/"
           }
         ]
       }
 
       # Create Application
-      resource "authentik_application" "kubesandbox_frontend" {
-        name              = "KubeSandbox Frontend"
-        slug              = "kubesandbox-frontend"
-        protocol_provider = authentik_provider_oauth2.kubesandbox_frontend.id
+      resource "authentik_application" "grafana" {
+        name              = "Grafana"
+        slug              = "grafana"
+        protocol_provider = authentik_provider_oauth2.grafana.id
         policy_engine_mode = "any"
       }
 
       # Outputs for Kubernetes secret
       # Keys with hyphens for Envoy Gateway SecurityPolicy
       output "client-id" {
-        value = authentik_provider_oauth2.kubesandbox_frontend.client_id
+        value = authentik_provider_oauth2.grafana.client_id
       }
 
       output "client-secret" {
-        value     = authentik_provider_oauth2.kubesandbox_frontend.client_secret
+        value     = authentik_provider_oauth2.grafana.client_secret
+        sensitive = true
+      }
+
+      # Keys with underscores for Backstage environment variables
+      output "OIDC_CLIENT_ID" {
+        value = authentik_provider_oauth2.grafana.client_id
+      }
+
+      output "OIDC_CLIENT_SECRET" {
+        value     = authentik_provider_oauth2.grafana.client_secret
         sensitive = true
       }
 
@@ -100,8 +110,8 @@ spec:
 
   # Write outputs to a secret that can be used by SecurityPolicy
   writeConnectionSecretToRef:
-    name: kubesandbox-frontend-client-secret
-    namespace: kubesandbox
+    name: grafana-client-secret
+    namespace: monitoring
 
   providerConfigRef:
     name: terraform-config
