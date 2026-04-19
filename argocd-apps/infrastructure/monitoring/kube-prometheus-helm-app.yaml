@@ -3,10 +3,14 @@ namespace: monitoring
 syncWave: "9"
 repoURL: https://prometheus-community.github.io/helm-charts
 chart: kube-prometheus-stack
-targetRevision: 83.6.0
+targetRevision: 80.13.3
 values: |
   grafana:
     admin:
       existingSecret: "grafana-secret"
       userKey: admin-user
       passwordKey: admin-password
+    sidecar:
+      datasources:
+        enabled: true
+        defaultDatasourceEnabled: true
