@@ -20,12 +20,6 @@ values: |
           discord_configs:
             - webhook_url: "https://discord.com/api/webhooks/1495225028097216582/gBumDncArzFma3cu2Vkm01KCrCvLZPfjVfnz2-Mj4Kz2A0rwr7nAOAtDIELF5nnAKaYK"
   grafana:
-    additionalDataSources:
-      - name: Prometheus
-        type: prometheus
-        url: http://kube-prometheus-kube-prome-prometheus.monitoring.svc.cluster.local:9090
-        access: proxy
-        isDefault: true
     envValueFrom:
       GF_AUTH_GENERIC_OAUTH_CLIENT_ID:
         secretKeyRef:
