@@ -14,3 +14,7 @@ values: |
       datasources:
         enabled: true
         defaultDatasourceEnabled: true
+        # This is the fix:
+        env:
+          - name: SC_HTTP_PORT
+            value: "8081"
