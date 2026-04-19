@@ -20,6 +20,8 @@ values: |
       userKey: admin-user
       passwordKey: admin-password
     grafana.ini:
+      server:
+        root_url: "https://grafana.jeremymr.dev"
       auth:
         signout_redirect_url: "https://auth.jeremymr.dev/application/o/grafana/end-session/"
         oauth_auto_login: true
