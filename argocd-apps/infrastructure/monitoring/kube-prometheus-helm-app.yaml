@@ -13,9 +13,3 @@ values: |
       existingSecret: "grafana-secret"
       userKey: admin-user
       passwordKey: admin-password
-    sidecar:
-      datasources:
-        enabled: true
-        defaultDatasourceEnabled: true
-        env:
-          SC_HTTP_PORT: "8081"
