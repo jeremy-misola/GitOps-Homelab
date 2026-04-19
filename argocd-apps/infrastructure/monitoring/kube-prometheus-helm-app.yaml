@@ -7,14 +7,20 @@ targetRevision: 80.13.3
 values: |
   alertmanager:
     config:
+      global:
+        resolve_timeout: 5m
+      route:
+        group_by: ['namespace']
+        group_wait: 30s
+        group_interval: 5m
+        repeat_interval: 12h
+        receiver: 'discord-receiver'
       receivers:
         - name: 'discord-receiver'
           discord_configs:
             - webhook_url: "https://discord.com/api/webhooks/1495225028097216582/gBumDncArzFma3cu2Vkm01KCrCvLZPfjVfnz2-Mj4Kz2A0rwr7nAOAtDIELF5nnAKaYK"
   grafana:
-    datasources.yaml:
-      apiVersion: 1
-      datasources:
+    additionalDataSources:
       - name: Prometheus
         type: prometheus
         url: http://kube-prometheus-kube-prome-prometheus.monitoring.svc.cluster.local:9090
