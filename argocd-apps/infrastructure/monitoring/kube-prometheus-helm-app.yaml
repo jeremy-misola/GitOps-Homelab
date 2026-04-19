@@ -34,5 +34,8 @@ values: |
         auth_url: "https://auth.jeremymr.dev/application/o/authorize/"
         token_url: "https://auth.jeremymr.dev/application/o/token/"
         api_url: "https://auth.jeremymr.dev/application/o/userinfo"
+        email_attribute_path: email
+        login_attribute_path: preferred_username
+        name_attribute_path: name
         # Optionally map user groups to Grafana roles
         role_attribute_path: contains(groups, 'Grafana Admins') && 'Admin' || contains(groups, 'Grafana Editors') && 'Editor' || 'Viewer'
