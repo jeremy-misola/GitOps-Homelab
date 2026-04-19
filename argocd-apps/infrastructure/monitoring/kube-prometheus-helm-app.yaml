@@ -6,6 +6,9 @@ chart: kube-prometheus-stack
 targetRevision: 80.13.3
 values: |
   grafana:
+    grafana.ini:
+      server:
+        root_url: https://grafana.jeremymr.dev
     admin:
       existingSecret: "grafana-secret"
       userKey: admin-user
