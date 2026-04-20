@@ -22,9 +22,9 @@ values: |
   grafana:
     sidecar:
       datasources:
-        skipReload: false
+        watchMethod: LIST
       dashboards:
-        skipReload: false
+        watchMethod: LIST
     envValueFrom:
       GF_AUTH_GENERIC_OAUTH_CLIENT_ID:
         secretKeyRef:
