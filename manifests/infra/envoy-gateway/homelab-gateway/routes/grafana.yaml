@@ -13,3 +13,5 @@ spec:
   - backendRefs:
     - name: kube-prometheus-grafana
       port: 80
+    timeouts:
+      request: "60s"
