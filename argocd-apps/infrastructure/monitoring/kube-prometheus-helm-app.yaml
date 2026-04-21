@@ -25,6 +25,16 @@ values: |
         watchMethod: LIST
       dashboards:
         watchMethod: LIST
+    additionalDataSources:
+      - name: Loki
+        type: loki
+        access: proxy
+        url: http://loki-stack-gateway.loki.svc.cluster.local:80
+        jsonData:
+          maxLines: 1000
+          httpHeaderName1: X-Scope-OrgID
+        secureJsonData:
+          httpHeaderValue1: "1"
     envValueFrom:
       GF_AUTH_GENERIC_OAUTH_CLIENT_ID:
         secretKeyRef:
