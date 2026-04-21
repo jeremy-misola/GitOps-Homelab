@@ -31,6 +31,7 @@ values: |
         access: proxy
         url: http://loki-stack-gateway.loki.svc.cluster.local:80
         jsonData:
+          timeout: "300"
           maxLines: 1000
           httpHeaderName1: X-Scope-OrgID
         secureJsonData:
@@ -51,6 +52,8 @@ values: |
     grafana.ini:
       server:
         root_url: "https://grafana.jeremymr.dev"
+      dataproxy:
+        timeout: 300
       auth:
         signout_redirect_url: "https://auth.jeremymr.dev/application/o/grafana/end-session/"
         oauth_auto_login: true
