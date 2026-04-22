@@ -1,6 +1,0 @@
-name: ghost-saima-config
-namespace: ghost-saima
-syncWave: "20"
-repoURL: https://github.com/jeremy-misola/GitOps-Homelab
-targetRevision: develop
-appPath: manifests/apps/ghost-saima
