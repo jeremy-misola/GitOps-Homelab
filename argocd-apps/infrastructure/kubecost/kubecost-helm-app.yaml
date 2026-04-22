@@ -1,7 +1,0 @@
-name: kubecost
-namespace: kubecost
-syncWave: "20"
-repoURL: https://kubecost.github.io/kubecost
-chart: kubecost
-targetRevision: 3.0.3
-values: |
