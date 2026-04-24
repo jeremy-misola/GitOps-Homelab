@@ -5,20 +5,76 @@ repoURL: https://prometheus-community.github.io/helm-charts
 chart: kube-prometheus-stack
 targetRevision: 80.13.3
 values: |
+  defaultRules:
+    create: true
+  additionalPrometheusRulesMap:
+    custom-alerts:
+      groups:
+        - name: custom-node-pressure
+          rules:
+            - alert: NodePressure
+              expr: |
+                max by (node, condition) (
+                  kube_node_status_condition{condition=~"MemoryPressure|DiskPressure|PIDPressure", status="true"} == 1
+                )
+              for: 10m
+              labels:
+                severity: warning
+              annotations:
+                summary: "Node pressure on {{ $labels.node }}"
+                description: "Node {{ $labels.node }} has {{ $labels.condition }} for more than 10 minutes."
+        - name: custom-service-downtime
+          rules:
+            - alert: BlackboxTargetDown
+              expr: probe_success{job=~"argocd|kleff"} == 0
+              for: 5m
+              labels:
+                severity: critical
+              annotations:
+                summary: "Blackbox probe failed for {{ $labels.job }}"
+                description: "The monitored target {{ $labels.job }} has been failing probes for more than 5 minutes."
   alertmanager:
     config:
       global:
         resolve_timeout: 5m
+      inhibit_rules:
+        - source_matchers:
+            - 'severity = critical'
+          target_matchers:
+            - 'severity =~ warning|info'
+          equal:
+            - 'namespace'
+            - 'alertname'
+        - source_matchers:
+            - 'severity = warning'
+          target_matchers:
+            - 'severity = info'
+          equal:
+            - 'namespace'
+            - 'alertname'
+        - source_matchers:
+            - 'alertname = InfoInhibitor'
+          target_matchers:
+            - 'severity = info'
+          equal:
+            - 'namespace'
       route:
         group_by: ['namespace']
         group_wait: 30s
         group_interval: 5m
         repeat_interval: 12h
         receiver: 'discord-receiver'
+        routes:
+          - receiver: 'null'
+            matchers:
+              - alertname = "Watchdog"
       receivers:
+        - name: 'null'
         - name: 'discord-receiver'
           discord_configs:
             - webhook_url: "https://discord.com/api/webhooks/1495225028097216582/gBumDncArzFma3cu2Vkm01KCrCvLZPfjVfnz2-Mj4Kz2A0rwr7nAOAtDIELF5nnAKaYK"
+      templates:
+        - '/etc/alertmanager/config/*.tmpl'
   grafana:
     sidecar:
       datasources:
