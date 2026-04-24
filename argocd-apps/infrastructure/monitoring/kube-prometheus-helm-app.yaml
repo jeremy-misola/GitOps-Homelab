@@ -34,6 +34,8 @@ values: |
                 summary: "Blackbox probe failed for {{ $labels.job }}"
                 description: "The monitored target {{ $labels.job }} has been failing probes for more than 5 minutes."
   alertmanager:
+    secrets:
+      - alertmanager-discord-webhook
     config:
       global:
         resolve_timeout: 5m
@@ -72,7 +74,7 @@ values: |
         - name: 'null'
         - name: 'discord-receiver'
           discord_configs:
-            - webhook_url: "https://discord.com/api/webhooks/1495225028097216582/gBumDncArzFma3cu2Vkm01KCrCvLZPfjVfnz2-Mj4Kz2A0rwr7nAOAtDIELF5nnAKaYK"
+            - webhook_url_file: /etc/alertmanager/secrets/alertmanager-discord-webhook/discord-webhook-url
       templates:
         - '/etc/alertmanager/config/*.tmpl'
   grafana:
