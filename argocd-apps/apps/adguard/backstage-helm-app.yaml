@@ -1,7 +1,0 @@
-name: adguard
-namespace: adguard
-syncWave: "20"
-repoURL: https://charts.gabe565.com
-chart: adguard-home 
-targetRevision: 0.3.25
-values: ""
