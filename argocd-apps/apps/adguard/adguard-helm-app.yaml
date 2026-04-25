@@ -5,6 +5,15 @@ repoURL: oci://ghcr.io/gabe565/charts/adguard-home
 chart: adguard 
 targetRevision: 0.3.25
 values: |
+  persistence:
+    config:
+      enabled: true
+      retain: true
+      mountPath: /opt/adguardhome/conf
+      storageClass: longhorn
+      accessMode: ReadWriteOnce
+      size: 1Gi
+
   config: |
     bind_host: 0.0.0.0
     bind_port: 80
