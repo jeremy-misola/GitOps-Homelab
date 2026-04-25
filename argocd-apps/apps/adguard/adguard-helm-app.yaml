@@ -5,13 +5,5 @@ repoURL: oci://ghcr.io/gabe565/charts/adguard-home
 chart: adguard 
 targetRevision: 0.3.25
 values: |
-  # Values for AdGuard Home
   env:
     TZ: "America/Toronto"
-
-  # Configure persistence to keep settings
-  persistence:
-    enabled: true
-    storageClass: "local-path" # Use your cluster's storage class
-    accessMode: ReadWriteOnce
-    size: 1Gi
