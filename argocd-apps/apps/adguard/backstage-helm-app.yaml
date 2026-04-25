@@ -1,0 +1,7 @@
+name: adguard
+namespace: adguard
+syncWave: "20"
+repoURL: oci://ghcr.io/gabe565/charts/adguard-home
+chart: adguard 
+targetRevision: 0.3.25
+values: ""
