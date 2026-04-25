@@ -15,7 +15,8 @@ values: |
       size: 1Gi
 
   args:
-    - --web-addr=0.0.0.0:3000
+    - --web-addr
+    - 0.0.0.0:3000
 
   config: |
     bind_host: 0.0.0.0
