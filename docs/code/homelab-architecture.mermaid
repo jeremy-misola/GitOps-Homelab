@@ -1,0 +1,101 @@
+---
+config:
+  layout: dagre
+---
+flowchart TB
+    User["Users / Admin"]
+    Git["GitHub Repo<br/>GitOps-Homelab"]
+    Doppler["Doppler"]
+    CF["Cloudflare DNS / Tunnel"]
+    LE["Let's Encrypt"]
+    Proxmox["Proxmox VE"]
+    TF["Terraform"]
+    Ansible["Ansible"]
+
+    subgraph Provisioning["Provisioning Layer"]
+        Proxmox --> TF
+        Doppler --> TF
+        TF -->|"Create VMs + inventories"| Ansible
+        Ansible -->|"Install K3s + ArgoCD"| ProdCluster
+        Ansible -->|"Install K3s + ArgoCD"| DevCluster
+    end
+
+    Git -->|"Root app + App-of-Apps sync chain"| ArgoCD
+
+    subgraph ProdCluster["Production K3s Cluster"]
+        ArgoCD["ArgoCD"]
+        ESO["External Secrets"]
+        Crossplane["Crossplane"]
+        CertManager["cert-manager"]
+        MetalLB["MetalLB"]
+        Envoy["Envoy Gateway"]
+        Authentik["Authentik"]
+        Longhorn["Longhorn"]
+        Garage["Garage S3"]
+        CloudNativePG["CloudNativePG"]
+        Otel["OpenTelemetry<br/>Operator + Collector"]
+        LGTM["Prometheus / Grafana / Loki / Tempo"]
+        Cloudflared["cloudflared"]
+
+        subgraph Apps["Platform Apps / Workloads"]
+            Backstage["Backstage"]
+            AdGuard["AdGuard"]
+            KubeSandbox["KubeSandbox<br/>frontend + backend"]
+            Portfolio["Portfolio"]
+        end
+    end
+
+    subgraph DevCluster["Development K3s Cluster"]
+        DevArgo["ArgoCD"]
+        DevApps["Dev workloads"]
+    end
+
+    User --> CF
+    CF --> Cloudflared
+    User --> Envoy
+
+    Git --> DevArgo
+    Doppler --> ESO
+    ESO -->|"Inject runtime secrets"| Authentik
+    ESO -->|"Inject runtime secrets"| Backstage
+    ESO -->|"Inject runtime secrets"| Portfolio
+    ESO -->|"Inject runtime secrets"| Cloudflared
+
+    LE -->|"ACME DNS-01 via Cloudflare"| CertManager
+    CertManager -->|"Wildcard TLS certs"| Envoy
+    MetalLB -->|"LoadBalancer IPs"| Envoy
+
+    Envoy -->|"HTTPRoute"| Backstage
+    Envoy -->|"HTTPRoute"| AdGuard
+    Envoy -->|"HTTPRoute"| KubeSandbox
+    Envoy -->|"HTTPRoute"| Portfolio
+    Envoy -->|"HTTPRoute"| Authentik
+    Envoy -->|"HTTPRoute"| LGTM
+    Envoy -->|"HTTPRoute"| ArgoCD
+
+    Authentik -->|"OIDC / SSO"| Backstage
+    Authentik -->|"OIDC / SSO"| LGTM
+    Crossplane -->|"Terraform workspaces"| Authentik
+    Crossplane -->|"Create buckets / creds"| Garage
+
+    Longhorn -->|"Persistent volumes"| Authentik
+    Longhorn -->|"Persistent volumes"| Portfolio
+    Longhorn -->|"Persistent volumes"| Garage
+    Longhorn -->|"Persistent volumes"| LGTM
+
+    CloudNativePG -->|"Operator-managed Postgres"| Backstage
+    Portfolio -->|"App DB PVC"| Longhorn
+
+    Garage -->|"S3 buckets + access keys"| LGTM
+    Otel -->|"Logs / traces"| LGTM
+    Apps -->|"Telemetry"| Otel
+    Envoy -->|"Gateway metrics / access logs"| Otel
+
+    classDef infra fill:#d9edf7,stroke:#31708f,color:#000
+    classDef app fill:#dff0d8,stroke:#3c763d,color:#000
+    classDef edge fill:#fcf8e3,stroke:#8a6d3b,color:#000
+    classDef ops fill:#f2dede,stroke:#a94442,color:#000
+
+    class User,Git,Doppler,CF,LE edge
+    class Proxmox,TF,Ansible,ArgoCD,DevArgo,ESO,Crossplane,CertManager,MetalLB,Envoy,Authentik,Longhorn,Garage,CloudNativePG,Otel,LGTM,Cloudflared infra
+    class Backstage,AdGuard,KubeSandbox,Portfolio,DevApps app

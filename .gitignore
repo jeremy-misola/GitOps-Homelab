@@ -30,3 +30,7 @@ override.tf.json
 # CLI configuration files
 .terraformrc
 terraform.rc
+
+# Virtual Environments
+venv-*
+provisioning/terraform/venv-*

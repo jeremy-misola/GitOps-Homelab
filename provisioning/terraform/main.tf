@@ -168,6 +168,7 @@ resource "null_resource" "run_ansible" {
 
   provisioner "local-exec" {
     command = <<-EOT
+      set -e
       echo "=== Waiting for ${each.key} VMs to be ready ==="
       sleep 60
 
@@ -180,13 +181,23 @@ resource "null_resource" "run_ansible" {
 
       echo "=== ${each.key} K3s cluster provisioning complete! ==="
 
-      echo "=== Installing Cluster Configuration Dependencies ==="
-      cd "${path.module}/../ansible"
-      ansible-galaxy collection install -r requirements.yml
-      pip install kubernetes
+      # Use absolute path for virtual environment to avoid issues with relative paths after cd
+      VENV_PATH="${abspath(path.module)}/venv-${each.key}"
+      
+      # Create virtual environment for local Ansible tasks
+      python3.13 -m venv "$VENV_PATH"
+      "$VENV_PATH/bin/pip" install kubernetes
 
       echo "=== Installing ArgoCD for ${each.key} cluster ==="
-      ansible-playbook playbooks/install_argocd.yml -e "kube_context=${each.value.cluster_context}" -e "cluster_name=${each.key}"
+      cd "${path.module}/../ansible"
+      ansible-galaxy collection install -r requirements.yml
+
+      # Force use of the virtual environment python for local tasks
+      ansible-playbook playbooks/install_argocd.yml \
+        -i localhost, \
+        -e "ansible_python_interpreter=$VENV_PATH/bin/python" \
+        -e "kube_context=${each.value.cluster_context}" \
+        -e "cluster_name=${each.key}"
     EOT
 
     environment = {
