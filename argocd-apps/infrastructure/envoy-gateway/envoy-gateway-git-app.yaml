@@ -1,6 +1,0 @@
-name: envoy-gateway-config
-namespace: envoy-gateway-system
-syncWave: "11"
-repoURL: https://github.com/jeremy-misola/GitOps-Homelab
-targetRevision: develop
-appPath: manifests/infra/envoy-gateway

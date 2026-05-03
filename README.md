@@ -33,12 +33,13 @@ Here is a high-level overview of the cluster.
 
 ## Repository Lifecycle (The Sync Chain)
 
-To manage many different configurations, I'm using a multi-stage **ArgoCD sync chain**. This allows for a "bootstrap-from-zero" workflow where applying a single file triggers the recursive deployment of the entire stack.
+To manage many different configurations, I'm using a Helm-driven **ArgoCD sync chain**. This keeps bootstrap simple while still preserving deterministic sync ordering between prerequisite manifests, Helm releases, and post-install resources.
 
-1.  **`bootstrap/`**: Contains the `root-app.yaml`. This is the manual entry point.
-2.  **`categories/`**: Defines parent "Category Apps" (Infrastructure vs. Applications) that orchestrate the order of operations.
-3.  **`argocd-apps/`**: Contains individual `Application` manifests for services like `istio` or `ghost`.
-4.  **`manifests/`**: The configuration source, containing Helm `values.yaml` overrides, Istio `VirtualServices`, and ESO `SecretStores`.
+1.  **`bootstrap/`**: Contains the environment-specific root applications (`root-app-dev.yaml` and `root-app-prd.yaml`). These are the manual entry points.
+2.  **`operators-helm/values/`**: Defines which operators and applications should be deployed in each environment and the sync wave for each one.
+3.  **`operators-helm/templates/`**: Renders ArgoCD `Application` objects for pre-requisite resources, Helm releases, and post-install resources.
+4.  **`operators-helm/operators/`**: Stores per-operator Helm value overrides and the Kubernetes manifests that should be applied before or after the chart.
+5.  **`argocd-apps/`, `categories/`, and `manifests/`**: Legacy layout retained as migration history/reference.
 
 ![ArgoCD App of Apps Architecture](./docs/images/argo-architecture.svg)
 

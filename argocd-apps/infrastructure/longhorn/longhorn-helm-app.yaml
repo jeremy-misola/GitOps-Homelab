@@ -1,9 +1,0 @@
-name: longhorn
-namespace: longhorn-system
-syncWave: "3"
-repoURL: https://charts.longhorn.io
-chart: longhorn
-targetRevision: 1.11.1
-values: |
-  preUpgradeChecker:
-    jobEnabled: false

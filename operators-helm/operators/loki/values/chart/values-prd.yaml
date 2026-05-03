@@ -1,0 +1,76 @@
+loki:
+  commonConfig:
+    replication_factor: 1
+  distributor:
+    otlp_config:
+      # Keep Loki's OTLP label set intentionally small.
+      # High-cardinality attributes like k8s.pod.name and service.instance.id
+      # make label lookups much more expensive in Explore.
+      default_resource_attributes_as_index_labels:
+        - service.name
+        - service.namespace
+        - deployment.environment
+        - deployment.environment.name
+        - cloud.region
+        - cloud.availability_zone
+        - k8s.cluster.name
+        - k8s.namespace.name
+        - k8s.container.name
+        - container.name
+        - k8s.replicaset.name
+        - k8s.deployment.name
+        - k8s.statefulset.name
+        - k8s.daemonset.name
+        - k8s.cronjob.name
+        - k8s.job.name
+  write:
+    replicas: 1
+  
+  schemaConfig:
+    configs:
+      - from: "2024-01-01"
+        store: tsdb
+        object_store: s3
+        schema: v13
+        index:
+          prefix: loki_index_
+          period: 24h
+
+  storage:
+    type: s3
+    bucketNames:
+      chunks: loki-chunks
+      ruler: loki-ruler
+      admin: loki-admin
+    s3:
+      endpoint: garage.garage.svc.cluster.local:3900 
+      region: garage
+      accessKeyId: ${S3_ACCESS_KEY}
+      secretAccessKey: ${S3_SECRET_KEY}
+      s3ForcePathStyle: true
+      insecure: true
+
+write:
+  replicas: 3
+  extraArgs: ["-config.expand-env=true"]
+  extraEnv: &lokiEnv
+    - name: S3_ACCESS_KEY
+      valueFrom:
+        secretKeyRef:
+          name: loki-s3-credentials
+          key: access-key-id
+    - name: S3_SECRET_KEY
+      valueFrom:
+        secretKeyRef:
+          name: loki-s3-credentials
+          key: secret-access-key
+read:
+  replicas: 1
+  affinity: {}
+  extraArgs: ["-config.expand-env=true"]
+  extraEnv: *lokiEnv
+backend:
+  replicas: 1
+  affinity: {}
+  extraArgs: ["-config.expand-env=true"]
+  extraEnv: *lokiEnv

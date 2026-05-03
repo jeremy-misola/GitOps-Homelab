@@ -6,8 +6,8 @@ if ! command -v kubeconform >/dev/null 2>&1; then
   exit 1
 fi
 
-# Validate only actual Kubernetes manifests. Descriptor files under argocd-apps/
-# are consumed as templates and are intentionally not direct Kubernetes resources.
+# Validate only actual Kubernetes manifests. Legacy descriptors under argocd-apps/
+# are intentionally excluded because they are no longer applied directly.
 shopt -s globstar nullglob
 manifests=(
   bootstrap/**/*.yml
@@ -16,11 +16,13 @@ manifests=(
   categories/**/*.yaml
   manifests/**/*.yml
   manifests/**/*.yaml
+  operators-helm/operators/**/*.yml
+  operators-helm/operators/**/*.yaml
 )
 shopt -u globstar nullglob
 
 if [ "${#manifests[@]}" -eq 0 ]; then
-  echo "No manifest files found in bootstrap/, categories/, or manifests/." >&2
+  echo "No manifest files found in bootstrap/, categories/, manifests/, or operators-helm/operators/." >&2
   exit 1
 fi
 

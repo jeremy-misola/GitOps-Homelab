@@ -1,7 +1,7 @@
 # Proxmox Connection (non-sensitive)
 pm_api_url      = "https://192.168.0.230:8006/api2/json"
 pm_tls_insecure = true
-target_node     = "pve"
+target_node     = "proxmox"
 
 # Template Configuration
 template_name = "ubuntu-2404-template"
@@ -14,30 +14,47 @@ nameserver     = "192.168.0.1"
 
 # Cloud-Init Configuration
 ci_user = "jurassicjey"
-ssh_public_keys = <<EOF
+ssh_public_keys = <<EOF_KEYS
 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPePe7odIztvlzr5RQJ8fyV9kxfHcyzwYmQDxDtYtHw0 jeremy@Jeremys-Mac-mini.local
 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFRgisKGZLdiAvV9c2mn+eFtZ6tZMO28futLysncYvBV jurassicjey@archlinux
-EOF
+EOF_KEYS
 
-# Control Plane Configuration (3 nodes: 8GB RAM, 100GB disk each)
-control_plane_cores     = 2
-control_plane_memory    = 8192
-control_plane_disk_size = "100G"
-control_plane_ips = [
-  "192.168.0.210",
-  "192.168.0.211",
-  "192.168.0.212"
-]
+# Shared K3s configuration
+k3s_version       = "v1.31.12+k3s1"
+extra_server_args = "--disable=traefik --disable=servicelb --disable=local-storage"
+extra_agent_args  = ""
 
-# Worker Configuration (3 nodes: 32GB RAM, 200GB disk each)
-worker_cores      = 4
-worker_memory     = 32768
-worker_disk_size  = "200G"
-worker_ips = [
-  "192.168.0.213",
-  "192.168.0.214",
-  "192.168.0.215"
-]
+# Cluster Configuration
+clusters = {
+  prod = {
+    control_plane = {
+      ips       = ["192.168.0.210", "192.168.0.211", "192.168.0.212"]
+      cores     = 2
+      memory    = 6144
+      disk_size = "100G"
+    }
+    worker = {
+      ips       = ["192.168.0.213", "192.168.0.214", "192.168.0.215"]
+      cores     = 6
+      memory    = 16384
+      disk_size = "200G"
+    }
+  }
+  dev = {
+    control_plane = {
+      ips       = ["192.168.0.220"]
+      cores     = 2
+      memory    = 6144
+      disk_size = "100G"
+    }
+    worker = {
+      ips       = ["192.168.0.221", "192.168.0.222"]
+      cores     = 4
+      memory    = 20480
+      disk_size = "200G"
+    }
+  }
+}
 
 # ==============================================================================
 # SENSITIVE VARIABLES - Set via Doppler
@@ -46,13 +63,13 @@ worker_ips = [
 #
 #   PM_API_TOKEN_ID     = "root@pam!your-token-id"
 #   PM_API_TOKEN_SECRET = "your-token-secret"
-#   K3S_TOKEN           = "your-k3s-cluster-token" (generate with: openssl rand -base64 64)
+#   PROD_K3S_TOKEN      = "your-production-k3s-cluster-token"
+#   DEV_K3S_TOKEN       = "your-development-k3s-cluster-token"
 #
 # Run Terraform with:
-#   doppler run -- sh -c 'TF_VAR_k3s_token=$K3S_TOKEN terraform apply'
+#   doppler run -- sh -c 'TF_VAR_prod_k3s_token=$PROD_K3S_TOKEN TF_VAR_dev_k3s_token=$DEV_K3S_TOKEN terraform apply'
 #
-# Note: Doppler requires uppercase secret names (A-Z, 0-9, _). Since TF_VAR_k3s_token
-# contains lowercase characters, we use K3S_TOKEN in Doppler and map it to
-# TF_VAR_k3s_token inside the shell command. This ensures Doppler sets K3S_TOKEN
-# first, then it's passed to Terraform via the TF_VAR_* convention.
+# Note: Doppler requires uppercase secret names (A-Z, 0-9, _). Since TF_VAR_prod_k3s_token
+# and TF_VAR_dev_k3s_token contain lowercase characters, we use PROD_K3S_TOKEN and
+# DEV_K3S_TOKEN in Doppler and map them inside the shell command.
 # ==============================================================================
