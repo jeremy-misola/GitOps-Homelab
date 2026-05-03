@@ -27,21 +27,16 @@
         context: "{{ kube_context | default(omit, true) }}"
 
     - name: Install ArgoCD Helm chart
-      kubernetes.core.helm:
-        name: argocd
-        chart_ref: argo/argo-cd
-        release_namespace: argocd
-        create_namespace: true
-        state: present
-        kubeconfig: "{{ kubeconfig }}"
-        context: "{{ kube_context | default(omit, true) }}"
-        values:
-          configs:
-            params:
-              # Run ArgoCD API server without TLS (for Envoy Gateway / reverse proxy setups)
-              "server.insecure": "true"
-              # Reconcile every minute instead of the default 3 minutes
-              "timeout.reconciliation": "60s"
+      shell: |
+        /opt/homebrew/bin/helm upgrade --install argocd argo/argo-cd \
+          --namespace argocd \
+          --create-namespace \
+          --kubeconfig {{ kubeconfig }} \
+          {% if kube_context %}--kube-context {{ kube_context }}{% endif %} \
+          --set configs.params."server\.insecure"=true \
+          --set configs.params."timeout\.reconciliation"=60s
+      register: helm_install
+      changed_when: "'deployed' in helm_install.stdout or 'created' in helm_install.stdout"
 
     - name: Create external-secrets namespace
       kubernetes.core.k8s:
