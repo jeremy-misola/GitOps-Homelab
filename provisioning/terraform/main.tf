@@ -179,6 +179,14 @@ resource "null_resource" "run_ansible" {
       ansible-playbook playbooks/site.yml -i "${local_file.ansible_inventory[each.key].filename}" -e "token=$${K3S_TOKEN}"
 
       echo "=== ${each.key} K3s cluster provisioning complete! ==="
+
+      echo "=== Installing Cluster Configuration Dependencies ==="
+      cd "${path.module}/../ansible"
+      ansible-galaxy collection install -r requirements.yml
+      pip install kubernetes
+
+      echo "=== Installing ArgoCD for ${each.key} cluster ==="
+      ansible-playbook playbooks/install_argocd.yml -e "kube_context=${each.value.cluster_context}" -e "cluster_name=${each.key}"
     EOT
 
     environment = {

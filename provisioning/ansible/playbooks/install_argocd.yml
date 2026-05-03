@@ -1,0 +1,81 @@
+---
+- name: Install and Configure ArgoCD
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    # This defaults to the standard kubeconfig location.
+    # Can be overridden with: ansible-playbook install_argocd.yml -e "kubeconfig=/path/to/kubeconfig"
+    kubeconfig: "~/.kube/config"
+    kube_context: ""
+    cluster_name: ""
+
+
+  tasks:
+    - name: Ensure kubernetes python library is installed
+      pip:
+        name: kubernetes
+        state: present
+
+    - name: Add ArgoCD Helm repository
+      kubernetes.core.helm_repository:
+        name: argo
+        repo_url: "https://argoproj.github.io/argo-helm"
+
+    - name: Create argocd namespace
+      kubernetes.core.k8s:
+        name: argocd
+        api_version: v1
+        kind: Namespace
+        state: present
+        kubeconfig: "{{ kubeconfig }}"
+        context: "{{ kube_context | default(omit, true) }}"
+
+    - name: Install ArgoCD Helm chart
+      kubernetes.core.helm:
+        name: argocd
+        chart_ref: argo/argo-cd
+        release_namespace: argocd
+        create_namespace: true
+        state: present
+        kubeconfig: "{{ kubeconfig }}"
+        context: "{{ kube_context | default(omit, true) }}"
+        values:
+          configs:
+            params:
+              # Run ArgoCD API server without TLS (for Envoy Gateway / reverse proxy setups)
+              "server.insecure": "true"
+              # Reconcile every minute instead of the default 3 minutes
+              "timeout.reconciliation": "60s"
+
+    - name: Create external-secrets namespace
+      kubernetes.core.k8s:
+        name: external-secrets
+        api_version: v1
+        kind: Namespace
+        state: present
+        kubeconfig: "{{ kubeconfig }}"
+        context: "{{ kube_context | default(omit, true) }}"
+
+    - name: Create doppler-token-auth-api secret
+      kubernetes.core.k8s:
+        state: present
+        kubeconfig: "{{ kubeconfig }}"
+        context: "{{ kube_context | default(omit, true) }}"
+        definition:
+          apiVersion: v1
+          kind: Secret
+          metadata:
+            name: doppler-token-auth-api
+            namespace: external-secrets
+          type: Opaque
+          stringData:
+            dopplerToken: "{{ lookup('env', 'DOPPLER_CONNECTION_TOKEN') }}"
+
+    - name: Apply root application for cluster
+      kubernetes.core.k8s:
+        state: present
+        src: "../../../bootstrap/root-app-{{ cluster_name }}.yaml"
+        kubeconfig: "{{ kubeconfig }}"
+        context: "{{ kube_context | default(omit, true) }}"
+        wait: yes

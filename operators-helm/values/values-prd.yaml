@@ -1,190 +1,178 @@
 environment: prd
-repoRevision: develop
+repoRevision: main
 
 operators:
   - name: external-secrets
     namespace: external-secrets
-    syncWave: 1
+    syncWave: 10
     repoURL: https://charts.external-secrets.io
     chart: external-secrets
     targetRevision: 2.2.0
     postResources:
       enabled: true
-      syncWave: 4
 
   - name: metallb
     namespace: metallb
-    syncWave: 0
+    syncWave: 20
     repoURL: https://metallb.github.io/metallb
     chart: metallb
     targetRevision: 0.15.3
     postResources:
       enabled: true
-      syncWave: 1
-
-  - name: crossplane
-    namespace: crossplane-system
-    syncWave: 0
-    repoURL: https://charts.crossplane.io/stable
-    chart: crossplane
-    targetRevision: 1.18.2
-    preResources:
-      enabled: true
-      syncWave: 15
-    postResources:
-      enabled: true
-      syncWave: 16
+      templated: true
 
   - name: cert-manager
     namespace: cert-manager
-    syncWave: 2
+    syncWave: 30
     repoURL: https://charts.jetstack.io
     chart: cert-manager
     targetRevision: v1.19.2
     preResources:
       enabled: true
-      syncWave: 5
     postResources:
       enabled: true
-      syncWave: 12
-
-  - name: cloudflare
-    namespace: cloudflare
-    syncWave: 4
-    postResources:
-      enabled: true
-      syncWave: 4
 
   - name: longhorn
     namespace: longhorn-system
-    syncWave: 3
+    syncWave: 40
     repoURL: https://charts.longhorn.io
     chart: longhorn
     targetRevision: 1.11.1
 
+  - name: crossplane
+    namespace: crossplane-system
+    syncWave: 50
+    repoURL: https://charts.crossplane.io/stable
+    chart: crossplane
+    targetRevision: 1.18.2
+    preResources:
+      enabled: true
+    postResources:
+      enabled: true
+      syncWave: 150
+
+  - name: cloudnativepg
+    namespace: cloudnativepg
+    syncWave: 60
+    repoURL: https://cloudnative-pg.io/charts/
+    chart: cloud-native-pg
+    targetRevision: 0.27.0
+
   - name: garage
     namespace: garage
-    syncWave: 7
+    syncWave: 70
     repoURL: https://datahub-local.github.io/garage-helm
     chart: garage
     targetRevision: 0.2.1
     preResources:
       enabled: true
-      syncWave: 5
-
-  - name: authentik
-    namespace: authentik
-    syncWave: 8
-    repoURL: https://charts.goauthentik.io/
-    chart: authentik
-    targetRevision: 2025.10.3
-    preResources:
-      enabled: true
-      syncWave: 5
 
   - name: envoy-gateway
     namespace: envoy-gateway-system
-    syncWave: 9
+    syncWave: 80
     repoURL: docker.io/envoyproxy
     chart: gateway-helm
     targetRevision: v1.7.1
     postResources:
       enabled: true
-      syncWave: 11
+
+  - name: authentik
+    namespace: authentik
+    syncWave: 90
+    repoURL: https://charts.goauthentik.io/
+    chart: authentik
+    targetRevision: 2025.10.3
+    preResources:
+      enabled: true
+
+  - name: cloudflare
+    namespace: cloudflare
+    syncWave: 100
+    postResources:
+      enabled: true
+
+  - name: otel-operator
+    namespace: opentelemetry-operator
+    syncWave: 110
+    repoURL: https://open-telemetry.github.io/opentelemetry-helm-charts
+    chart: opentelemetry-operator
+    targetRevision: 0.102.0
+    postResources:
+      enabled: true
+      syncWave: 195
+      namespace: opentelemetry-collector
+
+  - name: loki
+    namespace: loki
+    syncWave: 160
+    repoURL: https://grafana.github.io/helm-charts
+    chart: loki
+    targetRevision: 6.49.0
 
   - name: tempo
     namespace: tempo
-    syncWave: 9
+    syncWave: 170
     repoURL: https://grafana.github.io/helm-charts
     chart: tempo
     targetRevision: 1.24.2
 
   - name: kube-prometheus
     namespace: monitoring
-    syncWave: 9
+    syncWave: 180
     repoURL: https://prometheus-community.github.io/helm-charts
     chart: kube-prometheus-stack
     targetRevision: 80.13.3
     preResources:
       enabled: true
-      syncWave: 5
-
-  - name: blackbox-exporter
-    namespace: monitoring
-    syncWave: 10
-    repoURL: https://prometheus-community.github.io/helm-charts
-    chart: prometheus-blackbox-exporter
-    targetRevision: 11.7.0
-
-  - name: cloudnativepg
-    namespace: cloudnativepg
-    syncWave: 13
-    repoURL: https://cloudnative-pg.io/charts/
-    chart: cloud-native-pg
-    targetRevision: 0.27.0
-
-  - name: otel-operator
-    namespace: opentelemetry-operator
-    syncWave: 15
-    repoURL: https://open-telemetry.github.io/opentelemetry-helm-charts
-    chart: opentelemetry-operator
-    targetRevision: 0.102.0
-    postResources:
-      enabled: true
-      syncWave: 20
-      namespace: opentelemetry-collector
-
-  - name: loki
-    namespace: loki
-    syncWave: 18
-    repoURL: https://grafana.github.io/helm-charts
-    chart: loki
-    targetRevision: 6.49.0
 
   - name: otel-collector
     namespace: opentelemetry-collector
-    syncWave: 19
+    syncWave: 190
     repoURL: https://open-telemetry.github.io/opentelemetry-helm-charts
     chart: opentelemetry-collector
     targetRevision: 0.143.0
 
+  - name: blackbox-exporter
+    namespace: monitoring
+    syncWave: 200
+    repoURL: https://prometheus-community.github.io/helm-charts
+    chart: prometheus-blackbox-exporter
+    targetRevision: 11.7.0
+
   - name: backstage
     namespace: backstage
-    syncWave: 20
+    syncWave: 210
     repoURL: https://backstage.github.io/charts
     chart: backstage
     targetRevision: 2.6.3
     preResources:
       enabled: true
-      syncWave: 19
     postResources:
       enabled: true
-      syncWave: 21
 
   - name: adguard
     namespace: adguard
-    syncWave: 20
+    syncWave: 220
     repoURL: oci://ghcr.io/gabe565/charts/adguard-home
     chart: adguard
     targetRevision: 0.3.25
 
   - name: kubesandbox-backend
     namespace: kubesandbox
-    syncWave: 20
+    syncWave: 230
     repoURL: https://jeremy-misola.github.io/kubesandbox/
     chart: kubesandbox-backend
     targetRevision: 0.1.5
 
   - name: kubesandbox-frontend
     namespace: kubesandbox
-    syncWave: 20
+    syncWave: 240
     repoURL: https://jeremy-misola.github.io/kubesandbox/
     chart: kubesandbox-frontend
     targetRevision: 0.1.6
 
   - name: portfolio
     namespace: portfolio
-    syncWave: 20
+    syncWave: 250
     postResources:
       enabled: true
-      syncWave: 20

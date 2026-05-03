@@ -17,12 +17,22 @@ metadata:
     - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
+  {{- if $preResources.templated }}
+  source:
+    repoURL: https://github.com/jeremy-misola/GitOps-Homelab
+    targetRevision: {{ default "develop" $.Values.repoRevision }}
+    path: operators-helm/operators/{{ $operator.name }}/pre-resources
+    helm:
+      valueFiles:
+        - ../values/pre-resources/values-{{ $.Values.environment }}.yaml
+  {{- else }}
   source:
     repoURL: https://github.com/jeremy-misola/GitOps-Homelab
     targetRevision: {{ default "develop" $.Values.repoRevision }}
     path: operators-helm/operators/{{ $operator.name }}/pre-resources
     directory:
       recurse: true
+  {{- end }}
   destination:
     server: https://kubernetes.default.svc
     namespace: {{ default $operator.namespace $preResources.namespace }}
@@ -95,12 +105,22 @@ metadata:
     - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
+  {{- if $postResources.templated }}
+  source:
+    repoURL: https://github.com/jeremy-misola/GitOps-Homelab
+    targetRevision: {{ default "develop" $.Values.repoRevision }}
+    path: operators-helm/operators/{{ $operator.name }}/resources
+    helm:
+      valueFiles:
+        - ../values/resources/values-{{ $.Values.environment }}.yaml
+  {{- else }}
   source:
     repoURL: https://github.com/jeremy-misola/GitOps-Homelab
     targetRevision: {{ default "develop" $.Values.repoRevision }}
     path: operators-helm/operators/{{ $operator.name }}/resources
     directory:
       recurse: true
+  {{- end }}
   destination:
     server: https://kubernetes.default.svc
     namespace: {{ default $operator.namespace $postResources.namespace }}

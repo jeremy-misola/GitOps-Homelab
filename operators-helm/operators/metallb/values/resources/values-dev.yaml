@@ -1,0 +1,3 @@
+poolName: dev-pool
+addresses:
+  - 192.168.0.230-192.168.0.239
