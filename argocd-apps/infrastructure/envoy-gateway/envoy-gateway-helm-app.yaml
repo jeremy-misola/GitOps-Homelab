@@ -1,7 +1,0 @@
-name: envoy-gateway
-namespace: envoy-gateway-system
-syncWave: "9"
-repoURL: docker.io/envoyproxy
-chart: gateway-helm
-targetRevision: v1.7.1
-values: ""

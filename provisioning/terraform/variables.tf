@@ -2,9 +2,11 @@
 # Credentials are read from environment variables set by Doppler:
 #   PM_API_TOKEN_ID     - Proxmox API token ID
 #   PM_API_TOKEN_SECRET - Proxmox API token secret
-#   K3S_TOKEN           - K3s cluster token (mapped to TF_VAR_k3s_token)
+#   PROD_K3S_TOKEN      - Production K3s cluster token (mapped to TF_VAR_prod_k3s_token)
+#   DEV_K3S_TOKEN       - Development K3s cluster token (mapped to TF_VAR_dev_k3s_token)
 #
-# Run: doppler run -- sh -c 'TF_VAR_k3s_token=$K3S_TOKEN terraform apply'
+# Run:
+# doppler run -- sh -c '\''TF_VAR_prod_k3s_token=$PROD_K3S_TOKEN TF_VAR_dev_k3s_token=$DEV_K3S_TOKEN terraform apply'\''
 
 variable "pm_api_url" {
   description = "The URL of the Proxmox API"
@@ -66,67 +68,91 @@ variable "ssh_public_keys" {
   type        = string
 }
 
-# Control Plane Variables
-variable "control_plane_cores" {
-  description = "Number of CPU cores for control plane nodes"
-  type        = number
-  default     = 2
-}
-
-variable "control_plane_memory" {
-  description = "Memory in MB for control plane nodes"
-  type        = number
-  default     = 8192
-}
-
-variable "control_plane_disk_size" {
-  description = "Disk size for control plane nodes (e.g., '100G')"
+# K3s Configuration
+variable "k3s_version" {
+  description = "K3s version to install on both clusters"
   type        = string
-  default     = "100G"
+  default     = "v1.31.12+k3s1"
 }
 
-variable "control_plane_ips" {
-  description = "List of IP addresses for control plane nodes"
-  type        = list(string)
-  default     = [
-    "192.168.0.210",
-    "192.168.0.211",
-    "192.168.0.212"
-  ]
-}
-
-# Worker Variables
-variable "worker_cores" {
-  description = "Number of CPU cores for worker nodes"
-  type        = number
-  default     = 4
-}
-
-variable "worker_memory" {
-  description = "Memory in MB for worker nodes"
-  type        = number
-  default     = 32768
-}
-
-variable "worker_disk_size" {
-  description = "Disk size for worker nodes (e.g., '200G')"
+variable "extra_server_args" {
+  description = "Extra K3s server arguments applied to every cluster"
   type        = string
-  default     = "200G"
+  default     = "--disable=traefik --disable=servicelb --disable=local-storage"
 }
 
-variable "worker_ips" {
-  description = "List of IP addresses for worker nodes"
-  type        = list(string)
-  default     = [
-    "192.168.0.213",
-    "192.168.0.214",
-    "192.168.0.215"
-  ]
+variable "extra_agent_args" {
+  description = "Extra K3s agent arguments applied to every cluster"
+  type        = string
+  default     = ""
 }
 
-# K3s Cluster Variables
-variable "k3s_token" {
-  description = "K3s cluster token for node authentication (injected via TF_VAR_k3s_token from Doppler K3S_TOKEN)"
+# Cluster Topology
+variable "clusters" {
+  description = "Cluster definitions for each environment"
+  type = map(object({
+    control_plane = object({
+      ips       = list(string)
+      cores     = number
+      memory    = number
+      disk_size = string
+    })
+    worker = object({
+      ips       = list(string)
+      cores     = number
+      memory    = number
+      disk_size = string
+    })
+  }))
+
+  default = {
+    prod = {
+      control_plane = {
+        ips       = ["192.168.0.210", "192.168.0.211", "192.168.0.212"]
+        cores     = 2
+        memory    = 6144
+        disk_size = "100G"
+      }
+      worker = {
+        ips       = ["192.168.0.213", "192.168.0.214", "192.168.0.215"]
+        cores     = 6
+        memory    = 16384
+        disk_size = "200G"
+      }
+    }
+    dev = {
+      control_plane = {
+        ips       = ["192.168.0.220"]
+        cores     = 2
+        memory    = 6144
+        disk_size = "100G"
+      }
+      worker = {
+        ips       = ["192.168.0.221", "192.168.0.222"]
+        cores     = 4
+        memory    = 20480
+        disk_size = "200G"
+      }
+    }
+  }
+
+  validation {
+    condition = alltrue([
+      for cluster in values(var.clusters) : length(cluster.control_plane.ips) > 0 && length(cluster.control_plane.ips) % 2 == 1
+    ])
+    error_message = "Each cluster must define an odd number of control plane IPs and include at least one control plane node."
+  }
+}
+
+# K3s Cluster Tokens
+variable "prod_k3s_token" {
+  description = "Production K3s cluster token (injected via TF_VAR_prod_k3s_token from Doppler PROD_K3S_TOKEN)"
+  type        = string
+  sensitive   = true
+}
+
+variable "dev_k3s_token" {
+  description = "Development K3s cluster token (injected via TF_VAR_dev_k3s_token from Doppler DEV_K3S_TOKEN)"
   type        = string
   sensitive   = true
 }

@@ -1,15 +1,18 @@
 # Terraform Proxmox VM Provisioning
 
-This Terraform configuration provisions 6 VMs on Proxmox for a Kubernetes cluster:
-- 3 Control Plane nodes (8GB RAM, 100GB disk each)
-- 3 Worker nodes (32GB RAM, 200GB disk each)
+This Terraform configuration provisions two K3s clusters on Proxmox:
+- Production: 3 control plane nodes (6GB RAM, 2 vCPU) and 3 worker nodes (16GB RAM, 6 vCPU)
+- Development: 1 control plane node (6GB RAM, 2 vCPU) and 2 worker nodes (20GB RAM, 4 vCPU)
+
+Terraform also generates a dedicated Ansible inventory for each cluster and runs the K3s playbook separately for `prod` and `dev`.
 
 ## Prerequisites
 
 - [Terraform](https://www.terraform.io/downloads) >= 1.0.0
 - [Doppler CLI](https://docs.doppler.com/docs/installing-the-cli) installed and configured
-- Proxmox VE with the `ubuntu-2404-template` template (tag 900)
+- Proxmox VE with the `ubuntu-2404-template` template available
 - Proxmox API token with appropriate permissions
+- `kubectl` installed on the control machine if you want kubeconfig contexts merged automatically
 
 ## Doppler Setup
 
@@ -19,7 +22,8 @@ This configuration uses Doppler to manage sensitive credentials. Add the followi
 |-------------|-------------|---------|
 | `PM_API_TOKEN_ID` | Proxmox API token ID | `root@pam!terraform` |
 | `PM_API_TOKEN_SECRET` | Proxmox API token secret | `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx` |
-| `K3S_TOKEN` | K3s cluster token for node authentication | Generate with `openssl rand -base64 64` |
+| `PROD_K3S_TOKEN` | K3s token for the production cluster | `openssl rand -base64 64` |
+| `DEV_K3S_TOKEN` | K3s token for the development cluster | `openssl rand -base64 64` |
 
 ### Setting up Doppler secrets
 
@@ -32,107 +36,95 @@ doppler projects create homelab
 
 # Setup the project in this directory
 doppler setup
-# Select your project and config (e.g., homelab > prd)
+# Select your project and config (for example homelab > prd)
 
-# Add secrets (you'll be prompted for values)
+# Add secrets
 doppler secrets set PM_API_TOKEN_ID
 doppler secrets set PM_API_TOKEN_SECRET
-doppler secrets set K3S_TOKEN
-
-# Or set with values directly
-doppler secrets set PM_API_TOKEN_ID="root@pam!terraform"
-doppler secrets set PM_API_TOKEN_SECRET="your-secret-here"
-doppler secrets set K3S_TOKEN="$(openssl rand -base64 64)"
+doppler secrets set PROD_K3S_TOKEN="$(openssl rand -base64 64)"
+doppler secrets set DEV_K3S_TOKEN="$(openssl rand -base64 64)"
 ```
-
-**Alternative:** Use the Doppler dashboard at https://dashboard.doppler.com to add secrets via the web UI.
 
 ## Usage
 
 ```bash
+cd provisioning/terraform
+
 # Initialize Terraform
 terraform init
 
-# Preview changes (secrets injected from Doppler)
-doppler run -- sh -c 'TF_VAR_k3s_token=$K3S_TOKEN terraform plan'
+# Preview changes
+doppler run -- sh -c 'TF_VAR_prod_k3s_token=$PROD_K3S_TOKEN TF_VAR_dev_k3s_token=$DEV_K3S_TOKEN terraform plan'
 
-# Apply configuration (automatically runs Ansible after VMs are ready)
-doppler run -- sh -c 'TF_VAR_k3s_token=$K3S_TOKEN terraform apply'
+# Apply configuration
+# This provisions all VMs, generates provisioning/inventory-prod.yml and
+# provisioning/inventory-dev.yml, and runs Ansible once per cluster.
+doppler run -- sh -c 'TF_VAR_prod_k3s_token=$PROD_K3S_TOKEN TF_VAR_dev_k3s_token=$DEV_K3S_TOKEN terraform apply'
 
 # Destroy resources
-doppler run -- sh -c 'TF_VAR_k3s_token=$K3S_TOKEN terraform destroy'
+doppler run -- sh -c 'TF_VAR_prod_k3s_token=$PROD_K3S_TOKEN TF_VAR_dev_k3s_token=$DEV_K3S_TOKEN terraform destroy'
 ```
 
-**Note:** Doppler secret names must be uppercase (A-Z, 0-9, _). Since `TF_VAR_k3s_token` contains lowercase characters, we use `K3S_TOKEN` in Doppler and map it to `TF_VAR_k3s_token` in the shell command. This ensures Terraform receives the token correctly via its `TF_VAR_*` environment variable convention.
+## What Terraform Does
 
-### Automated Ansible Integration
-
-After Terraform provisions the VMs, it automatically:
-1. Waits 60 seconds for VMs to fully boot
-2. Installs required Ansible collections
-3. Runs the K3s Ansible playbook to configure the cluster
-
-The Ansible playbook (`../k3s-ansible/playbooks/site.yml`) is triggered via a `null_resource` with `local-exec` provisioner. The playbook will only run when:
-- VMs are first created
-- Control plane or worker IPs change
-- K3s version changes
-
-To re-run Ansible without recreating VMs:
-```bash
-cd ../k3s-ansible
-ansible-playbook playbooks/site.yml -i inventory.yml
-```
-
-Or taint the null_resource to force re-run:
-```bash
-terraform taint null_resource.run_ansible
-doppler run -- terraform apply
-```
+After applying, Terraform will:
+1. Create all `prod` and `dev` VMs from the shared Proxmox template.
+2. Generate `provisioning/inventory-prod.yml` and `provisioning/inventory-dev.yml`.
+3. Wait for the nodes to boot.
+4. Install required Ansible collections.
+5. Run `playbooks/site.yml` once for `prod` and once for `dev`.
+6. Merge kubeconfig contexts as `prod-k3s` and `dev-k3s` when `kubectl` is available.
 
 ## Configuration
 
-Non-sensitive configuration is stored in `terraform.tfvars`. Key settings:
+Non-sensitive configuration lives in `terraform.tfvars`.
+
+### Shared Settings
 
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `pm_api_url` | `https://192.168.0.230:8006/api2/json` | Proxmox API URL |
-| `target_node` | `pve` | Proxmox node name |
+| `target_node` | `proxmox` | Proxmox node name |
 | `template_name` | `ubuntu-2404-template` | VM template to clone |
 | `storage_pool` | `local-lvm` | Storage pool for disks |
 | `network_bridge` | `vmbr0` | Network bridge |
 | `gateway` | `192.168.0.1` | Network gateway |
+| `k3s_version` | `v1.31.12+k3s1` | K3s version for both clusters |
 
-### VM Resource Configuration
+### Cluster Topology
 
-| Node Type | Count | IPs | Memory | Disk | CPUs |
-|-----------|-------|-----|--------|------|------|
-| Control Plane | 3 | 192.168.0.210-212 | 8GB | 100GB | 2 |
-| Worker | 3 | 192.168.0.213-215 | 32GB | 200GB | 4 |
+| Cluster | Node Type | Count | Memory | Disk | vCPU |
+|---------|-----------|-------|--------|------|------|
+| `prod` | Control Plane | 3 | 6GB | 100GB | 2 |
+| `prod` | Worker | 3 | 16GB | 200GB | 6 |
+| `dev` | Control Plane | 1 | 6GB | 100GB | 2 |
+| `dev` | Worker | 2 | 20GB | 200GB | 4 |
 
-## Creating a Proxmox API Token
+Default IP layout:
+- `prod` control plane: `192.168.0.210-212`
+- `prod` workers: `192.168.0.213-215`
+- `dev` control plane: `192.168.0.220`
+- `dev` workers: `192.168.0.221-222`
 
-1. Login to Proxmox web UI
-2. Go to **Datacenter** → **Permissions** → **API Tokens**
-3. Click **Add** and select a user (e.g., `root@pam`)
-4. Enter a Token ID (e.g., `terraform`)
-5. Uncheck "Privilege Separation" if you want full permissions
-6. Copy the Token ID and Secret (shown only once!)
+## Re-running Ansible
+
+```bash
+cd provisioning/k3s-ansible
+ansible-playbook playbooks/site.yml -i ../inventory-prod.yml -e "token=$PROD_K3S_TOKEN"
+ansible-playbook playbooks/site.yml -i ../inventory-dev.yml -e "token=$DEV_K3S_TOKEN"
+```
+
+To force Terraform to re-run Ansible for one cluster:
+
+```bash
+cd provisioning/terraform
+terraform taint 'null_resource.run_ansible["prod"]'
+terraform taint 'null_resource.run_ansible["dev"]'
+```
 
 ## Outputs
 
 After applying, Terraform will output:
-- `control_plane_vms` - Details of control plane VMs
-- `worker_vms` - Details of worker VMs
-- `ansible_inventory` - Ansible-compatible inventory
-- `all_vm_ips` - List of all VM IP addresses
-
-## File Structure
-
-```
-terraform/
-├── main.tf              # Provider and VM resources
-├── variables.tf         # Input variables
-├── outputs.tf           # Output definitions
-├── terraform.tfvars     # Non-sensitive variable values
-├── terraform.tfvars.example # Example configuration
-└── README.md            # This file
+- `cluster_vms` - VM details grouped by `prod` and `dev`
+- `ansible_inventory_files` - Generated inventory file paths for each cluster
+- `all_vm_ips` - Every VM IP across both clusters

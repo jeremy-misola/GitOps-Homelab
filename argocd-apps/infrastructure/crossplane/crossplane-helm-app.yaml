@@ -1,8 +1,0 @@
-name: crossplane
-namespace: crossplane-system
-syncWave: "0"
-repoURL: https://charts.crossplane.io/stable
-chart: crossplane
-targetRevision: 1.18.2
-values: |
-  replicas: 1

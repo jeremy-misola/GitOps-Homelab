@@ -1,0 +1,141 @@
+{{- range .Values.operators }}
+{{- $operator := . }}
+{{- $preResources := default dict $operator.preResources }}
+{{- $postResources := default dict $operator.postResources }}
+{{- $hasHelm := and (not (empty $operator.repoURL)) (not (empty $operator.chart)) (not (empty $operator.targetRevision)) }}
+{{- if $preResources.enabled }}
+---
+# 1. PRE-REQUISITE RESOURCES
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{ $operator.name }}-prereqs
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "{{ default (sub (int $operator.syncWave) 1) $preResources.syncWave }}"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  {{- if $preResources.templated }}
+  source:
+    repoURL: https://github.com/jeremy-misola/GitOps-Homelab
+    targetRevision: {{ default "develop" $.Values.repoRevision }}
+    path: operators-helm/operators/{{ $operator.name }}/pre-resources
+    helm:
+      valueFiles:
+        - ../values/pre-resources/values-{{ $.Values.environment }}.yaml
+  {{- else }}
+  source:
+    repoURL: https://github.com/jeremy-misola/GitOps-Homelab
+    targetRevision: {{ default "develop" $.Values.repoRevision }}
+    path: operators-helm/operators/{{ $operator.name }}/pre-resources
+    directory:
+      recurse: true
+  {{- end }}
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: {{ default $operator.namespace $preResources.namespace }}
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m
+{{- end }}
+{{- if $hasHelm }}
+---
+# 2. THE HELM OPERATOR
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{ $operator.name }}-helm
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "{{ $operator.syncWave }}"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  sources:
+    - repoURL: {{ $operator.repoURL }}
+      chart: {{ $operator.chart }}
+      targetRevision: {{ $operator.targetRevision }}
+      helm:
+        valueFiles:
+          - $values-repo/operators-helm/operators/{{ $operator.name }}/values/chart/values-{{ $.Values.environment }}.yaml
+    - repoURL: https://github.com/jeremy-misola/GitOps-Homelab
+      targetRevision: {{ default "develop" $.Values.repoRevision }}
+      ref: values-repo
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: {{ $operator.namespace }}
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m
+{{- end }}
+{{- if $postResources.enabled }}
+---
+# 3. THE MANAGED RESOURCES
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{ $operator.name }}-resources
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "{{ default (ternary (add (int $operator.syncWave) 1) (int $operator.syncWave) $hasHelm) $postResources.syncWave }}"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  {{- if $postResources.templated }}
+  source:
+    repoURL: https://github.com/jeremy-misola/GitOps-Homelab
+    targetRevision: {{ default "develop" $.Values.repoRevision }}
+    path: operators-helm/operators/{{ $operator.name }}/resources
+    helm:
+      valueFiles:
+        - ../values/resources/values-{{ $.Values.environment }}.yaml
+  {{- else }}
+  source:
+    repoURL: https://github.com/jeremy-misola/GitOps-Homelab
+    targetRevision: {{ default "develop" $.Values.repoRevision }}
+    path: operators-helm/operators/{{ $operator.name }}/resources
+    directory:
+      recurse: true
+  {{- end }}
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: {{ default $operator.namespace $postResources.namespace }}
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m
+{{- end }}
+{{- end }}

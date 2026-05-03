@@ -1,0 +1,53 @@
+authentik:
+  secret_key: ""
+  
+  # Disable chart-managed passwords
+  postgresql:
+    password: ""
+  redis:
+    password: ""
+
+# Use global.envFrom to inject all secrets including bootstrap credentials
+# This is the recommended way to pass bootstrap env vars according to Authentik docs
+global:
+  envFrom:
+    - secretRef:
+        name: authentik-secrets
+
+server:
+  env:
+    # Allowed hosts - required when behind reverse proxy with TLS termination
+    - name: AUTHENTIK_ALLOWED_HOSTS
+      value: "auth.jeremymr.dev"
+    # Email configuration (overriding defaults)
+    - name: AUTHENTIK_EMAIL__USE_TLS
+      value: "true"
+    - name: AUTHENTIK_EMAIL__FROM
+      value: "misolarellinj06@gmail.com"
+
+worker:
+  env:
+    # Allowed hosts - required when behind reverse proxy with TLS termination
+    - name: AUTHENTIK_ALLOWED_HOSTS
+      value: "auth.jeremymr.dev"
+    # Email configuration (overriding defaults, worker sends emails)
+    - name: AUTHENTIK_EMAIL__USE_TLS
+      value: "true"
+    - name: AUTHENTIK_EMAIL__FROM
+      value: "authentik@jeremymr.dev"
+
+postgresql:
+  enabled: true
+  auth:
+    existingSecret: "authentik-secrets"
+    secretKeys:
+      # Map the keys defined in your ExternalSecret
+      adminPasswordKey: "POSTGRESQL_PASSWORD"
+      userPasswordKey: "POSTGRESQL_PASSWORD"
+
+redis:
+  enabled: true
+  auth:
+    enabled: true
+    existingSecret: "authentik-secrets"
+    existingSecretPasswordKey: "REDIS_PASSWORD"

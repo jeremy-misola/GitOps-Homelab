@@ -1,7 +1,0 @@
-name: tempo
-namespace: tempo
-syncWave: "9"
-repoURL: https://grafana.github.io/helm-charts
-chart: tempo
-targetRevision: 1.24.2
-values: ""

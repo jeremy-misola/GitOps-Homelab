@@ -1,0 +1,8 @@
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: {{ .Values.poolName | default "default-pool" }}
+  namespace: metallb
+spec:
+  addresses:
+    {{- toYaml .Values.addresses | nindent 4 }}

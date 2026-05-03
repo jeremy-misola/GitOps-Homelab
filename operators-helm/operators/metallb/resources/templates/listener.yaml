@@ -1,0 +1,8 @@
+apiVersion: metallb.io/v1beta1
+kind: L2Advertisement
+metadata:
+  name: {{ .Values.poolName | default "default-pool" }}-l2
+  namespace: metallb
+spec:
+  ipAddressPools:
+  - {{ .Values.poolName | default "default-pool" }}

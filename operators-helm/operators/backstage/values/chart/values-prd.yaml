@@ -1,0 +1,103 @@
+backstage:
+  replicas: 1
+  
+  extraEnvVarsSecrets:
+    - backstage-secrets
+    - devdocs-client-secret
+  
+  extraEnvVars:
+    - name: APP_CONFIG_backend_database_connection_host
+      value: backstage-postgresql
+    - name: APP_CONFIG_backend_database_connection_port
+      value: "5432"
+    - name: APP_CONFIG_backend_database_connection_user
+      value: bn_backstage
+  
+  appConfig:
+    app:
+      title: Developer Portal
+      baseUrl: https://devdocs.jeremymr.dev
+    backend:
+      baseUrl: https://devdocs.jeremymr.dev
+      listen:
+        port: 7007
+      csp:
+        connect-src: ["'self'", 'http:', 'https:']
+      cors:
+        origin: https://devdocs.jeremymr.dev
+        methods: [GET, HEAD, PATCH, POST, PUT, DELETE]
+        credentials: true
+      reading:
+        allow:
+          - host: raw.githubusercontent.com
+          - host: github.com
+      database:
+        client: pg
+        connection:
+          host: backstage-postgresql
+          port: 5432
+          user: bn_backstage
+          password: ${POSTGRES_PASSWORD}
+          ssl: false
+    auth:
+      environment: production
+      providers:
+        guest:
+          userEntityRef: user:default/guest
+          dangerouslyAllowOutsideDevelopment: true
+        oidc:
+          production:
+            clientId: ${OIDC_CLIENT_ID}
+            clientSecret: ${OIDC_CLIENT_SECRET}
+            metadataUrl: https://auth.jeremymr.dev/application/o/devdocs/.well-known/openid-configuration
+            callbackUrl: https://devdocs.jeremymr.dev/api/auth/oidc/handler/frame
+            prompt: auto
+            signIn:
+              resolvers:
+                - resolver: usernameMatchingUserEntityName
+    catalog:
+      rules:
+        - allow: [Component, System, API, Resource, Location, User, Group]
+      locations:
+        # Organization and Users
+        - type: url
+          target: https://raw.githubusercontent.com/jeremy-misola/GitOps-Homelab/main/docs/backstage/catalog/org.yaml
+          rules:
+            - allow: [User, Group]
+        # Systems
+        - type: url
+          target: https://raw.githubusercontent.com/jeremy-misola/GitOps-Homelab/main/docs/backstage/catalog/systems.yaml
+          rules:
+            - allow: [System]
+        # Components
+        - type: url
+          target: https://raw.githubusercontent.com/jeremy-misola/GitOps-Homelab/main/docs/backstage/catalog/components.yaml
+          rules:
+            - allow: [Component]
+        # APIs
+        - type: url
+          target: https://raw.githubusercontent.com/jeremy-misola/GitOps-Homelab/main/docs/backstage/catalog/apis.yaml
+          rules:
+            - allow: [API]
+    permission:
+      enabled: false
+
+postgresql:
+  enabled: true
+  architecture: standalone
+  auth:
+    username: bn_backstage
+    existingSecret: backstage-secrets
+    secretKeys:
+      userPasswordKey: POSTGRES_PASSWORD
+  primary:
+    persistence:
+      enabled: true
+      size: 8Gi
+
+service:
+  type: ClusterIP
+  ports:
+    backend: 7007
+    name: http-backend
+    targetPort: backend
