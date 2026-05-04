@@ -73,6 +73,8 @@ operators:
     repoURL: docker.io/envoyproxy
     chart: gateway-helm
     targetRevision: v1.7.1
+    preResources:
+      enabled: true
     postResources:
       enabled: true
 
