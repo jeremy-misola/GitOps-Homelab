@@ -5,10 +5,10 @@ metadata:
   namespace: longhorn-system
 spec:
   parentRefs:
-  - name: prod-web
+  - name: {{ .Values.gatewayName }}
     namespace: envoy-gateway-system
   hostnames:
-    - longhorn.jeremymr.dev
+    - longhorn{{ .Values.envSuffix }}.jeremymr.dev
   rules:
   - backendRefs:
     - name: longhorn-frontend

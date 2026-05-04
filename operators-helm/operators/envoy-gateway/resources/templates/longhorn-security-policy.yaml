@@ -13,7 +13,7 @@ spec:
       name: longhorn-route
   oidc:
     provider:
-      issuer: "https://auth.jeremymr.dev/application/o/longhorn/"
+      issuer: "https://auth{{ .Values.envSuffix }}.jeremymr.dev/application/o/longhorn/"
     # Client ID and Secret are managed by Crossplane Workspace
     # The secret is created by: manifests/infra/crossplane/workspaces/longhorn-auth.yaml
     # Secret keys must be "client-id" and "client-secret" (hyphens, not underscores)
@@ -21,5 +21,5 @@ spec:
       name: longhorn-client-secret
     clientSecret:
       name: longhorn-client-secret
-    redirectURL: "https://longhorn.jeremymr.dev/oauth2/callback"
+    redirectURL: "https://longhorn{{ .Values.envSuffix }}.jeremymr.dev/oauth2/callback"
     logoutPath: "/logout"

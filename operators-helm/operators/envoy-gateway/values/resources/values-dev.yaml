@@ -1,0 +1,3 @@
+gatewayName: dev-web
+gatewayAddress: 192.168.1.243
+envSuffix: "-dev"

@@ -1,9 +1,8 @@
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
-  name: prod-web
+  name: kubesandbox
   namespace: envoy-gateway-system
-  annotations:
 spec:
   infrastructure:
     labels:
@@ -11,11 +10,8 @@ spec:
     parametersRef:
       group: gateway.envoyproxy.io
       kind: EnvoyProxy
-      name: prod-web-config
+      name: kubesandbox-gateway-config
   gatewayClassName: envoy
-  addresses:
-  - type: IPAddress
-    value: 192.168.0.243
   listeners:
   - name: http
     protocol: HTTP
@@ -30,11 +26,8 @@ spec:
     tls:
       mode: Terminate
       certificateRefs:
-        - name: homelab-cert
-          namespace: envoy-gateway-system
-        - name: saima-cert
+        - name: kubesandbox-cert
           namespace: envoy-gateway-system
     allowedRoutes:
       namespaces:
         from: All
-    

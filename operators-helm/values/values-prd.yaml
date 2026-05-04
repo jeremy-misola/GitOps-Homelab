@@ -77,6 +77,7 @@ operators:
       enabled: true
     postResources:
       enabled: true
+      templated: true
 
   - name: authentik
     namespace: authentik
@@ -126,6 +127,9 @@ operators:
     targetRevision: 80.13.3
     preResources:
       enabled: true
+    postResources:
+      enabled: true
+      templated: true
 
   - name: otel-collector
     namespace: opentelemetry-collector
@@ -158,6 +162,9 @@ operators:
     repoURL: oci://ghcr.io/gabe565/charts/adguard-home
     chart: adguard
     targetRevision: 0.3.25
+    postResources:
+      enabled: true
+      templated: true
 
   - name: kubesandbox-backend
     namespace: kubesandbox

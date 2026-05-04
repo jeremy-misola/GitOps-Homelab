@@ -5,7 +5,7 @@ metadata:
   namespace: adguard
 spec:
   parentRefs:
-  - name: prod-web
+  - name: {{ .Values.gatewayName }}
     namespace: envoy-gateway-system
   hostnames:
     - adguard.jeremymr.dev

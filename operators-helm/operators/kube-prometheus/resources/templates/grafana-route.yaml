@@ -5,10 +5,10 @@ metadata:
   namespace: monitoring
 spec:
   parentRefs:
-  - name: prod-web
+  - name: {{ .Values.gatewayName }}
     namespace: envoy-gateway-system
   hostnames:
-    - grafana.jeremymr.dev
+    - grafana{{ .Values.envSuffix }}.jeremymr.dev
   rules:
   - backendRefs:
     - name: kube-prometheus-grafana
