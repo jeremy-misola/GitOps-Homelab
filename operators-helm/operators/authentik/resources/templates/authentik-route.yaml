@@ -11,5 +11,5 @@ spec:
     - auth{{ .Values.envSuffix }}.jeremymr.dev
   rules:
   - backendRefs:
-    - name: authentik-server
+    - name: authentik-helm-server
       port: 80
