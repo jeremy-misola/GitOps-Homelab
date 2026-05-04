@@ -31,8 +31,6 @@ spec:
       certificateRefs:
         - name: homelab-cert
           namespace: envoy-gateway-system
-        - name: saima-cert
-          namespace: envoy-gateway-system
     allowedRoutes:
       namespaces:
         from: All
