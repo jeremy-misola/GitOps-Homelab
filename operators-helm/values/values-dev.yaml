@@ -52,13 +52,6 @@ operators:
       enabled: true
       syncWave: 150
 
-  - name: cloudnativepg
-    namespace: cloudnativepg
-    syncWave: 60
-    repoURL: https://cloudnative-pg.io/charts/
-    chart: cloudnative-pg
-    targetRevision: 0.28.0
-
   - name: garage
     namespace: garage
     syncWave: 70
@@ -108,7 +101,7 @@ operators:
     targetRevision: 0.102.0
     postResources:
       enabled: true
-      syncWave: 195
+      syncWave: 205
       namespace: opentelemetry-collector
 
   - name: loki
@@ -137,23 +130,30 @@ operators:
       enabled: true
       templated: true
 
+  - name: cloudnativepg
+    namespace: cloudnativepg
+    syncWave: 190
+    repoURL: https://cloudnative-pg.io/charts/
+    chart: cloudnative-pg
+    targetRevision: 0.28.0
+
   - name: otel-collector
     namespace: opentelemetry-collector
-    syncWave: 190
+    syncWave: 200
     repoURL: https://open-telemetry.github.io/opentelemetry-helm-charts
     chart: opentelemetry-collector
     targetRevision: 0.143.0
 
   - name: blackbox-exporter
     namespace: monitoring
-    syncWave: 200
+    syncWave: 210
     repoURL: https://prometheus-community.github.io/helm-charts
     chart: prometheus-blackbox-exporter
     targetRevision: 11.7.0
 
   - name: backstage
     namespace: backstage
-    syncWave: 210
+    syncWave: 220
     repoURL: https://backstage.github.io/charts
     chart: backstage
     targetRevision: 2.6.3
@@ -164,7 +164,7 @@ operators:
 
   - name: adguard
     namespace: adguard
-    syncWave: 220
+    syncWave: 230
     repoURL: oci://ghcr.io/gabe565/charts/adguard-home
     chart: adguard
     targetRevision: 0.3.25
@@ -174,20 +174,20 @@ operators:
 
   - name: kubesandbox-backend
     namespace: kubesandbox
-    syncWave: 230
+    syncWave: 240
     repoURL: https://jeremy-misola.github.io/kubesandbox/
     chart: kubesandbox-backend
     targetRevision: 0.1.5
 
   - name: kubesandbox-frontend
     namespace: kubesandbox
-    syncWave: 240
+    syncWave: 250
     repoURL: https://jeremy-misola.github.io/kubesandbox/
     chart: kubesandbox-frontend
     targetRevision: 0.1.6
 
   - name: portfolio
     namespace: portfolio
-    syncWave: 250
+    syncWave: 260
     postResources:
       enabled: true
