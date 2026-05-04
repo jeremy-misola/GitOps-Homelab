@@ -56,7 +56,7 @@ operators:
     syncWave: 60
     repoURL: https://cloudnative-pg.io/charts/
     chart: cloud-native-pg
-    targetRevision: 0.27.0
+    targetRevision: 0.28.0
 
   - name: garage
     namespace: garage

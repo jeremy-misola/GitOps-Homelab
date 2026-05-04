@@ -5,7 +5,7 @@ metadata:
   namespace: authentik
 spec:
   parentRefs:
-  - name: {{ .Values.gatewayName }}
+  - name: "{{ .Values.gatewayName }}"
     namespace: envoy-gateway-system
   hostnames:
     - auth{{ .Values.envSuffix }}.jeremymr.dev

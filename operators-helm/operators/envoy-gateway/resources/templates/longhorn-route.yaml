@@ -5,7 +5,7 @@ metadata:
   namespace: longhorn-system
 spec:
   parentRefs:
-  - name: {{ .Values.gatewayName }}
+  - name: "{{ .Values.gatewayName }}"
     namespace: envoy-gateway-system
   hostnames:
     - longhorn{{ .Values.envSuffix }}.jeremymr.dev
