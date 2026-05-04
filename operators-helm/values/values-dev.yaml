@@ -88,6 +88,9 @@ operators:
     targetRevision: 2025.10.3
     preResources:
       enabled: true
+    postResources:
+      enabled: true
+      templated: true
 
   - name: cloudflare
     namespace: cloudflare

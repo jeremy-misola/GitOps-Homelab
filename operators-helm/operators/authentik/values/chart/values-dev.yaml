@@ -18,7 +18,7 @@ server:
   env:
     # Allowed hosts - required when behind reverse proxy with TLS termination
     - name: AUTHENTIK_ALLOWED_HOSTS
-      value: "auth.jeremymr.dev"
+      value: "auth-dev.jeremymr.dev"
     # Email configuration (overriding defaults)
     - name: AUTHENTIK_EMAIL__USE_TLS
       value: "true"
@@ -29,7 +29,7 @@ worker:
   env:
     # Allowed hosts - required when behind reverse proxy with TLS termination
     - name: AUTHENTIK_ALLOWED_HOSTS
-      value: "auth.jeremymr.dev"
+      value: "auth-dev.jeremymr.dev"
     # Email configuration (overriding defaults, worker sends emails)
     - name: AUTHENTIK_EMAIL__USE_TLS
       value: "true"
