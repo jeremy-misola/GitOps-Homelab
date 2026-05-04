@@ -1,5 +1,5 @@
 environment: prd
-repoRevision: main
+repoRevision: develop
 
 operators:
   - name: external-secrets
