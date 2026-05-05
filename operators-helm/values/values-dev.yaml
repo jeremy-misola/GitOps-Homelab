@@ -50,6 +50,7 @@ operators:
       syncWave: 45
     postResources:
       enabled: true
+      templated: true
       syncWave: 150
 
   - name: garage

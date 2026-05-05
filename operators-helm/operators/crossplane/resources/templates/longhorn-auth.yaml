@@ -2,7 +2,7 @@ apiVersion: tf.upbound.io/v1beta1
 kind: Workspace
 metadata:
   name: longhorn-auth
-  namespace: crossplane-system
+  namespace: {{ .Release.Namespace }}
   annotations:
     argocd.argoproj.io/sync-wave: "17"
 spec:
@@ -60,7 +60,7 @@ spec:
         allowed_redirect_uris = [
           {
             matching_mode = "strict"
-            url           = "https://longhorn.jeremymr.dev/oauth2/callback"
+            url           = "https://longhorn{{ .Values.envSuffix }}.jeremymr.dev/oauth2/callback"
           }
         ]
       }
@@ -85,7 +85,7 @@ spec:
 
     vars:
       - key: authentik_url
-        value: "https://auth.jeremymr.dev"
+        value: "{{ .Values.authentikUrl }}"
       - key: authorization_flow
         value: "default-provider-authorization-explicit-consent"
       - key: invalidation_flow
