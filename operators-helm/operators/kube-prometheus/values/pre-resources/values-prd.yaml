@@ -1,0 +1,3 @@
+gatewayName: prod-web
+envSuffix: ""
+authentikUrl: https://auth.jeremymr.dev
