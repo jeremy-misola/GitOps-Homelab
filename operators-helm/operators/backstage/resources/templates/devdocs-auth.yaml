@@ -1,8 +1,8 @@
 apiVersion: tf.upbound.io/v1beta1
 kind: Workspace
 metadata:
-  name: adguard-auth
-  namespace: crossplane-system
+  name: devdocs-auth
+  namespace: {{ .Release.Namespace }}
   annotations:
     argocd.argoproj.io/sync-wave: "17"
 spec:
@@ -50,42 +50,57 @@ spec:
       }
 
       # Create OIDC Provider
-      resource "authentik_provider_oauth2" "adguard" {
-        name               = "AdGuard"
+      resource "authentik_provider_oauth2" "devdocs" {
+        name               = "DevDocs"
         authorization_flow = data.authentik_flow.authorization.id
         invalidation_flow  = data.authentik_flow.invalidation.id
         client_type        = "confidential"
-        client_id          = "adguard"
+        client_id          = "devdocs"
 
         allowed_redirect_uris = [
           {
             matching_mode = "strict"
-            url           = "https://adguard.jeremymr.dev/oauth2/callback"
+            url           = "https://devdocs{{ .Values.envSuffix }}.jeremymr.dev/oauth2/callback"
+          },
+          {
+            matching_mode = "strict"
+            url           = "https://devdocs{{ .Values.envSuffix }}.jeremymr.dev/api/auth/oidc/handler/frame"
           }
         ]
       }
 
       # Create Application
-      resource "authentik_application" "adguard" {
-        name              = "AdGuard"
-        slug              = "adguard"
-        protocol_provider = authentik_provider_oauth2.adguard.id
+      resource "authentik_application" "devdocs" {
+        name              = "DevDocs"
+        slug              = "devdocs"
+        protocol_provider = authentik_provider_oauth2.devdocs.id
         policy_engine_mode = "any"
       }
 
-      # Outputs for Kubernetes secret (keys must use hyphens for Envoy Gateway SecurityPolicy)
+      # Outputs for Kubernetes secret
+      # Keys with hyphens for Envoy Gateway SecurityPolicy
       output "client-id" {
-        value = authentik_provider_oauth2.adguard.client_id
+        value = authentik_provider_oauth2.devdocs.client_id
       }
 
       output "client-secret" {
-        value     = authentik_provider_oauth2.adguard.client_secret
+        value     = authentik_provider_oauth2.devdocs.client_secret
+        sensitive = true
+      }
+
+      # Keys with underscores for Backstage environment variables
+      output "OIDC_CLIENT_ID" {
+        value = authentik_provider_oauth2.devdocs.client_id
+      }
+
+      output "OIDC_CLIENT_SECRET" {
+        value     = authentik_provider_oauth2.devdocs.client_secret
         sensitive = true
       }
 
     vars:
       - key: authentik_url
-        value: "https://auth.jeremymr.dev"
+        value: "{{ .Values.authentikUrl }}"
       - key: authorization_flow
         value: "default-provider-authorization-explicit-consent"
       - key: invalidation_flow
@@ -99,8 +114,8 @@ spec:
 
   # Write outputs to a secret that can be used by SecurityPolicy
   writeConnectionSecretToRef:
-    name: adguard-client-secret
-    namespace: adguard
+    name: devdocs-client-secret
+    namespace: {{ .Release.Namespace }}
 
   providerConfigRef:
     name: terraform-config

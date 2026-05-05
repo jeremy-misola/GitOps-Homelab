@@ -2,7 +2,7 @@ apiVersion: gateway.envoyproxy.io/v1alpha1
 kind: SecurityPolicy
 metadata:
   name: adguard-oidc-config
-  namespace: adguard
+  namespace: {{ .Release.Namespace }}
   annotations:
     # Crossplane creates the secret, so we need to ensure it exists first
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
