@@ -1,3 +1,4 @@
+envSuffix: ""
 defaultRules:
   create: true
 additionalPrometheusRulesMap:

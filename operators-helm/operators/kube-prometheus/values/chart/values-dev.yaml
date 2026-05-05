@@ -1,3 +1,4 @@
+envSuffix: "-dev"
 defaultRules:
   create: true
 additionalPrometheusRulesMap:
