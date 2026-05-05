@@ -38,6 +38,9 @@ operators:
     repoURL: https://charts.longhorn.io
     chart: longhorn
     targetRevision: 1.11.1
+    postResources:
+      enabled: true
+      templated: true
 
   - name: crossplane
     namespace: crossplane-system
@@ -110,6 +113,9 @@ operators:
     repoURL: https://grafana.github.io/helm-charts
     chart: loki
     targetRevision: 6.49.0
+    postResources:
+      enabled: true
+      templated: true
 
   - name: tempo
     namespace: tempo
@@ -161,6 +167,7 @@ operators:
       enabled: true
     postResources:
       enabled: true
+      templated: true
 
   - name: adguard
     namespace: adguard
@@ -185,6 +192,9 @@ operators:
     repoURL: https://jeremy-misola.github.io/kubesandbox/
     chart: kubesandbox-frontend
     targetRevision: 0.1.6
+    postResources:
+      enabled: true
+      templated: true
 
   - name: portfolio
     namespace: portfolio

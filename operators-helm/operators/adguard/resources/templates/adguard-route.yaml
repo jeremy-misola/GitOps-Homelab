@@ -8,7 +8,7 @@ spec:
   - name: {{ .Values.gatewayName }}
     namespace: envoy-gateway-system
   hostnames:
-    - adguard.jeremymr.dev
+    - adguard{{ .Values.envSuffix }}.jeremymr.dev
   rules:
   - backendRefs:
     - name: adguard-adguard-home
