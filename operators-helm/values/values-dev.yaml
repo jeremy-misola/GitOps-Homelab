@@ -111,6 +111,8 @@ operators:
     repoURL: https://grafana.github.io/helm-charts
     chart: loki
     targetRevision: 6.49.0
+    preResources:
+      enabled: true
     postResources:
       enabled: true
 
