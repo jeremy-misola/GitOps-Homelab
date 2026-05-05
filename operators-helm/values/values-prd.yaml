@@ -128,6 +128,7 @@ operators:
     targetRevision: 80.13.3
     preResources:
       enabled: true
+      templated: true
     postResources:
       enabled: true
       templated: true
