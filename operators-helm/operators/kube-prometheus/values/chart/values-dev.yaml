@@ -1,4 +1,7 @@
-envSuffix: "-dev"
+gatewayName: dev-web
+envSuffix: ""
+authentikUrl: https://auth.jeremymr.dev
+
 defaultRules:
   create: true
 additionalPrometheusRulesMap:
