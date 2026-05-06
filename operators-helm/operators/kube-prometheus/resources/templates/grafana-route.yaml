@@ -11,7 +11,7 @@ spec:
     - grafana{{ .Values.envSuffix }}.jeremymr.dev
   rules:
   - backendRefs:
-    - name: kube-prometheus-grafana
+    - name: kube-prometheus-helm-grafana
       port: 80
     timeouts:
       request: "60s"
