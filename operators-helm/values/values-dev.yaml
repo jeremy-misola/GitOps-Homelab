@@ -91,6 +91,7 @@ operators:
     syncWave: 100
     preResources:
       enabled: true
+      templated: true
     postResources:
       enabled: true
 
