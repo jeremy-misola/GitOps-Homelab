@@ -162,6 +162,7 @@ operators:
     chart: backstage
     targetRevision: 2.6.3
     preResources:
+      templated: true
       enabled: true
     postResources:
       enabled: true
