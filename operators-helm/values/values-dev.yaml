@@ -47,7 +47,6 @@ operators:
     targetRevision: 1.18.2
     preResources:
       enabled: true
-      syncWave: 45
     postResources:
       enabled: true
       templated: true
@@ -113,8 +112,6 @@ operators:
     chart: loki
     targetRevision: 6.49.0
     preResources:
-      enabled: true
-    postResources:
       enabled: true
 
   - name: tempo
