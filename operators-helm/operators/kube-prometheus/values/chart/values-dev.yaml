@@ -110,7 +110,7 @@ grafana:
     dataproxy:
       timeout: 300
     auth:
-      signout_redirect_url: "https://auth.jeremymr.dev/application/o/grafana/end-session/"
+      signout_redirect_url: "https://auth-dev.jeremymr.dev/application/o/grafana/end-session/"
       oauth_auto_login: true
     auth.generic_oauth:
       name: authentik
@@ -118,9 +118,9 @@ grafana:
       client_id: "${GF_AUTH_GENERIC_OAUTH_CLIENT_ID}"
       client_secret: "${GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET}"
       scopes: "openid profile email"
-      auth_url: "https://auth.jeremymr.dev/application/o/authorize/"
-      token_url: "https://auth.jeremymr.dev/application/o/token/"
-      api_url: "https://auth.jeremymr.dev/application/o/userinfo"
+      auth_url: "https://auth-dev.jeremymr.dev/application/o/authorize/"
+      token_url: "https://auth-dev.jeremymr.dev/application/o/token/"
+      api_url: "https://auth-dev.jeremymr.dev/application/o/userinfo"
       email_attribute_path: email
       login_attribute_path: preferred_username
       name_attribute_path: name
