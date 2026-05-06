@@ -176,6 +176,9 @@ operators:
     repoURL: oci://ghcr.io/gabe565/charts/adguard-home
     chart: adguard
     targetRevision: 0.3.25
+    preResources:
+      enabled: true
+      templated: true
     postResources:
       enabled: true
       templated: true
