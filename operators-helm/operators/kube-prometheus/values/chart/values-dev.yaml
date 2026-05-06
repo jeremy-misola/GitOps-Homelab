@@ -84,7 +84,7 @@ grafana:
     - name: Loki
       type: loki
       access: proxy
-      url: http://loki-stack-gateway.loki.svc.cluster.local:80
+      url: http://loki-helm-gateway.loki.svc.cluster.local:80
       jsonData:
         timeout: "300"
         maxLines: 1000
