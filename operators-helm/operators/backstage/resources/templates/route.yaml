@@ -11,5 +11,5 @@ spec:
     - devdocs{{ .Values.envSuffix }}.jeremymr.dev
   rules:
   - backendRefs:
-    - name: backstage
+    - name: backstage-helm
       port: 7007
