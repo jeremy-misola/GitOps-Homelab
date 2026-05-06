@@ -165,6 +165,7 @@ operators:
     targetRevision: 2.6.3
     preResources:
       enabled: true
+      templated: true
     postResources:
       enabled: true
       templated: true
