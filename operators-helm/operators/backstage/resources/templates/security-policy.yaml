@@ -1,0 +1,24 @@
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: SecurityPolicy
+metadata:
+  name: backstage-oidc-config
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    # Crossplane creates the secret, so we need to ensure it exists first
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: backstage-route
+  oidc:
+    provider:
+      issuer: "{{ .Values.authentikUrl }}/application/o/devdocs/"
+    # The secret is created by: manifests/infra/crossplane/workspaces/devdocs-auth.yaml
+    # Secret keys must be "client-id" and "client-secret" for Envoy Gateway OIDC
+    clientIDRef:
+      name: devdocs-client-secret
+    clientSecret:
+      name: devdocs-client-secret
+    redirectURL: "https://devdocs{{ .Values.envSuffix }}.jeremymr.dev/oauth2/callback"
+    logoutPath: "/logout"

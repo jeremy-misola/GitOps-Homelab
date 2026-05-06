@@ -1,3 +1,7 @@
+gatewayName: dev-web
+envSuffix: ""
+authentikUrl: https://auth.jeremymr.dev
+
 defaultRules:
   create: true
 additionalPrometheusRulesMap:
@@ -80,7 +84,7 @@ grafana:
     - name: Loki
       type: loki
       access: proxy
-      url: http://loki-stack-gateway.loki.svc.cluster.local:80
+      url: http://loki-helm-gateway.loki.svc.cluster.local:80
       jsonData:
         timeout: "300"
         maxLines: 1000
@@ -102,11 +106,11 @@ grafana:
     passwordKey: admin-password
   grafana.ini:
     server:
-      root_url: "https://grafana.jeremymr.dev"
+      root_url: "https://grafana-dev.jeremymr.dev"
     dataproxy:
       timeout: 300
     auth:
-      signout_redirect_url: "https://auth.jeremymr.dev/application/o/grafana/end-session/"
+      signout_redirect_url: "https://auth-dev.jeremymr.dev/application/o/grafana/end-session/"
       oauth_auto_login: true
     auth.generic_oauth:
       name: authentik
@@ -114,9 +118,9 @@ grafana:
       client_id: "${GF_AUTH_GENERIC_OAUTH_CLIENT_ID}"
       client_secret: "${GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET}"
       scopes: "openid profile email"
-      auth_url: "https://auth.jeremymr.dev/application/o/authorize/"
-      token_url: "https://auth.jeremymr.dev/application/o/token/"
-      api_url: "https://auth.jeremymr.dev/application/o/userinfo"
+      auth_url: "https://auth-dev.jeremymr.dev/application/o/authorize/"
+      token_url: "https://auth-dev.jeremymr.dev/application/o/token/"
+      api_url: "https://auth-dev.jeremymr.dev/application/o/userinfo"
       email_attribute_path: email
       login_attribute_path: preferred_username
       name_attribute_path: name

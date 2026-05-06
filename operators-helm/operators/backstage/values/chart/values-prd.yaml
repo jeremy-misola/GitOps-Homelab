@@ -7,7 +7,7 @@ backstage:
   
   extraEnvVars:
     - name: APP_CONFIG_backend_database_connection_host
-      value: backstage-postgresql
+      value: backstage-helm-postgresql
     - name: APP_CONFIG_backend_database_connection_port
       value: "5432"
     - name: APP_CONFIG_backend_database_connection_user

@@ -7,7 +7,7 @@ backstage:
   
   extraEnvVars:
     - name: APP_CONFIG_backend_database_connection_host
-      value: backstage-postgresql
+      value: backstage-helm-postgresql
     - name: APP_CONFIG_backend_database_connection_port
       value: "5432"
     - name: APP_CONFIG_backend_database_connection_user
@@ -16,15 +16,15 @@ backstage:
   appConfig:
     app:
       title: Developer Portal
-      baseUrl: https://devdocs.jeremymr.dev
+      baseUrl: https://devdocs-dev.jeremymr.dev
     backend:
-      baseUrl: https://devdocs.jeremymr.dev
+      baseUrl: https://devdocs-dev.jeremymr.dev
       listen:
         port: 7007
       csp:
         connect-src: ["'self'", 'http:', 'https:']
       cors:
-        origin: https://devdocs.jeremymr.dev
+        origin: https://devdocs-dev.jeremymr.dev
         methods: [GET, HEAD, PATCH, POST, PUT, DELETE]
         credentials: true
       reading:
@@ -34,7 +34,7 @@ backstage:
       database:
         client: pg
         connection:
-          host: backstage-postgresql
+          host: backstage-helm-postgresql
           port: 5432
           user: bn_backstage
           password: ${POSTGRES_PASSWORD}
@@ -49,8 +49,8 @@ backstage:
           production:
             clientId: ${OIDC_CLIENT_ID}
             clientSecret: ${OIDC_CLIENT_SECRET}
-            metadataUrl: https://auth.jeremymr.dev/application/o/devdocs/.well-known/openid-configuration
-            callbackUrl: https://devdocs.jeremymr.dev/api/auth/oidc/handler/frame
+            metadataUrl: https://auth-dev.jeremymr.dev/application/o/devdocs/.well-known/openid-configuration
+            callbackUrl: https://devdocs-dev.jeremymr.dev/api/auth/oidc/handler/frame
             prompt: auto
             signIn:
               resolvers:

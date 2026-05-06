@@ -49,14 +49,8 @@ operators:
       enabled: true
     postResources:
       enabled: true
+      templated: true
       syncWave: 150
-
-  - name: cloudnativepg
-    namespace: cloudnativepg
-    syncWave: 60
-    repoURL: https://cloudnative-pg.io/charts/
-    chart: cloud-native-pg
-    targetRevision: 0.27.0
 
   - name: garage
     namespace: garage
@@ -73,8 +67,11 @@ operators:
     repoURL: docker.io/envoyproxy
     chart: gateway-helm
     targetRevision: v1.7.1
+    preResources:
+      enabled: true
     postResources:
       enabled: true
+      templated: true
 
   - name: authentik
     namespace: authentik
@@ -84,10 +81,16 @@ operators:
     targetRevision: 2025.10.3
     preResources:
       enabled: true
+    postResources:
+      enabled: true
+      templated: true
 
   - name: cloudflare
     namespace: cloudflare
     syncWave: 100
+    preResources:
+      enabled: true
+      templated: true
     postResources:
       enabled: true
 
@@ -99,7 +102,7 @@ operators:
     targetRevision: 0.102.0
     postResources:
       enabled: true
-      syncWave: 195
+      syncWave: 205
       namespace: opentelemetry-collector
 
   - name: loki
@@ -108,6 +111,8 @@ operators:
     repoURL: https://grafana.github.io/helm-charts
     chart: loki
     targetRevision: 6.49.0
+    preResources:
+      enabled: true
 
   - name: tempo
     namespace: tempo
@@ -124,24 +129,35 @@ operators:
     targetRevision: 80.13.3
     preResources:
       enabled: true
+      templated: true
+    postResources:
+      enabled: true
+      templated: true
+
+  - name: cloudnativepg
+    namespace: cloudnativepg
+    syncWave: 190
+    repoURL: https://cloudnative-pg.io/charts/
+    chart: cloudnative-pg
+    targetRevision: 0.28.0
 
   - name: otel-collector
     namespace: opentelemetry-collector
-    syncWave: 190
+    syncWave: 200
     repoURL: https://open-telemetry.github.io/opentelemetry-helm-charts
     chart: opentelemetry-collector
     targetRevision: 0.143.0
 
   - name: blackbox-exporter
     namespace: monitoring
-    syncWave: 200
+    syncWave: 210
     repoURL: https://prometheus-community.github.io/helm-charts
     chart: prometheus-blackbox-exporter
     targetRevision: 11.7.0
 
   - name: backstage
     namespace: backstage
-    syncWave: 210
+    syncWave: 220
     repoURL: https://backstage.github.io/charts
     chart: backstage
     targetRevision: 2.6.3
@@ -149,30 +165,37 @@ operators:
       enabled: true
     postResources:
       enabled: true
+      templated: true
 
   - name: adguard
     namespace: adguard
-    syncWave: 220
+    syncWave: 230
     repoURL: oci://ghcr.io/gabe565/charts/adguard-home
     chart: adguard
     targetRevision: 0.3.25
+    postResources:
+      enabled: true
+      templated: true
 
   - name: kubesandbox-backend
     namespace: kubesandbox
-    syncWave: 230
+    syncWave: 240
     repoURL: https://jeremy-misola.github.io/kubesandbox/
     chart: kubesandbox-backend
     targetRevision: 0.1.5
 
   - name: kubesandbox-frontend
     namespace: kubesandbox
-    syncWave: 240
+    syncWave: 250
     repoURL: https://jeremy-misola.github.io/kubesandbox/
     chart: kubesandbox-frontend
     targetRevision: 0.1.6
+    postResources:
+      enabled: true
+      templated: true
 
   - name: portfolio
     namespace: portfolio
-    syncWave: 250
+    syncWave: 260
     postResources:
       enabled: true

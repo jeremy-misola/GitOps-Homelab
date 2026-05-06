@@ -1,0 +1,25 @@
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: SecurityPolicy
+metadata:
+  name: adguard-oidc-config
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    # Crossplane creates the secret, so we need to ensure it exists first
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: adguard-route
+  oidc:
+    provider:
+      issuer: "https://auth{{ .Values.envSuffix }}.jeremymr.dev/application/o/adguard/"
+    # Client ID and Secret are managed by Crossplane Workspace
+    # The secret is created by: manifests/infra/crossplane/workspaces/adguard-auth.yaml
+    # Secret keys must be "client-id" and "client-secret" (hyphens, not underscores)
+    clientIDRef:
+      name: adguard-client-secret
+    clientSecret:
+      name: adguard-client-secret
+    redirectURL: "https://adguard{{ .Values.envSuffix }}.jeremymr.dev/oauth2/callback"
+    logoutPath: "/logout"
