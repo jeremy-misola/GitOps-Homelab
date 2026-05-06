@@ -11,5 +11,5 @@ spec:
     - adguard{{ .Values.envSuffix }}.jeremymr.dev
   rules:
   - backendRefs:
-    - name: adguard-adguard-home
+    - name: adguard-helm-adguard-home
       port: 3000
