@@ -106,7 +106,7 @@ grafana:
     passwordKey: admin-password
   grafana.ini:
     server:
-      root_url: "https://grafana.jeremymr.dev"
+      root_url: "https://grafana-dev.jeremymr.dev"
     dataproxy:
       timeout: 300
     auth:
