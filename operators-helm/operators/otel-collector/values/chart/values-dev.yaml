@@ -58,12 +58,12 @@ config:
   exporters:
     # Self-hosted Loki
     otlphttp/loki:
-      endpoint: http://loki-stack-gateway.loki.svc.cluster.local:80/otlp
+      endpoint: http://loki-helm-stack-gateway.loki.svc.cluster.local:80/otlp
       headers:
         X-Scope-OrgID: "1"
     # Self-hosted Tempo
     otlp/tempo:
-      endpoint: tempo.tempo.svc.cluster.local:4317
+      endpoint: tempo-helm.tempo.svc.cluster.local:4317
       tls:
         insecure: true
     # Grafana Cloud - logs & traces via OTLP
