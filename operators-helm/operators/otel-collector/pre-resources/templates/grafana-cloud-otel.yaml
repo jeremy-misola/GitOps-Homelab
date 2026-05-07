@@ -1,0 +1,19 @@
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: grafana-cloud-otel
+  namespace: opentelemetry-collector
+spec:
+  secretStoreRef:
+    name: doppler-secret-store
+    kind: ClusterSecretStore
+  target:
+    name: grafana-cloud-otel
+    creationPolicy: Owner
+  data:
+  - secretKey: username
+    remoteRef:
+      key: GRAFANA_USERNAME
+  - secretKey: password
+    remoteRef:
+      key: {{ .Values.grafanaCloudTokenKey }}

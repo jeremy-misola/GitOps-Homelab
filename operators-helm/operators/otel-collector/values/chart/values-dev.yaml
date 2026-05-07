@@ -52,23 +52,49 @@ config:
       send_batch_size: 1000
       timeout: 10s
 
+  extensions:
+    basicauth/grafana:
+      client_auth:
+        username: "${env:GRAFANA_CLOUD_USERNAME}"
+        password: "${env:GRAFANA_CLOUD_TOKEN}"
+
   exporters:
+    # Self-hosted Loki
     otlphttp/loki:
       endpoint: http://loki-stack-gateway.loki.svc.cluster.local:80/otlp
       headers:
-        X-Scope-OrgID: "1" 
+        X-Scope-OrgID: "1"
+    # Self-hosted Tempo
     otlp/tempo:
       endpoint: tempo.tempo.svc.cluster.local:4317
       tls:
         insecure: true
+    # Grafana Cloud - logs & traces via OTLP
+    otlphttp/grafana:
+      endpoint: https://prometheus-prod-32-prod-ca-east-0.grafana.net/otlp
+      auth:
+        authenticator: basicauth/grafana
 
   service:
+    extensions: [basicauth/grafana]
     pipelines:
       logs:
         receivers: [otlp, filelog]
         processors: [k8sattributes, batch]
-        exporters: [otlphttp/loki]
+        exporters: [otlphttp/loki, otlphttp/grafana]
       traces:
         receivers: [otlp]
         processors: [k8sattributes, batch]
-        exporters: [otlp/tempo]
+        exporters: [otlp/tempo, otlphttp/grafana]
+
+extraEnvs:
+  - name: GRAFANA_CLOUD_USERNAME
+    valueFrom:
+      secretKeyRef:
+        name: grafana-cloud-otel
+        key: username
+  - name: GRAFANA_CLOUD_TOKEN
+    valueFrom:
+      secretKeyRef:
+        name: grafana-cloud-otel
+        key: password
