@@ -129,11 +129,11 @@ grafana:
 prometheus:
   prometheusSpec:
     remoteWrite:
-      - url: https://misolarellinj06.grafana.net/api/prom/push
+      - url: https://prometheus-prod-32-prod-ca-east-0.grafana.net./api/prom/push
         basicAuth:
           username:
             name: grafana-cloud-token
             key: prometheus-username
           password:
             name: grafana-cloud-token
-            key: api-token
+            key: access-token
