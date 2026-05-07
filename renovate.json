@@ -1,0 +1,61 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    ":separateMajorMinor",
+    ":combinePatchMinorUpdates"
+  ],
+  "labels": ["dependencies"],
+  "schedule": ["before 9am on Monday"],
+  "timezone": "America/Toronto",
+  "enabledManagers": ["custom.regex", "terraform", "github-actions"],
+  "packageRules": [
+    {
+      "description": "Auto-merge patch updates silently",
+      "matchUpdateTypes": ["patch"],
+      "automerge": true,
+      "platformAutomerge": true
+    },
+    {
+      "description": "Group all Helm chart updates from the dev values file into a single PR",
+      "groupName": "Helm Charts",
+      "matchManagers": ["custom.regex"],
+      "matchFileNames": ["operators-helm/values/values-dev.yaml"]
+    },
+    {
+      "description": "Group Terraform provider updates into a single PR",
+      "groupName": "Terraform Providers",
+      "matchManagers": ["terraform"]
+    }
+  ],
+  "customManagers": [
+    {
+      "description": "Update Helm chart versions in operator values files for dev cluster",
+      "customType": "regex",
+      "fileMatch": ["operators-helm/values/values-dev\\.yaml$"],
+      "matchStrings": [
+        "repoURL: (?<registryUrl>\\S+)\\n\\s+chart: (?<depName>\\S+)\\n\\s+targetRevision: (?<currentValue>\\S+)"
+      ],
+      "datasourceTemplate": "helm"
+    },
+    {
+      "description": "Update K3s version string in Terraform variables",
+      "customType": "regex",
+      "fileMatch": ["provisioning/terraform/variables\\.tf$"],
+      "matchStrings": [
+        "default\\s*=\\s*\"(?<currentValue>v\\d+\\.\\d+\\.\\d+\\+k3s1)\""
+      ],
+      "depNameTemplate": "k3s-io/k3s",
+      "datasourceTemplate": "github-releases"
+    },
+    {
+      "description": "Update Docker images in Kubernetes resource manifests",
+      "customType": "regex",
+      "fileMatch": ["operators-helm/operators/.*/resources/.*\\.yaml$"],
+      "matchStrings": [
+        "image: (?<depName>\\S+):(?<currentValue>\\S+)"
+      ],
+      "datasourceTemplate": "docker"
+    }
+  ]
+}
