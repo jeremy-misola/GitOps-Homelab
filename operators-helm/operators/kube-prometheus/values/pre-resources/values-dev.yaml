@@ -1,3 +1,4 @@
 gatewayName: dev-web
 envSuffix: "-dev"
 authentikUrl: https://auth-dev.jeremymr.dev
+grafanaCloudTokenKey: GRAFANA_CLOUD_DEV_TOKEN

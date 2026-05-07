@@ -147,6 +147,9 @@ operators:
     repoURL: https://open-telemetry.github.io/opentelemetry-helm-charts
     chart: opentelemetry-collector
     targetRevision: 0.143.0
+    preResources:
+      enabled: true
+      templated: true
 
   - name: blackbox-exporter
     namespace: monitoring
@@ -162,6 +165,7 @@ operators:
     chart: backstage
     targetRevision: 2.6.3
     preResources:
+      templated: true
       enabled: true
     postResources:
       enabled: true

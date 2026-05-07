@@ -15,7 +15,7 @@ The goal of this project is to explore and validate production-grade Kubernetes 
 - **Terraform + Ansible** — Full-stack IaC from bare-metal Proxmox VMs to running clusters
 - **Doppler + External Secrets** — Zero secrets in git, all injected at runtime
 - **OpenTelemetry + LGTM** — Unified observability (logs, traces, metrics)
-- **Crossplane** — In-cluster infrastructure orchestration
+- **Crossplane** — In-cluster IaC that provisions vCluster control planes, Garage S3 buckets, and Authentik OIDC applications
 
 ---
 
@@ -91,8 +91,8 @@ All operators deployed in sync-wave order across four layers.
 |------|-------------|---------|
 | 220 | **backstage** | Developer portal |
 | 230 | **adguard** | DNS-level ad-blocking |
-| 240 | **kubesandbox-backend** | Ephemeral sandbox environments (backend) |
-| 250 | **kubesandbox-frontend** | Ephemeral sandbox environments (frontend) |
+| 240 | **kubesandbox-backend** | Ephemeral sandbox environments — provisions vCluster control planes via Crossplane |
+| 250 | **kubesandbox-frontend** | Ephemeral sandbox environments — provisions vCluster control planes via Crossplane |
 | 260 | **portfolio** | Personal portfolio website |
 
 ---
@@ -131,9 +131,21 @@ Longhorn provides persistent volumes for Grafana and Loki, while Garage S3 store
 
 ---
 
-## Crossplane
+## In-Cluster Infrastructure as Code (Crossplane)
 
-Crossplane manages infrastructure directly from Kubernetes using provider-helm, provider-kubernetes, and provider-terraform. Composite resources handle ephemeral sandbox environments (KubeSandbox), OIDC application registration in Authentik, S3 bucket provisioning in Garage, and Longhorn backup authentication.
+Crossplane runs Terraform and Helm providers inside the cluster, turning infrastructure into Kubernetes-native resources that are fully managed through GitOps.
+
+### vCluster — Ephemeral Control Planes
+
+Each KubeSandbox session provisions an isolated Kubernetes control plane as a vCluster Helm release. A single `KubeSandboxSession` composite resource creates the namespace, ResourceQuota, hardened shell pod, default-deny network policy, and vCluster — all deployed as one atomic unit with a configurable TTL.
+
+### Garage — Declarative S3 Buckets
+
+S3 buckets and access keys in Garage are managed as Crossplane Terraform Workspaces. Declare a bucket in git, Crossplane executes the Terraform provider in-cluster, and the resulting credentials are written to a Kubernetes Secret — ready for applications to consume without manual intervention.
+
+### Authentik — Automated OIDC Registration
+
+Authentik OIDC applications (clients, providers, scopes) are registered through Crossplane Terraform Workspaces. The generated client ID and secret are stored directly as Kubernetes Secrets, referenced by Envoy Gateway SecurityPolicies for per-service SSO.
 
 ---
 

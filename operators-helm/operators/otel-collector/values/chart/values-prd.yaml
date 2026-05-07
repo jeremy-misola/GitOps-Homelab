@@ -52,23 +52,41 @@ config:
       send_batch_size: 1000
       timeout: 10s
 
+  extensions:
+    health_check: {}
+
   exporters:
+    # Self-hosted Loki
     otlphttp/loki:
-      endpoint: http://loki-stack-gateway.loki.svc.cluster.local:80/otlp
+      endpoint: http://loki-helm-stack-gateway.loki.svc.cluster.local:80/otlp
       headers:
-        X-Scope-OrgID: "1" 
+        X-Scope-OrgID: "1"
+    # Self-hosted Tempo
     otlp/tempo:
-      endpoint: tempo.tempo.svc.cluster.local:4317
+      endpoint: tempo-helm.tempo.svc.cluster.local:4317
       tls:
         insecure: true
+    # Grafana Cloud - logs & traces via OTLP
+    otlphttp/grafana:
+      endpoint: https://otlp-gateway-prod-ca-east-0.grafana.net/otlp
+      headers:
+        authorization: "${env:GRAFANA_CLOUD_BASIC_AUTH_HEADER}"
 
   service:
+    extensions: [health_check]
     pipelines:
       logs:
         receivers: [otlp, filelog]
         processors: [k8sattributes, batch]
-        exporters: [otlphttp/loki]
+        exporters: [otlphttp/loki, otlphttp/grafana]
       traces:
         receivers: [otlp]
         processors: [k8sattributes, batch]
-        exporters: [otlp/tempo]
+        exporters: [otlp/tempo, otlphttp/grafana]
+
+extraEnvs:
+  - name: GRAFANA_CLOUD_BASIC_AUTH_HEADER
+    valueFrom:
+      secretKeyRef:
+        name: grafana-cloud-otel
+        key: basic-auth-header

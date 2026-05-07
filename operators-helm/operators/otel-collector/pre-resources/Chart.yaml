@@ -1,0 +1,6 @@
+apiVersion: v2
+name: otel-collector-pre-resources
+description: Pre-resources for the OpenTelemetry Collector (Grafana Cloud OTel credentials)
+type: application
+version: 0.1.0
+appVersion: "1.0"
