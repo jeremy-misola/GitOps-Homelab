@@ -11,9 +11,6 @@ spec:
     name: grafana-cloud-otel
     creationPolicy: Owner
   data:
-  - secretKey: username
+  - secretKey: basic-auth-header
     remoteRef:
-      key: GRAFANA_USERNAME
-  - secretKey: password
-    remoteRef:
-      key: {{ .Values.grafanaCloudTokenKey }}
+      key: GRAFANA_CLOUD_BASIC_AUTH_HEADER
