@@ -3,6 +3,7 @@
   "extends": [
     "config:recommended"
   ],
+  "repositories": ["jeremy-misola/GitOps-Homelab"],
   "labels": ["dependencies"],
   "schedule": ["before 9am on Monday"],
   "timezone": "America/Toronto",
