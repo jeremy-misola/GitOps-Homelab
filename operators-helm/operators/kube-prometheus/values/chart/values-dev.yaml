@@ -137,5 +137,5 @@ prometheus:
           password:
             name: grafana-cloud-token
             key: access-token
-  externalLabels:
+    externalLabels:
       cluster: dev
