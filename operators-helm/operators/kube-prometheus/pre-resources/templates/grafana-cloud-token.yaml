@@ -14,10 +14,7 @@ spec:
   - secretKey: access-token
     remoteRef:
       key: {{ .Values.grafanaCloudTokenKey }}
-  - secretKey: admin-user
-    remoteRef:
-      key: GRAFANA_ADMIN_USER
-  - secretKey: username
+  - secretKey: prometheus-username
     remoteRef:
       key: GRAFANA_USERNAME
 
