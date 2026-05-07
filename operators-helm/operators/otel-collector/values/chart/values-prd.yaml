@@ -53,6 +53,7 @@ config:
       timeout: 10s
 
   extensions:
+    health_check: {}
     basicauth/grafana:
       client_auth:
         username: "${env:GRAFANA_CLOUD_USERNAME}"
@@ -76,7 +77,7 @@ config:
         authenticator: basicauth/grafana
 
   service:
-    extensions: [basicauth/grafana]
+    extensions: [health_check, basicauth/grafana]
     pipelines:
       logs:
         receivers: [otlp, filelog]
