@@ -9,8 +9,9 @@
   "enabledManagers": ["custom.regex", "terraform", "github-actions"],
   "packageRules": [
     {
-      "description": "Auto-merge patch updates silently",
-      "matchUpdateTypes": ["patch"],
+      "description": "Group patch and minor updates into a single PR",
+      "matchUpdateTypes": ["patch", "minor"],
+      "groupName": "patch and minor updates",
       "automerge": true,
       "platformAutomerge": true
     },
