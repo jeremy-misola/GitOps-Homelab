@@ -122,3 +122,14 @@ grafana:
       name_attribute_path: name
       # Optionally map user groups to Grafana roles
       role_attribute_path: contains(groups, 'Grafana Admins') && 'Admin' || contains(groups, 'Grafana Editors') && 'Editor' || 'Viewer'
+prometheus:
+  prometheusSpec:
+    remoteWrite:
+      - url: https://misolarellinj06.grafana.net/api/prom/push
+        basicAuth:
+          username:
+            name: grafana-cloud-token
+            key: prometheus-username
+          password:
+            name: grafana-cloud-token
+            key: api-token
