@@ -72,7 +72,7 @@ variable "ssh_public_keys" {
 variable "k3s_version" {
   description = "K3s version to install on both clusters"
   type        = string
-  default     = "v1.31.12+k3s1"
+  default     = "v1.36.1+k3s1"
 }
 
 variable "extra_server_args" {
