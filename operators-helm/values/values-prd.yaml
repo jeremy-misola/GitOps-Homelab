@@ -206,4 +206,4 @@ operators:
     syncWave: 260
     repoURL: docker.io/jurassicjey
     chart: portfolio-helm
-    targetRevision: 0.1.1779408941-13595f8
+    targetRevision: 0.1.1779414165-e96116f
