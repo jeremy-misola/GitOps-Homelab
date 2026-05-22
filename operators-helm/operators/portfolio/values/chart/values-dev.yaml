@@ -1,0 +1,22 @@
+replicaCount: 1
+
+httpRoute:
+  parentRefs:
+    - name: dev-web
+      namespace: envoy-gateway-system
+  hostnames:
+    - portfolio-dev.jeremymr.dev
+
+cnpg:
+  instances: 1
+  storage:
+    size: 5Gi
+    storageClass: longhorn
+
+resources:
+  requests:
+    cpu: "100m"
+    memory: "256Mi"
+  limits:
+    cpu: "300m"
+    memory: "512Mi"

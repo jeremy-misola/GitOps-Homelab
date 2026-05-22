@@ -204,5 +204,6 @@ operators:
   - name: portfolio
     namespace: portfolio
     syncWave: 260
-    postResources:
-      enabled: true
+    repoURL: docker.io/jurassicjey
+    chart: portfolio-helm
+    targetRevision: 0.1.1779408941-13595f8
