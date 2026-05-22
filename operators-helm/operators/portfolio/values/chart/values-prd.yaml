@@ -1,5 +1,5 @@
 image:
-  tag: sha-13595f8
+  tag: latest
 
 replicaCount: 3
 
