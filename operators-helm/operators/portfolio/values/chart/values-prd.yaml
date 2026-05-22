@@ -1,3 +1,6 @@
+image:
+  tag: sha-13595f8
+
 replicaCount: 3
 
 httpRoute:

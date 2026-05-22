@@ -1,3 +1,6 @@
+image:
+  tag: latest
+
 replicaCount: 1
 
 httpRoute:
