@@ -7,7 +7,7 @@ operators:
     syncWave: 10
     repoURL: https://charts.external-secrets.io
     chart: external-secrets
-    targetRevision: 2.4.1
+    targetRevision: 2.5.0
     postResources:
       enabled: true
 
@@ -16,7 +16,7 @@ operators:
     syncWave: 20
     repoURL: https://metallb.github.io/metallb
     chart: metallb
-    targetRevision: 0.15.3
+    targetRevision: 0.16.0
     postResources:
       enabled: true
       templated: true
@@ -44,7 +44,7 @@ operators:
     syncWave: 50
     repoURL: https://charts.crossplane.io/stable
     chart: crossplane
-    targetRevision: 1.20.7
+    targetRevision: 1.20.8
     preResources:
       enabled: true
     postResources:
@@ -99,7 +99,7 @@ operators:
     syncWave: 110
     repoURL: https://open-telemetry.github.io/opentelemetry-helm-charts
     chart: opentelemetry-operator
-    targetRevision: 0.112.1
+    targetRevision: 0.113.1
     postResources:
       enabled: true
       syncWave: 205
@@ -139,14 +139,14 @@ operators:
     syncWave: 190
     repoURL: https://cloudnative-pg.io/charts/
     chart: cloudnative-pg
-    targetRevision: 0.28.0
+    targetRevision: 0.28.2
 
   - name: otel-collector
     namespace: opentelemetry-collector
     syncWave: 200
     repoURL: https://open-telemetry.github.io/opentelemetry-helm-charts
     chart: opentelemetry-collector
-    targetRevision: 0.153.0
+    targetRevision: 0.156.2
     preResources:
       enabled: true
       templated: true
