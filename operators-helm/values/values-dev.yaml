@@ -157,6 +157,10 @@ operators:
     repoURL: https://prometheus-community.github.io/helm-charts
     chart: prometheus-blackbox-exporter
     targetRevision: 11.7.0
+    
+#################################
+############ APPS ###############
+#################################
 
   - name: backstage
     namespace: backstage
@@ -177,6 +181,19 @@ operators:
     repoURL: oci://ghcr.io/gabe565/charts/adguard-home
     chart: adguard
     targetRevision: 0.3.25
+    preResources:
+      enabled: true
+      templated: true
+    postResources:
+      enabled: true
+      templated: true
+
+  - name: nextcloud
+    namespace: nextcloud
+    syncWave: 235
+    repoURL: https://nextcloud.github.io/helm/
+    chart: nextcloud
+    targetRevision: 9.1.0
     preResources:
       enabled: true
       templated: true
