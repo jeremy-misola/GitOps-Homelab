@@ -3,7 +3,7 @@ kind: CompositeResourceDefinition
 metadata:
   name: xkubesandboxsessions.platform.kubesandbox.com
   annotations:
-    argocd.argoproj.io/sync-wave: "18"
+    argocd.argoproj.io/sync-wave: "25"
 spec:
   group: platform.kubesandbox.com
   names:
