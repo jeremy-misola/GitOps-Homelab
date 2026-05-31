@@ -32,6 +32,7 @@ operators:
     postResources:
       enabled: true
 
+  # My poor 1tb storage cannot do longhorn :(
   # - name: longhorn
   #   namespace: longhorn-system
   #   syncWave: 40
