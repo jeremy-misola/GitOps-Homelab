@@ -184,19 +184,6 @@ operators:
       enabled: true
       templated: true
 
-  - name: nextcloud
-    namespace: nextcloud
-    syncWave: 235
-    repoURL: https://nextcloud.github.io/helm/
-    chart: nextcloud
-    targetRevision: 9.1.0
-    preResources:
-      enabled: true
-      templated: true
-    postResources:
-      enabled: true
-      templated: true
-
   - name: kubesandbox-backend
     namespace: kubesandbox
     syncWave: 240
@@ -210,6 +197,19 @@ operators:
     repoURL: https://jeremy-misola.github.io/kubesandbox/
     chart: kubesandbox-frontend
     targetRevision: 0.1.6
+    postResources:
+      enabled: true
+      templated: true
+
+  - name: immich
+    namespace: immich
+    syncWave: 236
+    repoURL: oci://ghcr.io/immich-app/immich-charts
+    chart: immich
+    targetRevision: 0.12.0
+    preResources:
+      enabled: true
+      templated: true
     postResources:
       enabled: true
       templated: true

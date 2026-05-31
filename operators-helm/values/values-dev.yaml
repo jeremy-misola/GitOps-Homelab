@@ -218,6 +218,19 @@ operators:
       enabled: true
       templated: true
 
+  - name: immich
+    namespace: immich
+    syncWave: 236
+    repoURL: oci://ghcr.io/immich-app/immich-charts
+    chart: immich
+    targetRevision: 0.12.0
+    preResources:
+      enabled: true
+      templated: true
+    postResources:
+      enabled: true
+      templated: true
+
   - name: portfolio
     namespace: portfolio
     syncWave: 260

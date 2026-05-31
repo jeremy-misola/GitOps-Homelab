@@ -1,0 +1,4 @@
+envSuffix: ""
+librarySize: 50Gi
+cnpgInstances: 3
+cnpgStorage: 30Gi
