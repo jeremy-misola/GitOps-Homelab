@@ -488,12 +488,12 @@ spec:
 
           - name: shell-httproute
             base:
-              apiVersion: kubernetes.crossplane.io/v1alpha2
+              apiVersion:
               kind: Object
               metadata:
                 name: placeholder
                 annotations:
-                  argocd.argoproj.io/sync-wave: "25"
+                  argocd.argoproj.io/sync-wave: "18"
               spec:
                 providerConfigRef:
                   name: kubernetes-incluster
