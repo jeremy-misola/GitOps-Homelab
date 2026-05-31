@@ -32,12 +32,12 @@ operators:
     postResources:
       enabled: true
 
-  - name: longhorn
-    namespace: longhorn-system
-    syncWave: 40
-    repoURL: https://charts.longhorn.io
-    chart: longhorn
-    targetRevision: 1.11.1
+  # - name: longhorn
+  #   namespace: longhorn-system
+  #   syncWave: 40
+  #   repoURL: https://charts.longhorn.io
+  #   chart: longhorn
+  #   targetRevision: 1.11.1
 
   - name: crossplane
     namespace: crossplane-system
