@@ -54,6 +54,7 @@ spec:
 
       resource "authentik_provider_oauth2" "immich" {
         name               = "Immich"
+        client_id          = "immich"
         authorization_flow = data.authentik_flow.authorization.id
         invalidation_flow  = data.authentik_flow.invalidation.id
         client_type        = "confidential"
