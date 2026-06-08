@@ -10,7 +10,6 @@ spec:
   instances: {{ .Values.cnpgInstances }}
   storage:
     size: {{ .Values.cnpgStorage }}
-    storageClass: longhorn
   enableSuperuserAccess: true
   bootstrap:
     initdb:
