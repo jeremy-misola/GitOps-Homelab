@@ -81,7 +81,6 @@ valkey:
       size: 1Gi
       type: emptyDir
       accessMode: ReadWriteOnce
-      storageClass: longhorn
 
 server:
   enabled: true
