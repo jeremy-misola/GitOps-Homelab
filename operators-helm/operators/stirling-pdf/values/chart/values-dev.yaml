@@ -59,7 +59,13 @@ securityContext:
 
 containerSecurityContext: {}
 
-resources: {}
+resources:
+  requests:
+    memory: 1Gi
+    cpu: 500m
+  limits:
+    memory: 2Gi
+    cpu: 2000m
 
 probes:
   liveness:
