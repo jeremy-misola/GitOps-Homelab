@@ -23,6 +23,36 @@ persistence:
 configuration:
   enabled: true
 
+initContainers:
+  - name: install-hacs
+    image: ubuntu:24.04
+    command:
+      - /bin/bash
+      - -lc
+      - |
+        set -euo pipefail
+        export DEBIAN_FRONTEND=noninteractive
+        apt-get update
+        apt-get install -y --no-install-recommends wget ca-certificates
+        mkdir -p /config/custom_components
+        cd /tmp
+        wget -O - https://get.hacs.xyz | bash -
+        rm -rf /config/custom_components/hacs
+        cp -R /tmp/hacs /config/custom_components/hacs
+    volumeMounts:
+      - name: home-assistant
+        mountPath: /config
+      - name: hacs-tmp
+        mountPath: /tmp
+
+additionalVolumes:
+  - name: hacs-tmp
+    emptyDir: {}
+
+additionalMounts:
+  - name: hacs-tmp
+    mountPath: /tmp
+
 resources:
   requests:
     cpu: 100m
