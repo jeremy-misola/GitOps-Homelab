@@ -1,4 +1,4 @@
 envSuffix: "-dev"
-librarySize: 5Gi
+librarySize: 10Gi
 cnpgInstances: 1
-cnpgStorage: 5Gi
+cnpgStorage: 10Gi
