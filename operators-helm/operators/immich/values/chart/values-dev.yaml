@@ -5,6 +5,7 @@ controllers:
         image:
           tag: v2.6.3
         env:
+          HOST: "0.0.0.0"
           REDIS_HOSTNAME: '{{ printf "%s-valkey" .Release.Name }}'
           IMMICH_MACHINE_LEARNING_URL: '{{ printf "http://%s-machine-learning:3003" .Release.Name }}'
           DB_HOSTNAME:
