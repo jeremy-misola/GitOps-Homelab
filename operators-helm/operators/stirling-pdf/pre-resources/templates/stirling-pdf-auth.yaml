@@ -4,10 +4,9 @@ metadata:
   name: stirling-pdf-auth
   namespace: {{ .Release.Namespace }}
   annotations:
-    argocd.argoproj.io/sync-wave: "25"
+    argocd.argoproj.io/sync-wave: "17"
 spec:
   forProvider:
-    # Inline Terraform configuration for Authentik OIDC app
     source: Inline
     module: |
       terraform {
@@ -36,6 +35,10 @@ spec:
         type = string
       }
 
+      variable "env_suffix" {
+        type = string
+      }
+
       provider "authentik" {
         url   = var.authentik_url
         token = var.authentik_token
@@ -49,13 +52,12 @@ spec:
         slug = var.invalidation_flow
       }
 
-      # Create OIDC Provider
       resource "authentik_provider_oauth2" "stirling_pdf" {
         name               = "Stirling PDF"
+        client_id          = "stirling-pdf"
         authorization_flow = data.authentik_flow.authorization.id
         invalidation_flow  = data.authentik_flow.invalidation.id
         client_type        = "confidential"
-        client_id          = "stirling-pdf"
 
         allowed_redirect_uris = [
           {
@@ -65,15 +67,13 @@ spec:
         ]
       }
 
-      # Create Application
       resource "authentik_application" "stirling_pdf" {
-        name              = "Stirling PDF"
-        slug              = "stirling-pdf"
-        protocol_provider = authentik_provider_oauth2.stirling_pdf.id
+        name               = "Stirling PDF"
+        slug               = "stirling-pdf"
+        protocol_provider  = authentik_provider_oauth2.stirling_pdf.id
         policy_engine_mode = "any"
       }
 
-      # Outputs for Kubernetes secret (keys must use hyphens for Envoy Gateway SecurityPolicy)
       output "client-id" {
         value = authentik_provider_oauth2.stirling_pdf.client_id
       }
@@ -85,13 +85,14 @@ spec:
 
     vars:
       - key: authentik_url
-        value: "{{ .Values.authentikUrl }}"
+        value: "https://auth{{ .Values.envSuffix }}.jeremymr.dev"
       - key: authorization_flow
         value: "default-provider-authorization-explicit-consent"
       - key: invalidation_flow
         value: "default-provider-invalidation-flow"
       - key: env_suffix
         value: "{{ .Values.envSuffix }}"
+
     env:
       - name: TF_VAR_authentik_token
         secretKeyRef:
@@ -99,7 +100,6 @@ spec:
           name: authentik-api-token
           key: token
 
-  # Write outputs to a secret that can be used by SecurityPolicy
   writeConnectionSecretToRef:
     name: stirling-pdf-client-secret
     namespace: stirling-pdf

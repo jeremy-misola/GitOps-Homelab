@@ -169,6 +169,12 @@ operators:
     repoURL: https://docs.stirlingpdf.com/Stirling-PDF-chart/
     chart: stirling-pdf-chart
     targetRevision: 3.1.0
+    preResources:
+      enabled: true
+      templated: true
+    postResources:
+      enabled: true
+      templated: true
 
   - name: backstage
     namespace: backstage

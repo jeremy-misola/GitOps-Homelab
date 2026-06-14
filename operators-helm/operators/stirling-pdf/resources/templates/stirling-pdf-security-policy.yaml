@@ -2,7 +2,7 @@ apiVersion: gateway.envoyproxy.io/v1alpha1
 kind: SecurityPolicy
 metadata:
   name: stirling-pdf-oidc-config
-  namespace: stirling-pdf
+  namespace: {{ .Release.Namespace }}
   annotations:
     # Crossplane creates the secret, so we need to ensure it exists first
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
@@ -14,8 +14,7 @@ spec:
   oidc:
     provider:
       issuer: "https://auth{{ .Values.envSuffix }}.jeremymr.dev/application/o/stirling-pdf/"
-    # Client ID and Secret are managed by Crossplane Workspace
-    # The secret is created by: operators-helm/operators/crossplane/resources/templates/stirling-pdf-auth.yaml
+    # Client ID and Secret are managed by Crossplane Workspace in pre-resources
     # Secret keys must be "client-id" and "client-secret" (hyphens, not underscores)
     clientIDRef:
       name: stirling-pdf-client-secret
