@@ -224,6 +224,13 @@ operators:
       enabled: true
       templated: true
 
+  - name: home-assistant
+    namespace: home-assistant
+    syncWave: 220
+    repoURL: http://pajikos.github.io/home-assistant-helm-chart
+    chart: home-assistant
+    targetRevision: 0.3.66
+
   - name: portfolio
     namespace: portfolio
     syncWave: 220

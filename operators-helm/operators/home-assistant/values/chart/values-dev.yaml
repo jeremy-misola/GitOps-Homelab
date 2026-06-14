@@ -1,0 +1,32 @@
+fullnameOverride: home-assistant
+
+env:
+  - name: TZ
+    value: America/Toronto
+
+service:
+  type: ClusterIP
+  port: 8123
+
+httpRoute:
+  enabled: true
+  parentRefs:
+    - name: dev-web
+      namespace: envoy-gateway-system
+  hostnames:
+    - home-assistant-dev.jeremymr.dev
+
+persistence:
+  enabled: true
+  size: 10Gi
+
+configuration:
+  enabled: true
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 768Mi
