@@ -1,1 +1,2 @@
-# No chart overrides for dev.
+# Chart overrides for dev environment
+# No overrides needed - defaults in Chart.yaml/values.yaml are sufficient

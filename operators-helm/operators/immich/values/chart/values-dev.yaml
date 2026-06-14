@@ -1,5 +1,3 @@
-fullnameOverride: immich
-
 controllers:
   main:
     containers:
@@ -54,6 +52,8 @@ controllers:
             value: path
 
 immich:
+  metrics:
+    enabled: false
   persistence:
     library:
       existingClaim: immich-library
@@ -64,9 +64,10 @@ immich:
     storageTemplate:
       enabled: true
       template: "{{y}}/{{y}}-{{MM}}-{{dd}}/{{filename}}"
+  configurationKind: ConfigMap
 
 valkey:
-  enabled: true
+  enabled: false
   controllers:
     main:
       containers:
@@ -117,56 +118,3 @@ machine-learning:
 
 microservices:
   enabled: true
-  controllers:
-    main:
-      containers:
-        main:
-          image:
-            repository: ghcr.io/immich-app/immich-server
-            pullPolicy: IfNotPresent
-          env:
-            REDIS_HOSTNAME: '{{ printf "%s-valkey" .Release.Name }}'
-            IMMICH_MACHINE_LEARNING_URL: '{{ printf "http://%s-machine-learning:3003" .Release.Name }}'
-            DB_HOSTNAME:
-              valueFrom:
-                secretKeyRef:
-                  name: immich-db-credentials
-                  key: host
-            DB_DATABASE_NAME:
-              value: immich
-            DB_USERNAME:
-              valueFrom:
-                secretKeyRef:
-                  name: immich-db-credentials
-                  key: username
-            DB_PASSWORD:
-              valueFrom:
-                secretKeyRef:
-                  name: immich-db-credentials
-                  key: password
-            DB_VECTOR_EXTENSION:
-              value: pgvector
-            IMMICH_S3_ENDPOINT:
-              valueFrom:
-                secretKeyRef:
-                  name: immich-s3-credentials
-                  key: host
-            IMMICH_S3_BUCKET:
-              valueFrom:
-                secretKeyRef:
-                  name: immich-s3-credentials
-                  key: bucket
-            IMMICH_S3_ACCESS_KEY:
-              valueFrom:
-                secretKeyRef:
-                  name: immich-s3-credentials
-                  key: accessKey
-            IMMICH_S3_SECRET_KEY:
-              valueFrom:
-                secretKeyRef:
-                  name: immich-s3-credentials
-                  key: secretKey
-            IMMICH_S3_REGION:
-              value: garage
-            IMMICH_S3_ADDRESSING_STYLE:
-              value: path
