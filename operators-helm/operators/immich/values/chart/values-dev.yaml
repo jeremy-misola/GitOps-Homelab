@@ -67,7 +67,7 @@ immich:
   configurationKind: ConfigMap
 
 valkey:
-  enabled: false
+  enabled: true
   controllers:
     main:
       containers:
