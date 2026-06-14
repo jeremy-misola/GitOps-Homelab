@@ -35,7 +35,7 @@ spec:
         type = string
       }
 
-      variable "immich_url" {
+      variable "env_suffix" {
         type = string
       }
 
@@ -62,7 +62,7 @@ spec:
         allowed_redirect_uris = [
           {
             matching_mode = "strict"
-            url           = "https://${var.immich_url}/auth/login"
+            url           = "https://photos${var.env_suffix}.jeremymr.dev/oauth2/callback"
           }
         ]
       }
@@ -83,10 +83,6 @@ spec:
         sensitive = true
       }
 
-      output "immich-url" {
-        value = var.immich_url
-      }
-
     vars:
       - key: authentik_url
         value: "https://auth{{ .Values.envSuffix }}.jeremymr.dev"
@@ -94,8 +90,8 @@ spec:
         value: "default-provider-authorization-explicit-consent"
       - key: invalidation_flow
         value: "default-provider-invalidation-flow"
-      - key: immich_url
-        value: "photos{{ .Values.envSuffix }}.jeremymr.dev"
+      - key: env_suffix
+        value: "{{ .Values.envSuffix }}"
 
     env:
       - name: TF_VAR_authentik_token
@@ -105,7 +101,7 @@ spec:
           key: token
 
   writeConnectionSecretToRef:
-    name: immich-oidc-credentials
+    name: immich-client-secret
     namespace: immich
 
   providerConfigRef:

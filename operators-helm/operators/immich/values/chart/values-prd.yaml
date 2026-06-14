@@ -51,6 +51,27 @@ controllers:
             value: garage
           IMMICH_S3_ADDRESSING_STYLE:
             value: path
+          # OIDC (Authentik) - handled at Envoy gateway level via SecurityPolicy
+          IMMICH_OAUTH_ENABLED:
+            value: "true"
+          IMMICH_OAUTH_CLIENT_ID:
+            valueFrom:
+              secretKeyRef:
+                name: immich-client-secret
+                key: client-id
+          IMMICH_OAUTH_CLIENT_SECRET:
+            valueFrom:
+              secretKeyRef:
+                name: immich-client-secret
+                key: client-secret
+          IMMICH_OAUTH_ISSUER_URL:
+            value: "https://auth.jeremymr.dev/application/o/immich/"
+          IMMICH_OAUTH_REDIRECT_URI:
+            value: "https://photos.jeremymr.dev/oauth2/callback"
+          IMMICH_OAUTH_AUTO_REGISTRATION:
+            value: "true"
+          IMMICH_OAUTH_BUTTON_TEXT:
+            value: "Sign in with Authentik"
 
 immich:
   metrics:
