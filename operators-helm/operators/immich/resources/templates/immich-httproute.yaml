@@ -11,5 +11,5 @@ spec:
     - photos{{ .Values.envSuffix }}.jeremymr.dev
   rules:
   - backendRefs:
-    - name: immich-server
-      port: 3001
+    - name: immich-helm-server
+      port: 2283
