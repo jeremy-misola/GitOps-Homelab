@@ -70,7 +70,7 @@ resources:
 probes:
   liveness:
     enabled: true
-    initialDelaySeconds: 5
+    initialDelaySeconds: 60
     periodSeconds: 10
     timeoutSeconds: 1
     successThreshold: 1
@@ -79,7 +79,7 @@ probes:
     scheme: HTTP
   readiness:
     enabled: true
-    initialDelaySeconds: 5
+    initialDelaySeconds: 60
     periodSeconds: 10
     timeoutSeconds: 1
     successThreshold: 1
