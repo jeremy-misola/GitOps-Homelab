@@ -33,7 +33,7 @@ initContainers:
         set -euo pipefail
         export DEBIAN_FRONTEND=noninteractive
         apt-get update
-        apt-get install -y --no-install-recommends wget ca-certificates
+        apt-get install -y --no-install-recommends wget ca-certificates unzip
         mkdir -p /config/custom_components
         cd /tmp
         wget -O - https://get.hacs.xyz | bash -
