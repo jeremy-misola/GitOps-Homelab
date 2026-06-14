@@ -35,10 +35,8 @@ initContainers:
         apt-get update
         apt-get install -y --no-install-recommends wget ca-certificates unzip
         mkdir -p /config/custom_components
-        cd /tmp
+        cd /config/custom_components
         wget -O - https://get.hacs.xyz | bash -
-        rm -rf /config/custom_components/hacs
-        cp -R /tmp/hacs /config/custom_components/hacs
     volumeMounts:
       - name: home-assistant
         mountPath: /config
