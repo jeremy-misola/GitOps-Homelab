@@ -1,0 +1,25 @@
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: SecurityPolicy
+metadata:
+  name: stirling-pdf-oidc-config
+  namespace: stirling-pdf
+  annotations:
+    # Crossplane creates the secret, so we need to ensure it exists first
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: stirling-pdf-route
+  oidc:
+    provider:
+      issuer: "https://auth{{ .Values.envSuffix }}.jeremymr.dev/application/o/stirling-pdf/"
+    # Client ID and Secret are managed by Crossplane Workspace
+    # The secret is created by: operators-helm/operators/crossplane/resources/templates/stirling-pdf-auth.yaml
+    # Secret keys must be "client-id" and "client-secret" (hyphens, not underscores)
+    clientIDRef:
+      name: stirling-pdf-client-secret
+    clientSecret:
+      name: stirling-pdf-client-secret
+    redirectURL: "https://stirling-pdf{{ .Values.envSuffix }}.jeremymr.dev/oauth2/callback"
+    logoutPath: "/logout"

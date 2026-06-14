@@ -158,6 +158,13 @@ operators:
     chart: prometheus-blackbox-exporter
     targetRevision: 11.7.0
 
+  - name: stirling-pdf
+    namespace: stirling-pdf
+    syncWave: 220
+    repoURL: https://docs.stirlingpdf.com/Stirling-PDF-chart/
+    chart: stirling-pdf-chart
+    targetRevision: 3.1.0
+
   - name: backstage
     namespace: backstage
     syncWave: 220
@@ -173,7 +180,7 @@ operators:
 
   - name: adguard
     namespace: adguard
-    syncWave: 230
+    syncWave: 220
     repoURL: oci://ghcr.io/gabe565/charts/adguard-home
     chart: adguard
     targetRevision: 0.3.25
@@ -186,21 +193,21 @@ operators:
 
   - name: kubesandbox-backend
     namespace: kubesandbox
-    syncWave: 240
+    syncWave: 220
     repoURL: https://jeremy-misola.github.io/kubesandbox/
     chart: kubesandbox-backend
     targetRevision: 0.1.5
 
   - name: kubesandbox-frontend
     namespace: kubesandbox
-    syncWave: 250
+    syncWave: 220
     repoURL: https://jeremy-misola.github.io/kubesandbox/
     chart: kubesandbox-frontend
     targetRevision: 0.1.6
 
   - name: immich
     namespace: immich
-    syncWave: 236
+    syncWave: 220
     repoURL: https://immich-app.github.io/immich-charts
     chart: immich
     targetRevision: 0.12.0
@@ -213,7 +220,7 @@ operators:
 
   - name: portfolio
     namespace: portfolio
-    syncWave: 260
+    syncWave: 220
     repoURL: docker.io/jurassicjey
     chart: portfolio-helm
     targetRevision: 0.1.1779414165-e96116f
