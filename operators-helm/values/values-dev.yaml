@@ -215,6 +215,13 @@ operators:
       enabled: true
       templated: true
 
+  - name: home-assistant
+    namespace: home-assistant
+    syncWave: 220
+    repoURL: http://pajikos.github.io/home-assistant-helm-chart
+    chart: home-assistant
+    targetRevision: 0.3.66
+
   - name: kubesandbox-backend
     namespace: kubesandbox
     syncWave: 220
@@ -248,3 +255,16 @@ operators:
     repoURL: docker.io/jurassicjey
     chart: portfolio-helm
     targetRevision: 0.1.1779414165-e96116f
+
+  - name: code-server
+    namespace: code-server
+    syncWave: 220
+    repoURL: https://general-intelligence-systems.github.io/code-server-helm
+    chart: code-server
+    targetRevision: 3.38.0
+    preResources:
+      enabled: true
+      templated: true
+    postResources:
+      enabled: true
+      templated: true
