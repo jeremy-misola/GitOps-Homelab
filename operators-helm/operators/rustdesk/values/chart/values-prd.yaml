@@ -1,0 +1,22 @@
+fullnameOverride: rustdesk
+
+service:
+  type: LoadBalancer
+  externalTrafficPolicy: Cluster
+  enableWebClientSupport: true
+
+resources:
+  hbbrResource:
+    requests:
+      cpu: 25m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
+  hbbsResource:
+    requests:
+      cpu: 25m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi

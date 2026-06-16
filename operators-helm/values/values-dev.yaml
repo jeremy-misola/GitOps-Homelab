@@ -255,3 +255,13 @@ operators:
     repoURL: docker.io/jurassicjey
     chart: portfolio-helm
     targetRevision: 0.1.1779414165-e96116f
+
+  - name: rustdesk
+    namespace: rustdesk
+    syncWave: 220
+    repoURL: https://schich.tel/helm-charts
+    chart: rustdesk-server-oss
+    targetRevision: 0.2.4
+    postResources:
+      enabled: true
+      templated: true
