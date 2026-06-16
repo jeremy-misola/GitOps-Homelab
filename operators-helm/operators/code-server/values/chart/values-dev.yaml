@@ -7,6 +7,10 @@ image:
   tag: "4.123.0"
   pullPolicy: IfNotPresent
 
+extraArgs:
+  - --auth
+  - none
+
 service:
   type: ClusterIP
   port: 8080

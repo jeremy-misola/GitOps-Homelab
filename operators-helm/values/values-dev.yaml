@@ -262,6 +262,9 @@ operators:
     repoURL: https://general-intelligence-systems.github.io/code-server-helm
     chart: code-server
     targetRevision: 3.38.0
+    preResources:
+      enabled: true
+      templated: true
     postResources:
       enabled: true
       templated: true

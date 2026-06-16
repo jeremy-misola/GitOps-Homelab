@@ -1,6 +1,6 @@
 apiVersion: v2
 name: code-server-resources
-description: Managed resources for code-server
+description: Managed resources for code-server (Envoy OIDC)
 type: application
 version: 0.1.0
-appVersion: "1.0.0"
+appVersion: "1.0"
