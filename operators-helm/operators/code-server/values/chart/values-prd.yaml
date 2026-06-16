@@ -1,0 +1,35 @@
+fullnameOverride: code-server
+
+replicaCount: 1
+
+image:
+  repository: codercom/code-server
+  tag: "4.123.0"
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 8080
+
+persistence:
+  enabled: true
+  accessMode: ReadWriteOnce
+  size: 10Gi
+
+securityContext:
+  enabled: true
+  fsGroup: 1000
+  runAsUser: 1000
+
+volumePermissions:
+  enabled: true
+  securityContext:
+    runAsUser: 0
+
+resources:
+  requests:
+    cpu: 250m
+    memory: 512Mi
+  limits:
+    cpu: 1000m
+    memory: 2Gi

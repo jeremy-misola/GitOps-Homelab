@@ -256,3 +256,12 @@ operators:
     chart: portfolio-helm
     targetRevision: 0.1.1779414165-e96116f
 
+  - name: code-server
+    namespace: code-server
+    syncWave: 220
+    repoURL: https://general-intelligence-systems.github.io/code-server-helm
+    chart: code-server
+    targetRevision: 2.1.0
+    postResources:
+      enabled: true
+      templated: true
