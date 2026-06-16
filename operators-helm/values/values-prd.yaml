@@ -243,7 +243,7 @@ operators:
     syncWave: 220
     repoURL: https://general-intelligence-systems.github.io/code-server-helm
     chart: code-server
-    targetRevision: 2.1.0
+    targetRevision: 3.38.0
     postResources:
       enabled: true
       templated: true
