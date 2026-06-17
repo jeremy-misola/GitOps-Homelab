@@ -230,6 +230,9 @@ operators:
     repoURL: https://guerzon.github.io/vaultwarden
     chart: vaultwarden
     targetRevision: 0.39.0
+    postResources:
+      enabled: true
+      templated: true
 
   - name: home-assistant
     namespace: home-assistant
