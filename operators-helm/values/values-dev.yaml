@@ -249,6 +249,13 @@ operators:
       enabled: true
       templated: true
 
+  - name: vaultwarden
+    namespace: vaultwarden
+    syncWave: 220
+    repoURL: https://guerzon.github.io/vaultwarden
+    chart: vaultwarden
+    targetRevision: 0.39.0
+
   - name: portfolio
     namespace: portfolio
     syncWave: 220

@@ -1,0 +1,5 @@
+# Vaultwarden Helm chart values for prd environment
+# Chart: vaultwarden v0.39.0
+
+image:
+  tag: "1.36.0-alpine"
