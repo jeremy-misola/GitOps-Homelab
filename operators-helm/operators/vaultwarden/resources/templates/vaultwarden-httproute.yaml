@@ -11,5 +11,5 @@ spec:
     - vaultwarden{{ .Values.envSuffix }}.jeremymr.dev
   rules:
   - backendRefs:
-    - name: vaultwarden
+    - name: vaultwarden-helm
       port: 80
