@@ -52,11 +52,15 @@ spec:
         slug = var.invalidation_flow
       }
 
-      # Reference the default offline_access scope mapping (system-managed by Authentik)
+      # Scope mapping for offline_access (needed for refresh tokens)
       resource "authentik_scope_mapping" "offline_access" {
         name        = "Vaultwarden Offline Access"
         scope_name  = "offline_access"
-        expression  = ""
+        expression  = <<-EOT
+          return {
+            "scope": "offline_access"
+          }
+        EOT
       }
 
       # Create custom email scope mapping that returns email_verified: True
