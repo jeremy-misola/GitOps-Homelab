@@ -4,8 +4,11 @@
 image:
   tag: "1.36.0-alpine"
 
-# Disable public signups
-signupsAllowed: false
+# Domain where the application is accessed
+domain: "https://vaultwarden-dev.jeremymr.dev"
+
+# Enable signups for SSO auto-provisioning (restricted to domain via signupsDomains if needed)
+signupsAllowed: true
 
 # SSO OpenID Connect Configuration (Authentik)
 sso:
@@ -16,8 +19,8 @@ sso:
     existingSecretKey: "client_id"
   clientSecret:
     existingSecretKey: "client_secret"
-  # Authority URL: https://auth-dev.jeremymr.dev/application/o/vaultwarden/
-  authority: "https://auth-dev.jeremymr.dev/application/o/vaultwarden/"
+  # Authority URL (no trailing slash)
+  authority: "https://auth-dev.jeremymr.dev/application/o/vaultwarden"
   scopes: "email profile offline_access"
   onlySSO: false
   signupsMatchEmail: true
