@@ -1,0 +1,140 @@
+apiVersion: tf.upbound.io/v1beta1
+kind: Workspace
+metadata:
+  name: vaultwarden-auth
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "221"
+spec:
+  forProvider:
+    source: Inline
+    module: |
+      terraform {
+        required_providers {
+          authentik = {
+            source  = "goauthentik/authentik"
+            version = "~> 2025.2.0"
+          }
+        }
+      }
+
+      variable "authentik_url" {
+        type = string
+      }
+
+      variable "authentik_token" {
+        type      = string
+        sensitive = true
+      }
+
+      variable "authorization_flow" {
+        type = string
+      }
+
+      variable "invalidation_flow" {
+        type = string
+      }
+
+      variable "vaultwarden_url" {
+        type = string
+      }
+
+      provider "authentik" {
+        url   = var.authentik_url
+        token = var.authentik_token
+      }
+
+      data "authentik_flow" "authorization" {
+        slug = var.authorization_flow
+      }
+
+      data "authentik_flow" "invalidation" {
+        slug = var.invalidation_flow
+      }
+
+      # Look up the default offline_access scope mapping
+      data "authentik_scope_mapping" "offline_access" {
+        managed_list = [
+          "goauthentik.io/providers/oauth2/scope-offline_access"
+        ]
+      }
+
+      # Create custom email scope mapping that returns email_verified: True
+      # Vaultwarden requires email_verified: True (default authentik email scope returns False)
+      resource "authentik_scope_mapping" "vaultwarden_email" {
+        name        = "Vaultwarden Email Scope"
+        scope_name  = "email"
+        expression  = <<-EOT
+          return {
+              "email": request.user.email,
+              "email_verified": True
+          }
+        EOT
+      }
+
+      # Create OAuth2 Provider
+      resource "authentik_provider_oauth2" "vaultwarden" {
+        name               = "Vaultwarden"
+        client_id          = "vaultwarden"
+        authorization_flow = data.authentik_flow.authorization.id
+        invalidation_flow  = data.authentik_flow.invalidation.id
+        client_type        = "confidential"
+
+        allowed_redirect_uris = [
+          {
+            matching_mode = "strict"
+            url           = "https://${var.vaultwarden_url}/identity/connect/oidc-signin"
+          }
+        ]
+
+        property_mappings = [
+          authentik_scope_mapping.vaultwarden_email.id,
+          data.authentik_scope_mapping.offline_access.id,
+        ]
+
+        access_token_validity  = "minutes=15"
+        refresh_token_validity = "days=30"
+      }
+
+      # Create Application
+      resource "authentik_application" "vaultwarden" {
+        name               = "Vaultwarden"
+        slug               = "vaultwarden"
+        protocol_provider  = authentik_provider_oauth2.vaultwarden.id
+        policy_engine_mode = "any"
+
+        meta_launch_url = "https://${var.vaultwarden_url}"
+      }
+
+      output "client_id" {
+        value = authentik_provider_oauth2.vaultwarden.client_id
+      }
+
+      output "client_secret" {
+        value     = authentik_provider_oauth2.vaultwarden.client_secret
+        sensitive = true
+      }
+
+    vars:
+      - key: authentik_url
+        value: "https://auth{{ .Values.envSuffix }}.jeremymr.dev"
+      - key: authorization_flow
+        value: "default-provider-authorization-explicit-consent"
+      - key: invalidation_flow
+        value: "default-provider-invalidation-flow"
+      - key: vaultwarden_url
+        value: "vaultwarden{{ .Values.envSuffix }}.jeremymr.dev"
+
+    env:
+      - name: TF_VAR_authentik_token
+        secretKeyRef:
+          namespace: crossplane-system
+          name: authentik-api-token
+          key: token
+
+  writeConnectionSecretToRef:
+    name: vaultwarden-oidc-credentials
+    namespace: vaultwarden
+
+  providerConfigRef:
+    name: terraform-config

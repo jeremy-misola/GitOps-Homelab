@@ -255,6 +255,9 @@ operators:
     repoURL: https://guerzon.github.io/vaultwarden
     chart: vaultwarden
     targetRevision: 0.39.0
+    preResources:
+      enabled: true
+      templated: true
     postResources:
       enabled: true
       templated: true

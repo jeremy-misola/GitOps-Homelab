@@ -3,3 +3,23 @@
 
 image:
   tag: "1.36.0-alpine"
+
+# Disable public signups
+signupsAllowed: false
+
+# SSO OpenID Connect Configuration (Authentik)
+sso:
+  enabled: true
+  # Pull client ID and secret from the Crossplane-generated secret
+  existingSecret: "vaultwarden-oidc-credentials"
+  clientId:
+    existingSecretKey: "client_id"
+  clientSecret:
+    existingSecretKey: "client_secret"
+  # Authority URL: https://auth.jeremymr.dev/application/o/vaultwarden/
+  authority: "https://auth.jeremymr.dev/application/o/vaultwarden/"
+  scopes: "email profile offline_access"
+  onlySSO: false
+  signupsMatchEmail: true
+  ignoreEmailVerification: false
+  cacheExpiration: 0
