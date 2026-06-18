@@ -52,13 +52,6 @@ spec:
         slug = var.invalidation_flow
       }
 
-      # Look up the default offline_access scope mapping
-      data "authentik_property_mapping_provider_scope" "offline_access" {
-        managed_list = [
-          "goauthentik.io/providers/oauth2/scope-offline_access"
-        ]
-      }
-
       # Create custom email scope mapping that returns email_verified: True
       # Vaultwarden requires email_verified: True (default authentik email scope returns False)
       resource "authentik_scope_mapping" "vaultwarden_email" {
@@ -89,7 +82,6 @@ spec:
 
         property_mappings = [
           authentik_scope_mapping.vaultwarden_email.id,
-          data.authentik_property_mapping_provider_scope.offline_access.id,
         ]
 
         access_token_validity  = "minutes=15"
