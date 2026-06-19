@@ -19,8 +19,8 @@ sso:
     existingSecretKey: "client_id"
   clientSecret:
     existingSecretKey: "client_secret"
-  # Authority URL (no trailing slash)
-  authority: "https://auth.jeremymr.dev/application/o/vaultwarden"
+  # Authority URL must match Authentik discovery issuer exactly
+  authority: "https://auth.jeremymr.dev/application/o/vaultwarden/"
   scopes: "email profile offline_access"
   onlySSO: false
   signupsMatchEmail: true
