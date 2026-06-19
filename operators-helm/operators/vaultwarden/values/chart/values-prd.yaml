@@ -19,8 +19,8 @@ sso:
     existingSecretKey: "client_id"
   clientSecret:
     existingSecretKey: "client_secret"
-  # Authority URL must be the provider base URL without trailing slash
-  authority: "https://auth.jeremymr.dev/application/o/vaultwarden"
+  # Authority URL must match the provider issuer exactly.
+  authority: "https://auth.jeremymr.dev/application/o/vaultwarden/"
   scopes: "openid email profile offline_access"
   onlySSO: false
   signupsMatchEmail: true
