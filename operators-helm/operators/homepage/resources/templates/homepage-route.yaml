@@ -17,5 +17,5 @@ spec:
     - homepage{{ .Values.envSuffix }}.jeremymr.dev
   rules:
   - backendRefs:
-    - name: homepage
+    - name: homepage-helm
       port: 3000
