@@ -1,0 +1,119 @@
+# Homepage Helm chart values for dev environment
+# Chart: jameswynn/homepage
+
+# Enable RBAC for Kubernetes integration
+enableRbac: true
+
+serviceAccount:
+  create: true
+
+config:
+  # Kubernetes service discovery via gateway API HTTPRoutes
+  kubernetes:
+    mode: cluster
+    gateway: true
+
+  # Homepage config sections as a string to preserve ordering
+  settingsString: |
+    title: Homepage (Dev)
+    headerStyle: boxed
+    layout:
+      Infrastructure:
+        style: row
+        columns: 3
+      Monitoring:
+        style: row
+        columns: 3
+      Storage:
+        style: row
+        columns: 3
+      Security:
+        style: row
+        columns: 3
+      Apps:
+        style: row
+        columns: 3
+      Sandbox:
+        style: row
+        columns: 3
+
+  widgets:
+    - resources:
+        backend: kubernetes
+        expanded: true
+        cpu: true
+        memory: true
+
+    - kubernetes:
+        cluster:
+          show: true
+          cpu: true
+          memory: true
+          showLabel: true
+          label: "cluster"
+        nodes:
+          show: true
+          cpu: true
+          memory: true
+          showLabel: true
+
+    - search:
+        provider: duckduckgo
+        target: _blank
+
+    - openmeteo:
+        label: Current Weather
+        latitude: 51.5074
+        longitude: -0.1278
+        units: metric
+        cache: 5
+
+    - longhorn:
+        expanded: true
+        total: true
+        labels: true
+        nodes: true
+
+  services: []
+  bookmarks: []
+
+env:
+  - name: HOMEPAGE_ALLOWED_HOSTS
+    value: "homepage-dev.jeremymr.dev"
+
+  - name: HOMEPAGE_CONFIG_YAML_DIR
+    value: /app/config
+
+  - name: TZ
+    value: "America/New_York"
+
+  # OIDC authentication via Authentik
+  - name: HOMEPAGE_OIDC_AUTH_ENABLED
+    value: "true"
+  - name: HOMEPAGE_OIDC_CLIENT_ID
+    value: "homepage"
+  - name: HOMEPAGE_OIDC_CLIENT_SECRET
+    valueFrom:
+      secretKeyRef:
+        name: homepage-oidc-credentials
+        key: client-secret
+  - name: HOMEPAGE_OIDC_ISSUER_URL
+    value: "https://auth-dev.jeremymr.dev/application/o/homepage/"
+  - name: HOMEPAGE_OIDC_SCOPES
+    value: "openid profile email"
+  - name: HOMEPAGE_OIDC_USERNAME_CLAIM
+    value: "preferred_username"
+
+persistence:
+  logs:
+    enabled: true
+    type: emptyDir
+    mountPath: /app/config/logs
+
+resources:
+  requests:
+    memory: 128Mi
+    cpu: 100m
+  limits:
+    memory: 512Mi
+    cpu: 500m
