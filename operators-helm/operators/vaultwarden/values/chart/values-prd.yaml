@@ -9,20 +9,3 @@ domain: "https://vaultwarden.jeremymr.dev"
 
 # Enable signups for SSO auto-provisioning (restricted to domain via signupsDomains if needed)
 signupsAllowed: true
-
-# SSO OpenID Connect Configuration (Authentik)
-sso:
-  enabled: true
-  # Pull client ID and secret from the Crossplane-generated secret
-  existingSecret: "vaultwarden-oidc-credentials"
-  clientId:
-    existingSecretKey: "client_id"
-  clientSecret:
-    existingSecretKey: "client_secret"
-  # Authority URL must match the provider issuer exactly.
-  authority: "https://auth.jeremymr.dev/application/o/vaultwarden/"
-  scopes: "openid email profile offline_access"
-  onlySSO: false
-  signupsMatchEmail: true
-  ignoreEmailVerification: false
-  cacheExpiration: 0
