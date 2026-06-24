@@ -1,6 +1,0 @@
-apiVersion: v2
-name: nextcloud-resources
-description: Managed resources for Nextcloud (Security Policy)
-type: application
-version: 0.1.0
-appVersion: "1.0"

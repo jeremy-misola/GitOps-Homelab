@@ -7,7 +7,7 @@ operators:
     syncWave: 10
     repoURL: https://charts.external-secrets.io
     chart: external-secrets
-    targetRevision: 2.2.0
+    targetRevision: 2.6.0
     postResources:
       enabled: true
 
@@ -16,7 +16,7 @@ operators:
     syncWave: 20
     repoURL: https://metallb.github.io/metallb
     chart: metallb
-    targetRevision: 0.15.3
+    targetRevision: 0.16.1
     postResources:
       enabled: true
       templated: true
@@ -26,7 +26,7 @@ operators:
     syncWave: 30
     repoURL: https://charts.jetstack.io
     chart: cert-manager
-    targetRevision: v1.19.2
+    targetRevision: v1.20.2
     preResources:
       enabled: true
     postResources:
@@ -44,7 +44,7 @@ operators:
     syncWave: 50
     repoURL: https://charts.crossplane.io/stable
     chart: crossplane
-    targetRevision: 1.18.2
+    targetRevision: 2.2.1
     preResources:
       enabled: true
     postResources:
@@ -57,7 +57,7 @@ operators:
     syncWave: 70
     repoURL: https://datahub-local.github.io/garage-helm
     chart: garage
-    targetRevision: 0.2.1
+    targetRevision: 0.6.0
     preResources:
       enabled: true
 
@@ -78,7 +78,7 @@ operators:
     syncWave: 90
     repoURL: https://charts.goauthentik.io/
     chart: authentik
-    targetRevision: 2025.10.3
+    targetRevision: 2026.2.2
     preResources:
       enabled: true
     postResources:
@@ -99,7 +99,7 @@ operators:
     syncWave: 110
     repoURL: https://open-telemetry.github.io/opentelemetry-helm-charts
     chart: opentelemetry-operator
-    targetRevision: 0.102.0
+    targetRevision: 0.117.0
     postResources:
       enabled: true
       syncWave: 205
@@ -110,7 +110,7 @@ operators:
     syncWave: 160
     repoURL: https://grafana.github.io/helm-charts
     chart: loki
-    targetRevision: 6.49.0
+    targetRevision: 7.0.0
     preResources:
       enabled: true
 
@@ -119,14 +119,14 @@ operators:
     syncWave: 170
     repoURL: https://grafana.github.io/helm-charts
     chart: tempo
-    targetRevision: 1.24.2
+    targetRevision: 1.24.4
 
   - name: kube-prometheus
     namespace: monitoring
     syncWave: 180
     repoURL: https://prometheus-community.github.io/helm-charts
     chart: kube-prometheus-stack
-    targetRevision: 80.13.3
+    targetRevision: 84.5.0
     preResources:
       enabled: true
       templated: true
@@ -139,14 +139,14 @@ operators:
     syncWave: 190
     repoURL: https://cloudnative-pg.io/charts/
     chart: cloudnative-pg
-    targetRevision: 0.28.0
+    targetRevision: 0.28.3
 
   - name: otel-collector
     namespace: opentelemetry-collector
     syncWave: 200
     repoURL: https://open-telemetry.github.io/opentelemetry-helm-charts
     chart: opentelemetry-collector
-    targetRevision: 0.143.0
+    targetRevision: 0.159.0
     preResources:
       enabled: true
       templated: true
@@ -156,7 +156,11 @@ operators:
     syncWave: 210
     repoURL: https://prometheus-community.github.io/helm-charts
     chart: prometheus-blackbox-exporter
-    targetRevision: 11.7.0
+    targetRevision: 11.13.0
+
+#################################
+############ APPS ###############
+#################################
 
   - name: stirling-pdf
     namespace: stirling-pdf
@@ -176,10 +180,10 @@ operators:
     syncWave: 220
     repoURL: https://backstage.github.io/charts
     chart: backstage
-    targetRevision: 2.6.3
+    targetRevision: 2.8.2
     preResources:
-      templated: true
       enabled: true
+      templated: true
     postResources:
       enabled: true
       templated: true
@@ -196,6 +200,13 @@ operators:
     postResources:
       enabled: true
       templated: true
+
+  - name: home-assistant
+    namespace: home-assistant
+    syncWave: 220
+    repoURL: http://pajikos.github.io/home-assistant-helm-chart
+    chart: home-assistant
+    targetRevision: 0.3.67
 
   - name: kubesandbox-backend
     namespace: kubesandbox
@@ -237,13 +248,6 @@ operators:
       enabled: true
       templated: true
 
-  - name: home-assistant
-    namespace: home-assistant
-    syncWave: 220
-    repoURL: http://pajikos.github.io/home-assistant-helm-chart
-    chart: home-assistant
-    targetRevision: 0.3.66
-
   - name: portfolio
     namespace: portfolio
     syncWave: 220
@@ -256,7 +260,7 @@ operators:
     syncWave: 220
     repoURL: https://general-intelligence-systems.github.io/code-server-helm
     chart: code-server
-    targetRevision: 3.38.0
+    targetRevision: 3.39.0
     preResources:
       enabled: true
       templated: true

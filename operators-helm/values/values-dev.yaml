@@ -32,14 +32,6 @@ operators:
     postResources:
       enabled: true
 
-  # My poor 1tb storage cannot do longhorn :(
-  # - name: longhorn
-  #   namespace: longhorn-system
-  #   syncWave: 40
-  #   repoURL: https://charts.longhorn.io
-  #   chart: longhorn
-  #   targetRevision: 1.11.1
-
   - name: crossplane
     namespace: crossplane-system
     syncWave: 50
@@ -195,19 +187,6 @@ operators:
     repoURL: oci://ghcr.io/gabe565/charts/adguard-home
     chart: adguard
     targetRevision: 0.3.25
-    preResources:
-      enabled: true
-      templated: true
-    postResources:
-      enabled: true
-      templated: true
-
-  - name: nextcloud
-    namespace: nextcloud
-    syncWave: 220
-    repoURL: https://nextcloud.github.io/helm/
-    chart: nextcloud
-    targetRevision: 9.1.3
     preResources:
       enabled: true
       templated: true
