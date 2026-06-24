@@ -10,5 +10,5 @@ spec:
     sectionName: minecraft
   rules:
   - backendRefs:
-    - name: my-minecraft
+    - name: minecraft-helm
       port: 25565
