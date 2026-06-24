@@ -1,0 +1,15 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: vaultwarden-route
+  namespace: {{ .Release.Namespace }}
+spec:
+  parentRefs:
+  - name: {{ .Values.gatewayName }}
+    namespace: envoy-gateway-system
+  hostnames:
+    - vaultwarden{{ .Values.envSuffix }}.jeremymr.dev
+  rules:
+  - backendRefs:
+    - name: vaultwarden-helm
+      port: 80
