@@ -1,8 +1,0 @@
-app:
-  ingress:
-    enabled: false
-
-kong:
-  proxy:
-    http:
-      enabled: true

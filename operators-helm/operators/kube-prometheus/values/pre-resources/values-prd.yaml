@@ -1,4 +1,3 @@
 gatewayName: prod-web
 envSuffix: ""
 authentikUrl: https://auth.jeremymr.dev
-grafanaCloudTokenKey: GRAFANA_CLOUD_PROD_TOKEN

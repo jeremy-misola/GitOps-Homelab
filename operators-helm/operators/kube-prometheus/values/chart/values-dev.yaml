@@ -51,6 +51,11 @@ grafana:
         httpHeaderName1: X-Scope-OrgID
       secureJsonData:
         httpHeaderValue1: "1"
+
+    - name: Tempo
+      type: tempo
+      access: proxy
+      url: http://tempo-helm.tempo.svc.cluster.local:3100
   envValueFrom:
     GF_AUTH_GENERIC_OAUTH_CLIENT_ID:
       secretKeyRef:
@@ -89,13 +94,9 @@ grafana:
 prometheus:
   prometheusSpec:
     remoteWrite:
-      - url: https://prometheus-prod-32-prod-ca-east-0.grafana.net./api/prom/push
-        basicAuth:
-          username:
-            name: grafana-cloud-token
-            key: prometheus-username
-          password:
-            name: grafana-cloud-token
-            key: access-token
+      # Cross-cluster: dev Prometheus → prod Mimir via its dedicated MetalLB IP.
+      - url: http://192.168.0.241/api/v1/push
+        headers:
+          X-Scope-OrgID: dev
     externalLabels:
       cluster: dev
