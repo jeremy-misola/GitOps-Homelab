@@ -45,7 +45,7 @@ operators:
     syncWave: 50
     repoURL: https://charts.crossplane.io/stable
     chart: crossplane
-    targetRevision: 1.20.10
+    targetRevision: 2.2.1
     preResources:
       enabled: true
     postResources:
@@ -79,7 +79,7 @@ operators:
     syncWave: 90
     repoURL: https://charts.goauthentik.io/
     chart: authentik
-    targetRevision: 2025.12.4
+    targetRevision: 2026.2.2
     preResources:
       enabled: true
     postResources:
@@ -111,7 +111,7 @@ operators:
     syncWave: 160
     repoURL: https://grafana.github.io/helm-charts
     chart: loki
-    targetRevision: 6.55.0
+    targetRevision: 7.0.0
     preResources:
       enabled: true
 
@@ -127,7 +127,7 @@ operators:
     syncWave: 180
     repoURL: https://prometheus-community.github.io/helm-charts
     chart: kube-prometheus-stack
-    targetRevision: 80.14.4
+    targetRevision: 84.5.0
     preResources:
       enabled: true
       templated: true
