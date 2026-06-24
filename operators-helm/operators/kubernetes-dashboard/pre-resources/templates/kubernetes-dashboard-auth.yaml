@@ -1,0 +1,108 @@
+apiVersion: tf.upbound.io/v1beta1
+kind: Workspace
+metadata:
+  name: kubernetes-dashboard-auth
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "17"
+spec:
+  forProvider:
+    source: Inline
+    module: |
+      terraform {
+        required_providers {
+          authentik = {
+            source  = "goauthentik/authentik"
+            version = "~> 2025.2.0"
+          }
+        }
+      }
+
+      variable "authentik_url" {
+        type = string
+      }
+
+      variable "authentik_token" {
+        type      = string
+        sensitive = true
+      }
+
+      variable "authorization_flow" {
+        type = string
+      }
+
+      variable "invalidation_flow" {
+        type = string
+      }
+
+      variable "env_suffix" {
+        type = string
+      }
+
+      provider "authentik" {
+        url   = var.authentik_url
+        token = var.authentik_token
+      }
+
+      data "authentik_flow" "authorization" {
+        slug = var.authorization_flow
+      }
+
+      data "authentik_flow" "invalidation" {
+        slug = var.invalidation_flow
+      }
+
+      resource "authentik_provider_oauth2" "kubernetes_dashboard" {
+        name               = "Kubernetes Dashboard"
+        client_id          = "kubernetes-dashboard"
+        authorization_flow = data.authentik_flow.authorization.id
+        invalidation_flow  = data.authentik_flow.invalidation.id
+        client_type        = "confidential"
+
+        allowed_redirect_uris = [
+          {
+            matching_mode = "strict"
+            url           = "https://dashboard${var.env_suffix}.jeremymr.dev/oauth2/callback"
+          }
+        ]
+      }
+
+      resource "authentik_application" "kubernetes_dashboard" {
+        name               = "Kubernetes Dashboard"
+        slug               = "kubernetes-dashboard"
+        protocol_provider  = authentik_provider_oauth2.kubernetes_dashboard.id
+        policy_engine_mode = "any"
+      }
+
+      output "client-id" {
+        value = authentik_provider_oauth2.kubernetes_dashboard.client_id
+      }
+
+      output "client-secret" {
+        value     = authentik_provider_oauth2.kubernetes_dashboard.client_secret
+        sensitive = true
+      }
+
+    vars:
+      - key: authentik_url
+        value: "https://auth{{ .Values.envSuffix }}.jeremymr.dev"
+      - key: authorization_flow
+        value: "default-provider-authorization-explicit-consent"
+      - key: invalidation_flow
+        value: "default-provider-invalidation-flow"
+      - key: env_suffix
+        value: "{{ .Values.envSuffix }}"
+
+    env:
+      - name: TF_VAR_authentik_token
+        secretKeyRef:
+          namespace: crossplane-system
+          name: authentik-api-token
+          key: token
+
+  writeConnectionSecretToRef:
+    name: kubernetes-dashboard-client-secret
+    namespace: kubernetes-dashboard
+
+  providerConfigRef:
+    name: terraform-config
