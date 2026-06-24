@@ -15,17 +15,17 @@ mimir:
     blocks_storage:
       s3:
         bucket_name: mimir-blocks
-        path_style_force_enabled: true
+        bucket_lookup_type: path
 
     alertmanager_storage:
       s3:
         bucket_name: mimir-alertmanager
-        path_style_force_enabled: true
+        bucket_lookup_type: path
 
     ruler_storage:
       s3:
         bucket_name: mimir-ruler
-        path_style_force_enabled: true
+        bucket_lookup_type: path
 
     limits:
       ingestion_rate: 100000
