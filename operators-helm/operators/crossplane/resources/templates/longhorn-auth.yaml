@@ -5,7 +5,6 @@
 #   namespace: {{ .Release.Namespace }}
 #   annotations:
 #     argocd.argoproj.io/sync-wave: "25"
-    argocd.argoproj.io/compare-options: IgnoreExtraneous
 # spec:
 #   forProvider:
 #     # Inline Terraform configuration for Authentik OIDC app
