@@ -11,5 +11,5 @@ spec:
     - headlamp{{ .Values.envSuffix }}.jeremymr.dev
   rules:
   - backendRefs:
-    - name: headlamp-helm-headlamp
+    - name: headlamp-helm
       port: 80
