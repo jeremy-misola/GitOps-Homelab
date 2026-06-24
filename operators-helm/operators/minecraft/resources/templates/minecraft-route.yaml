@@ -1,0 +1,14 @@
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: TCPRoute
+metadata:
+  name: minecraft-route
+  namespace: {{ .Release.Namespace }}
+spec:
+  parentRefs:
+  - name: {{ .Values.gatewayName }}
+    namespace: envoy-gateway-system
+    sectionName: minecraft
+  rules:
+  - backendRefs:
+    - name: my-minecraft
+      port: 25565
