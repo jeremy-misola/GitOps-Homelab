@@ -62,6 +62,9 @@ alertmanager:
   zoneAwareReplication:
     enabled: false
 
+minio:
+  enabled: false
+
 # Nginx gateway — unified ingress point for remoteWrite and queries.
 # Given a dedicated MetalLB IP so the dev cluster can push cross-cluster
 # without DNS rewrites (192.168.0.241 is next after the Envoy Gateway at .240).
