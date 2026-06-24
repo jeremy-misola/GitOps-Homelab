@@ -1,0 +1,191 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  name: minecraft-server
+  annotations:
+    argocd.argoproj.io/sync-wave: "10"
+spec:
+  compositeTypeRef:
+    apiVersion: platform.jeremymr.dev/v1alpha1
+    kind: XMinecraftServer
+  mode: Pipeline
+  pipeline:
+    - step: patch-and-transform
+      functionRef:
+        name: function-patch-and-transform
+      input:
+        apiVersion: pt.fn.crossplane.io/v1beta1
+        kind: Resources
+        resources:
+
+          # ── Minecraft Helm Release ────────────────────────────────────────────
+          # The Helm chart creates its own namespace — no separate Object needed.
+          # This avoids a race where the Helm release tries to deploy before the
+          # namespace Object reconciles.
+          - name: minecraft-release
+            base:
+              apiVersion: helm.crossplane.io/v1beta1
+              kind: Release
+              metadata:
+                name: placeholder
+              spec:
+                providerConfigRef:
+                  name: helm-incluster
+                forProvider:
+                  chart:
+                    name: minecraft
+                    repository: https://itzg.github.io/minecraft-server-charts
+                  namespace: placeholder
+                  values:
+                    minecraftServer:
+                      eula: "TRUE"
+                      version: "LATEST"
+                      type: "VANILLA"
+                      difficulty: easy
+                      gameMode: survival
+                      motd: "A Minecraft Server"
+                      memory: "2048M"
+                      maxPlayers: 20
+                      serviceType: LoadBalancer
+                      rcon:
+                        enabled: true
+                        withGeneratedPassword: true
+                    resources:
+                      requests:
+                        cpu: "500m"
+                        memory: "2Gi"
+                      limits:
+                        memory: "2Gi"
+                    persistence:
+                      dataDir:
+                        enabled: true
+                        Size: "5Gi"
+                        accessModes:
+                          - ReadWriteOnce
+            patches:
+              - type: CombineFromComposite
+                combine:
+                  variables:
+                    - fromFieldPath: metadata.labels[crossplane.io/claim-namespace]
+                    - fromFieldPath: metadata.labels[crossplane.io/claim-name]
+                  strategy: string
+                  string:
+                    fmt: "%s-%s-minecraft"
+                toFieldPath: metadata.name
+
+              - type: CombineFromComposite
+                combine:
+                  variables:
+                    - fromFieldPath: metadata.labels[crossplane.io/claim-namespace]
+                    - fromFieldPath: metadata.labels[crossplane.io/claim-name]
+                  strategy: string
+                  string:
+                    fmt: "%s-%s"
+                toFieldPath: spec.forProvider.namespace
+
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.version
+                toFieldPath: spec.forProvider.values.minecraftServer.version
+                policy:
+                  fromFieldPath: Optional
+
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.type
+                toFieldPath: spec.forProvider.values.minecraftServer.type
+                policy:
+                  fromFieldPath: Optional
+
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.difficulty
+                toFieldPath: spec.forProvider.values.minecraftServer.difficulty
+                policy:
+                  fromFieldPath: Optional
+
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.gameMode
+                toFieldPath: spec.forProvider.values.minecraftServer.gameMode
+                policy:
+                  fromFieldPath: Optional
+
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.motd
+                toFieldPath: spec.forProvider.values.minecraftServer.motd
+                policy:
+                  fromFieldPath: Optional
+
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.memory
+                toFieldPath: spec.forProvider.values.minecraftServer.memory
+                policy:
+                  fromFieldPath: Optional
+
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.maxPlayers
+                toFieldPath: spec.forProvider.values.minecraftServer.maxPlayers
+                policy:
+                  fromFieldPath: Optional
+
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.resources.cpu
+                toFieldPath: spec.forProvider.values.resources.requests.cpu
+                policy:
+                  fromFieldPath: Optional
+
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.resources.memory
+                toFieldPath: spec.forProvider.values.resources.requests.memory
+                policy:
+                  fromFieldPath: Optional
+
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.resources.memory
+                toFieldPath: spec.forProvider.values.resources.limits.memory
+                policy:
+                  fromFieldPath: Optional
+
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.storage.size
+                toFieldPath: spec.forProvider.values.persistence.dataDir.Size
+                policy:
+                  fromFieldPath: Optional
+
+              - type: ToCompositeFieldPath
+                fromFieldPath: metadata.name
+                toFieldPath: status.helmRelease
+
+              - type: ToCompositeFieldPath
+                fromFieldPath: spec.forProvider.namespace
+                toFieldPath: status.serverNamespace
+
+              - type: ToCompositeFieldPath
+                fromFieldPath: status.atProvider.state
+                toFieldPath: status.phase
+                transforms:
+                  - type: map
+                    map:
+                      deployed: Ready
+                      pending-install: Provisioning
+                      pending-upgrade: Updating
+                      failed: Error
+                policy:
+                  fromFieldPath: Optional
+
+              - type: ToCompositeFieldPath
+                fromFieldPath: status.atProvider.state
+                toFieldPath: status.message
+                transforms:
+                  - type: string
+                    string:
+                      type: Format
+                      fmt: "helm release state: %s"
+                policy:
+                  fromFieldPath: Optional
+
+            readinessChecks:
+              - type: MatchString
+                fieldPath: status.atProvider.state
+                matchString: deployed
+
+    - step: automatically-detect-ready-composed-resources
+      functionRef:
+        name: function-auto-ready

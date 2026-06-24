@@ -1,0 +1,11 @@
+# Vaultwarden Helm chart values for dev environment
+# Chart: vaultwarden v0.39.0
+
+image:
+  tag: "1.36.0-alpine"
+
+# Domain where the application is accessed
+domain: "https://vaultwarden-dev.jeremymr.dev"
+
+# Enable signups for SSO auto-provisioning (restricted to domain via signupsDomains if needed)
+signupsAllowed: true

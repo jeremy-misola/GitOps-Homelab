@@ -224,6 +224,19 @@ operators:
       enabled: true
       templated: true
 
+  - name: vaultwarden
+    namespace: vaultwarden
+    syncWave: 220
+    repoURL: https://guerzon.github.io/vaultwarden
+    chart: vaultwarden
+    targetRevision: 0.39.0
+    preResources:
+      enabled: true
+      templated: true
+    postResources:
+      enabled: true
+      templated: true
+
   - name: home-assistant
     namespace: home-assistant
     syncWave: 220
@@ -250,3 +263,28 @@ operators:
     postResources:
       enabled: true
       templated: true
+
+  - name: homepage
+    namespace: homepage
+    syncWave: 220
+    repoURL: https://jameswynn.github.io/helm-charts
+    chart: homepage
+    targetRevision: 2.1.0
+    preResources:
+      enabled: true
+      templated: true
+    postResources:
+      enabled: true
+      templated: true
+
+  - name: minecraft
+    namespace: minecraft
+    syncWave: 155
+    preResources:
+      enabled: true
+      syncWave: 155
+      namespace: crossplane-system
+    postResources:
+      enabled: true
+      syncWave: 165
+      namespace: minecraft
