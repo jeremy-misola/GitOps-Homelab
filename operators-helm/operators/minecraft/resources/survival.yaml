@@ -6,7 +6,7 @@ metadata:
 spec:
   serverName: survival
   version: "LATEST"
-  type: PAPER
+  type: FABRIC
   difficulty: normal
   gameMode: survival
   motd: "Jeremy's Homelab - Survival"

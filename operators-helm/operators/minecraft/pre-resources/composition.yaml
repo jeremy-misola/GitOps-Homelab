@@ -18,61 +18,10 @@ spec:
         kind: Resources
         resources:
 
-          # ── 1. Namespace ──────────────────────────────────────────────────────
-          - name: server-namespace
-            base:
-              apiVersion: kubernetes.crossplane.io/v1alpha2
-              kind: Object
-              metadata:
-                name: placeholder
-              spec:
-                providerConfigRef:
-                  name: kubernetes-incluster
-                forProvider:
-                  manifest:
-                    apiVersion: v1
-                    kind: Namespace
-                    metadata:
-                      name: placeholder
-                      labels:
-                        jeremymr.dev/managed: "true"
-                        jeremymr.dev/type: minecraft-server
-            patches:
-              - type: CombineFromComposite
-                combine:
-                  variables:
-                    - fromFieldPath: metadata.labels[crossplane.io/claim-namespace]
-                    - fromFieldPath: metadata.labels[crossplane.io/claim-name]
-                  strategy: string
-                  string:
-                    fmt: "%s-%s-ns"
-                toFieldPath: metadata.name
-
-              - type: CombineFromComposite
-                combine:
-                  variables:
-                    - fromFieldPath: metadata.labels[crossplane.io/claim-namespace]
-                    - fromFieldPath: metadata.labels[crossplane.io/claim-name]
-                  strategy: string
-                  string:
-                    fmt: "%s-%s"
-                toFieldPath: spec.forProvider.manifest.metadata.name
-
-              - type: FromCompositeFieldPath
-                fromFieldPath: spec.serverName
-                toFieldPath: spec.forProvider.manifest.metadata.labels[jeremymr.dev/server-name]
-
-              - type: CombineFromComposite
-                combine:
-                  variables:
-                    - fromFieldPath: metadata.labels[crossplane.io/claim-namespace]
-                    - fromFieldPath: metadata.labels[crossplane.io/claim-name]
-                  strategy: string
-                  string:
-                    fmt: "%s-%s"
-                toFieldPath: status.serverNamespace
-
-          # ── 2. Minecraft Helm Release ─────────────────────────────────────────
+          # ── Minecraft Helm Release ────────────────────────────────────────────
+          # The Helm chart creates its own namespace — no separate Object needed.
+          # This avoids a race where the Helm release tries to deploy before the
+          # namespace Object reconciles.
           - name: minecraft-release
             base:
               apiVersion: helm.crossplane.io/v1beta1
@@ -87,7 +36,6 @@ spec:
                     name: minecraft
                     repository: https://itzg.github.io/minecraft-server-charts
                   namespace: placeholder
-                  skipCreateNamespace: true
                   values:
                     minecraftServer:
                       eula: "TRUE"
@@ -204,6 +152,10 @@ spec:
               - type: ToCompositeFieldPath
                 fromFieldPath: metadata.name
                 toFieldPath: status.helmRelease
+
+              - type: ToCompositeFieldPath
+                fromFieldPath: spec.forProvider.namespace
+                toFieldPath: status.serverNamespace
 
               - type: ToCompositeFieldPath
                 fromFieldPath: status.atProvider.state
