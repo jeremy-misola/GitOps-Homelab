@@ -11,19 +11,21 @@ mimir:
           access_key_id: ${S3_ACCESS_KEY}
           secret_access_key: ${S3_SECRET_KEY}
           insecure: true
-          path_style_force_enabled: true
 
     blocks_storage:
       s3:
         bucket_name: mimir-blocks
+        path_style_force_enabled: true
 
     alertmanager_storage:
       s3:
         bucket_name: mimir-alertmanager
+        path_style_force_enabled: true
 
     ruler_storage:
       s3:
         bucket_name: mimir-ruler
+        path_style_force_enabled: true
 
     limits:
       ingestion_rate: 100000
