@@ -1,0 +1,19 @@
+apiVersion: platform.jeremymr.dev/v1alpha1
+kind: MinecraftServer
+metadata:
+  name: survival
+  namespace: minecraft
+spec:
+  serverName: survival
+  version: "LATEST"
+  type: PAPER
+  difficulty: normal
+  gameMode: survival
+  motd: "Jeremy's Homelab - Survival"
+  maxPlayers: 20
+  memory: "2048M"
+  storage:
+    size: "10Gi"
+  resources:
+    cpu: "500m"
+    memory: "2Gi"

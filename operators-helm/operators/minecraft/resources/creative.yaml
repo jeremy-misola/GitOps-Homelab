@@ -1,0 +1,19 @@
+apiVersion: platform.jeremymr.dev/v1alpha1
+kind: MinecraftServer
+metadata:
+  name: creative
+  namespace: minecraft
+spec:
+  serverName: creative
+  version: "LATEST"
+  type: PAPER
+  difficulty: peaceful
+  gameMode: creative
+  motd: "Jeremy's Homelab - Creative"
+  maxPlayers: 10
+  memory: "1536M"
+  storage:
+    size: "5Gi"
+  resources:
+    cpu: "500m"
+    memory: "2Gi"

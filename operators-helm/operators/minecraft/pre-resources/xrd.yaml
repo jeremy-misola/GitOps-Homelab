@@ -1,0 +1,119 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: xminecraftservers.platform.jeremymr.dev
+  annotations:
+    argocd.argoproj.io/sync-wave: "5"
+spec:
+  group: platform.jeremymr.dev
+  names:
+    kind: XMinecraftServer
+    plural: xminecraftservers
+    singular: xminecraftserver
+  claimNames:
+    kind: MinecraftServer
+    plural: minecraftservers
+    singular: minecraftserver
+  defaultCompositionRef:
+    name: minecraft-server
+  versions:
+    - name: v1alpha1
+      served: true
+      referenceable: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              required:
+                - serverName
+              properties:
+                serverName:
+                  type: string
+                  maxLength: 48
+                  description: Short slug used for naming resources. Lowercase alphanumeric and hyphens only.
+                  pattern: "^[a-z0-9][a-z0-9-]*[a-z0-9]$"
+                version:
+                  type: string
+                  default: "LATEST"
+                  description: Minecraft version string or LATEST.
+                type:
+                  type: string
+                  default: "VANILLA"
+                  description: Server type.
+                  enum:
+                    - VANILLA
+                    - PAPER
+                    - FABRIC
+                    - FORGE
+                    - SPIGOT
+                    - BUKKIT
+                difficulty:
+                  type: string
+                  default: "easy"
+                  description: Game difficulty.
+                  enum:
+                    - peaceful
+                    - easy
+                    - normal
+                    - hard
+                gameMode:
+                  type: string
+                  default: "survival"
+                  description: Default game mode for players.
+                  enum:
+                    - survival
+                    - creative
+                    - adventure
+                    - spectator
+                motd:
+                  type: string
+                  default: "A Minecraft Server"
+                  maxLength: 59
+                  description: Message of the day shown in the server list.
+                maxPlayers:
+                  type: integer
+                  default: 20
+                  minimum: 1
+                  maximum: 100
+                  description: Maximum number of players allowed on the server.
+                memory:
+                  type: string
+                  default: "2048M"
+                  description: JVM heap size for the Minecraft process (e.g. 1024M, 4G).
+                storage:
+                  type: object
+                  default: {}
+                  properties:
+                    size:
+                      type: string
+                      default: "5Gi"
+                      description: Size of the persistent volume for world data.
+                resources:
+                  type: object
+                  default: {}
+                  properties:
+                    cpu:
+                      type: string
+                      default: "500m"
+                      description: CPU request/limit for the Minecraft pod.
+                    memory:
+                      type: string
+                      default: "2Gi"
+                      description: Memory request/limit for the Minecraft pod.
+            status:
+              type: object
+              properties:
+                phase:
+                  type: string
+                  description: Lifecycle phase of the server.
+                message:
+                  type: string
+                  description: Latest reconcile message.
+                serverNamespace:
+                  type: string
+                  description: Namespace created for this server.
+                helmRelease:
+                  type: string
+                  description: Name of the Crossplane Helm Release managing the server.
