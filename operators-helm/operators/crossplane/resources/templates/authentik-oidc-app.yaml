@@ -5,6 +5,7 @@ metadata:
   namespace: crossplane-system
   annotations:
     crossplane.io/terraform-module: "true"
+    argocd.argoproj.io/sync-wave: "15"
 data:
   main.tf: |
     terraform {

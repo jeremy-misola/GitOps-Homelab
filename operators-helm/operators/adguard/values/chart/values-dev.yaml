@@ -3,7 +3,6 @@ persistence:
     enabled: true
     retain: true
     mountPath: /opt/adguardhome/conf
-    storageClass: longhorn
     accessMode: ReadWriteOnce
     size: 1Gi
 

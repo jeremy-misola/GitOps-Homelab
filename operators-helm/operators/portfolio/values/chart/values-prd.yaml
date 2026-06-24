@@ -1,0 +1,25 @@
+image:
+  tag: latest
+
+replicaCount: 3
+
+httpRoute:
+  parentRefs:
+    - name: prod-web
+      namespace: envoy-gateway-system
+  hostnames:
+    - portfolio.jeremymr.dev
+
+cnpg:
+  instances: 3
+  storage:
+    size: 10Gi
+    storageClass: longhorn
+
+resources:
+  requests:
+    cpu: "100m"
+    memory: "256Mi"
+  limits:
+    cpu: "500m"
+    memory: "512Mi"

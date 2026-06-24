@@ -1,0 +1,88 @@
+# Stirling PDF Helm chart values for prod environment
+# Chart: stirling-pdf-chart v3.1.0
+
+replicaCount: 1
+strategy:
+  type: RollingUpdate
+
+image:
+  registry: docker.stirlingpdf.com
+  repository: stirlingtools/stirling-pdf
+  tag: ""
+  pullPolicy: IfNotPresent
+
+envs:
+  - name: UI_APPNAME
+    value: "Stirling PDF"
+  - name: UI_HOMEDESCRIPTION
+    value: "Your locally hosted one-stop-shop for all your PDF needs."
+  - name: UI_APPNAMENAVBAR
+    value: "Stirling PDF"
+  - name: SYSTEM_DEFAULTLOCALE
+    value: "en-GB"
+  - name: SECURITY_ENABLELOGIN
+    value: "false"
+  - name: DISABLE_ADDITIONAL_FEATURES
+    value: "false"
+  - name: SYSTEM_MAXFILESIZE
+    value: "500"
+  - name: SYSTEM_GOOGLEVISIBILITY
+    value: "true"
+
+service:
+  servicename: stirling-pdf
+  type: ClusterIP
+  externalPort: 8080
+  targetPort: ""
+  nodePort:
+  annotations: {}
+  labels: {}
+
+persistence:
+  enabled: true
+  accessMode: ReadWriteOnce
+  size: 8Gi
+  path: /tmp
+  storageClass: "local-path"
+
+ingress:
+  enabled: false
+
+serviceAccount:
+  create: true
+  name: ""
+  automountServiceAccountToken: false
+
+securityContext:
+  enabled: true
+  fsGroup: 1000
+
+containerSecurityContext: {}
+
+resources:
+  requests:
+    memory: 2Gi
+    cpu: 500m
+  limits:
+    memory: 6Gi
+    cpu: 2000m
+
+probes:
+  liveness:
+    enabled: true
+    initialDelaySeconds: 90
+    periodSeconds: 10
+    timeoutSeconds: 5
+    successThreshold: 1
+    failureThreshold: 3
+  livenessHttpGetConfig:
+    scheme: HTTP
+  readiness:
+    enabled: true
+    initialDelaySeconds: 90
+    periodSeconds: 10
+    timeoutSeconds: 5
+    successThreshold: 1
+    failureThreshold: 3
+  readinessHttpGetConfig:
+    scheme: HTTP

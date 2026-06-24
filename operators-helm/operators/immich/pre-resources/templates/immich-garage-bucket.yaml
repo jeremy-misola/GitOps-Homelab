@@ -1,0 +1,110 @@
+apiVersion: tf.upbound.io/v1beta1
+kind: Workspace
+metadata:
+  name: immich-garage-bucket
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "17"
+spec:
+  forProvider:
+    source: Inline
+    module: |
+      terraform {
+        required_providers {
+          garage = {
+            source  = "arsolitt/garagehq"
+            version = ">= 0.0.1"
+          }
+        }
+      }
+
+      variable "garage_host" {
+        type = string
+      }
+
+      variable "garage_s3_host" {
+        type = string
+      }
+
+      variable "garage_scheme" {
+        type    = string
+        default = "http"
+      }
+
+      variable "garage_token" {
+        type      = string
+        sensitive = true
+      }
+
+      variable "bucket_name" {
+        type = string
+      }
+
+      variable "key_name" {
+        type = string
+      }
+
+      provider "garage" {
+        host   = var.garage_host
+        scheme = var.garage_scheme
+        token  = var.garage_token
+      }
+
+      resource "garage_bucket" "immich" {
+        global_alias = var.bucket_name
+      }
+
+      resource "garage_key" "immich" {
+        name = var.key_name
+      }
+
+      resource "garage_bucket_key" "immich" {
+        bucket_id     = garage_bucket.immich.id
+        access_key_id = garage_key.immich.access_key_id
+        read          = true
+        write         = true
+        owner         = false
+      }
+
+      output "host" {
+        value = var.garage_s3_host
+      }
+
+      output "bucket" {
+        value = garage_bucket.immich.id
+      }
+
+      output "accessKey" {
+        value = garage_key.immich.access_key_id
+      }
+
+      output "secretKey" {
+        value     = garage_key.immich.secret_access_key
+        sensitive = true
+      }
+
+    vars:
+      - key: garage_host
+        value: "garage.garage.svc:3903"
+      - key: garage_s3_host
+        value: "http://garage.garage.svc.cluster.local:3900"
+      - key: garage_scheme
+        value: "http"
+      - key: bucket_name
+        value: "immich{{ .Values.envSuffix }}-data"
+      - key: key_name
+        value: "immich{{ .Values.envSuffix }}-key"
+
+    env:
+      - name: TF_VAR_garage_token
+        secretKeyRef:
+          namespace: crossplane-system
+          name: garage-admin-credentials
+          key: garage-admin-token
+
+  writeConnectionSecretToRef:
+    name: immich-s3-credentials
+    namespace: immich
+
+  providerConfigRef:
+    name: terraform-config

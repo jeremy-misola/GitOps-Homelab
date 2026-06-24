@@ -1,0 +1,108 @@
+apiVersion: tf.upbound.io/v1beta1
+kind: Workspace
+metadata:
+  name: stirling-pdf-auth
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "17"
+spec:
+  forProvider:
+    source: Inline
+    module: |
+      terraform {
+        required_providers {
+          authentik = {
+            source  = "goauthentik/authentik"
+            version = "~> 2025.2.0"
+          }
+        }
+      }
+
+      variable "authentik_url" {
+        type = string
+      }
+
+      variable "authentik_token" {
+        type      = string
+        sensitive = true
+      }
+
+      variable "authorization_flow" {
+        type = string
+      }
+
+      variable "invalidation_flow" {
+        type = string
+      }
+
+      variable "env_suffix" {
+        type = string
+      }
+
+      provider "authentik" {
+        url   = var.authentik_url
+        token = var.authentik_token
+      }
+
+      data "authentik_flow" "authorization" {
+        slug = var.authorization_flow
+      }
+
+      data "authentik_flow" "invalidation" {
+        slug = var.invalidation_flow
+      }
+
+      resource "authentik_provider_oauth2" "stirling_pdf" {
+        name               = "Stirling PDF"
+        client_id          = "stirling-pdf"
+        authorization_flow = data.authentik_flow.authorization.id
+        invalidation_flow  = data.authentik_flow.invalidation.id
+        client_type        = "confidential"
+
+        allowed_redirect_uris = [
+          {
+            matching_mode = "strict"
+            url           = "https://stirling-pdf${var.env_suffix}.jeremymr.dev/oauth2/callback"
+          }
+        ]
+      }
+
+      resource "authentik_application" "stirling_pdf" {
+        name               = "Stirling PDF"
+        slug               = "stirling-pdf"
+        protocol_provider  = authentik_provider_oauth2.stirling_pdf.id
+        policy_engine_mode = "any"
+      }
+
+      output "client-id" {
+        value = authentik_provider_oauth2.stirling_pdf.client_id
+      }
+
+      output "client-secret" {
+        value     = authentik_provider_oauth2.stirling_pdf.client_secret
+        sensitive = true
+      }
+
+    vars:
+      - key: authentik_url
+        value: "https://auth{{ .Values.envSuffix }}.jeremymr.dev"
+      - key: authorization_flow
+        value: "default-provider-authorization-explicit-consent"
+      - key: invalidation_flow
+        value: "default-provider-invalidation-flow"
+      - key: env_suffix
+        value: "{{ .Values.envSuffix }}"
+
+    env:
+      - name: TF_VAR_authentik_token
+        secretKeyRef:
+          namespace: crossplane-system
+          name: authentik-api-token
+          key: token
+
+  writeConnectionSecretToRef:
+    name: stirling-pdf-client-secret
+    namespace: stirling-pdf
+
+  providerConfigRef:
+    name: terraform-config

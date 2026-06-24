@@ -1,0 +1,91 @@
+fullnameOverride: nextcloud
+
+nextcloud:
+  host: nextcloud-dev.jeremymr.dev
+  trustedDomains:
+    - nextcloud-dev.jeremymr.dev
+
+  objectStore:
+    s3:
+      enabled: true
+      existingSecret: nextcloud-s3-credentials
+      secretKeys:
+        host: host
+        accessKey: accessKey
+        secretKey: secretKey
+        bucket: bucket
+      ssl: false
+      port: "3900"
+      region: garage
+      usePathStyle: true
+      autoCreate: false
+
+  configs:
+    proxy.config.php: |
+      <?php
+      $CONFIG = array (
+        'trusted_proxies' => ['10.42.0.0/16', '10.43.0.0/16'],
+        'overwriteprotocol' => 'https',
+      );
+
+persistence:
+  enabled: true
+  size: 20Gi
+
+redis:
+  enabled: true
+  auth:
+    enabled: false
+
+mariadb:
+  enabled: true
+  architecture: standalone
+  auth:
+    database: nextcloud
+    username: nextcloud
+    password: nextcloud
+  primary:
+    persistence:
+      enabled: true
+      size: 10Gi
+
+service:
+  type: ClusterIP
+  port: 80
+
+httpRoute:
+  enabled: true
+  hostnames:
+    - nextcloud-dev.jeremymr.dev
+  parentRefs:
+    - name: dev-web
+      namespace: envoy-gateway-system
+
+resources:
+  requests:
+    cpu: 250m
+    memory: 512Mi
+  limits:
+    cpu: 1000m
+    memory: 2Gi
+
+startupProbe:
+  enabled: true
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 60
+
+livenessProbe:
+  enabled: true
+  initialDelaySeconds: 180
+  periodSeconds: 15
+  timeoutSeconds: 5
+  failureThreshold: 10
+
+readinessProbe:
+  enabled: true
+  initialDelaySeconds: 120
+  periodSeconds: 15
+  timeoutSeconds: 5
+  failureThreshold: 10

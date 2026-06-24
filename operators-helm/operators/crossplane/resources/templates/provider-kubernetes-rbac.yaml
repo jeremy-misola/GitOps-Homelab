@@ -3,7 +3,7 @@ kind: ClusterRoleBinding
 metadata:
   name: provider-kubernetes-admin-binding
   annotations:
-    argocd.argoproj.io/sync-wave: "5"
+    argocd.argoproj.io/sync-wave: "15"
 subjects:
   - kind: ServiceAccount
     name: provider-kubernetes
@@ -18,7 +18,7 @@ kind: ClusterRoleBinding
 metadata:
   name: provider-helm-admin-binding
   annotations:
-    argocd.argoproj.io/sync-wave: "5"
+    argocd.argoproj.io/sync-wave: "15"
 subjects:
   - kind: ServiceAccount
     name: provider-helm

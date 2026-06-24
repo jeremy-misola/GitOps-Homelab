@@ -7,7 +7,7 @@ operators:
     syncWave: 10
     repoURL: https://charts.external-secrets.io
     chart: external-secrets
-    targetRevision: 2.2.0
+    targetRevision: 2.6.0
     postResources:
       enabled: true
 
@@ -16,7 +16,7 @@ operators:
     syncWave: 20
     repoURL: https://metallb.github.io/metallb
     chart: metallb
-    targetRevision: 0.15.3
+    targetRevision: 0.16.1
     postResources:
       enabled: true
       templated: true
@@ -26,18 +26,19 @@ operators:
     syncWave: 30
     repoURL: https://charts.jetstack.io
     chart: cert-manager
-    targetRevision: v1.19.2
+    targetRevision: v1.20.2
     preResources:
       enabled: true
     postResources:
       enabled: true
 
-  - name: longhorn
-    namespace: longhorn-system
-    syncWave: 40
-    repoURL: https://charts.longhorn.io
-    chart: longhorn
-    targetRevision: 1.11.1
+  # My poor 1tb storage cannot do longhorn :(
+  # - name: longhorn
+  #   namespace: longhorn-system
+  #   syncWave: 40
+  #   repoURL: https://charts.longhorn.io
+  #   chart: longhorn
+  #   targetRevision: 1.11.1
 
   - name: crossplane
     namespace: crossplane-system
@@ -57,7 +58,7 @@ operators:
     syncWave: 70
     repoURL: https://datahub-local.github.io/garage-helm
     chart: garage
-    targetRevision: 0.2.1
+    targetRevision: 0.6.0
     preResources:
       enabled: true
 
@@ -99,7 +100,7 @@ operators:
     syncWave: 110
     repoURL: https://open-telemetry.github.io/opentelemetry-helm-charts
     chart: opentelemetry-operator
-    targetRevision: 0.102.0
+    targetRevision: 0.117.0
     postResources:
       enabled: true
       syncWave: 205
@@ -119,7 +120,7 @@ operators:
     syncWave: 170
     repoURL: https://grafana.github.io/helm-charts
     chart: tempo
-    targetRevision: 1.24.2
+    targetRevision: 1.24.4
 
   - name: kube-prometheus
     namespace: monitoring
@@ -139,14 +140,14 @@ operators:
     syncWave: 190
     repoURL: https://cloudnative-pg.io/charts/
     chart: cloudnative-pg
-    targetRevision: 0.28.0
+    targetRevision: 0.28.3
 
   - name: otel-collector
     namespace: opentelemetry-collector
     syncWave: 200
     repoURL: https://open-telemetry.github.io/opentelemetry-helm-charts
     chart: opentelemetry-collector
-    targetRevision: 0.143.0
+    targetRevision: 0.159.0
     preResources:
       enabled: true
       templated: true
@@ -156,14 +157,31 @@ operators:
     syncWave: 210
     repoURL: https://prometheus-community.github.io/helm-charts
     chart: prometheus-blackbox-exporter
-    targetRevision: 11.7.0
+    targetRevision: 11.13.0
+    
+#################################
+############ APPS ###############
+#################################
+
+  - name: stirling-pdf
+    namespace: stirling-pdf
+    syncWave: 220
+    repoURL: https://docs.stirlingpdf.com/Stirling-PDF-chart/
+    chart: stirling-pdf-chart
+    targetRevision: 3.1.0
+    preResources:
+      enabled: true
+      templated: true
+    postResources:
+      enabled: true
+      templated: true
 
   - name: backstage
     namespace: backstage
     syncWave: 220
     repoURL: https://backstage.github.io/charts
     chart: backstage
-    targetRevision: 2.6.3
+    targetRevision: 2.8.2
     preResources:
       enabled: true
       templated: true
@@ -173,7 +191,7 @@ operators:
 
   - name: adguard
     namespace: adguard
-    syncWave: 230
+    syncWave: 220
     repoURL: oci://ghcr.io/gabe565/charts/adguard-home
     chart: adguard
     targetRevision: 0.3.25
@@ -184,25 +202,69 @@ operators:
       enabled: true
       templated: true
 
+  - name: nextcloud
+    namespace: nextcloud
+    syncWave: 220
+    repoURL: https://nextcloud.github.io/helm/
+    chart: nextcloud
+    targetRevision: 9.1.3
+    preResources:
+      enabled: true
+      templated: true
+    postResources:
+      enabled: true
+      templated: true
+
+  - name: home-assistant
+    namespace: home-assistant
+    syncWave: 220
+    repoURL: http://pajikos.github.io/home-assistant-helm-chart
+    chart: home-assistant
+    targetRevision: 0.3.67
+
   - name: kubesandbox-backend
     namespace: kubesandbox
-    syncWave: 240
+    syncWave: 220
     repoURL: https://jeremy-misola.github.io/kubesandbox/
     chart: kubesandbox-backend
     targetRevision: 0.1.5
 
   - name: kubesandbox-frontend
     namespace: kubesandbox
-    syncWave: 250
+    syncWave: 220
     repoURL: https://jeremy-misola.github.io/kubesandbox/
     chart: kubesandbox-frontend
     targetRevision: 0.1.6
+
+  - name: immich
+    namespace: immich
+    syncWave: 220
+    repoURL: https://immich-app.github.io/immich-charts
+    chart: immich
+    targetRevision: 0.12.0
+    preResources:
+      enabled: true
+      templated: true
     postResources:
       enabled: true
       templated: true
 
   - name: portfolio
     namespace: portfolio
-    syncWave: 260
+    syncWave: 220
+    repoURL: docker.io/jurassicjey
+    chart: portfolio-helm
+    targetRevision: 0.1.1779414165-e96116f
+
+  - name: code-server
+    namespace: code-server
+    syncWave: 220
+    repoURL: https://general-intelligence-systems.github.io/code-server-helm
+    chart: code-server
+    targetRevision: 3.39.0
+    preResources:
+      enabled: true
+      templated: true
     postResources:
       enabled: true
+      templated: true

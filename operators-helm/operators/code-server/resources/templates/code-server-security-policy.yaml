@@ -1,0 +1,21 @@
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: SecurityPolicy
+metadata:
+  name: code-server-oidc-config
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: code-server-route
+  oidc:
+    provider:
+      issuer: "https://auth{{ .Values.envSuffix }}.jeremymr.dev/application/o/code-server/"
+    clientIDRef:
+      name: code-server-client-secret
+    clientSecret:
+      name: code-server-client-secret
+    redirectURL: "https://code-server{{ .Values.envSuffix }}.jeremymr.dev/oauth2/callback"
+    logoutPath: "/logout"
