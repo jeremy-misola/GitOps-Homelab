@@ -273,19 +273,6 @@ operators:
       enabled: true
       templated: true
 
-  - name: kubernetes-dashboard
-    namespace: kubernetes-dashboard
-    syncWave: 60
-    repoURL: https://kubernetes.github.io/dashboard
-    chart: kubernetes-dashboard
-    targetRevision: 7.14.0
-    preResources:
-      enabled: true
-      templated: true
-    postResources:
-      enabled: true
-      templated: true
-
   - name: minecraft
     namespace: minecraft
     syncWave: 60

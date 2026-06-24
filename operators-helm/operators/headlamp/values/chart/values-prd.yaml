@@ -1,0 +1,4 @@
+config:
+  # Authenticate every user as the pod's service account.
+  # Safe here because Envoy Gateway SecurityPolicy handles OIDC auth in front of Headlamp.
+  unsafeUseServiceAccountToken: true

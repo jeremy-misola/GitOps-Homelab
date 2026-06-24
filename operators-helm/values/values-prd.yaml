@@ -293,6 +293,19 @@ operators:
       enabled: true
       templated: true
 
+  - name: headlamp
+    namespace: headlamp
+    syncWave: 60
+    repoURL: https://kubernetes-sigs.github.io/headlamp/
+    chart: headlamp
+    targetRevision: 0.43.0
+    preResources:
+      enabled: true
+      templated: true
+    postResources:
+      enabled: true
+      templated: true
+
   - name: minecraft
     namespace: minecraft
     syncWave: 60
