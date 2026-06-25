@@ -27,22 +27,29 @@ spec:
           sendResolved: true
   inhibitRules:
     - sourceMatch:
-        severity: critical
-      targetMatchRE:
-        severity: "warning|info"
+        - name: severity
+          value: critical
+      targetMatch:
+        - name: severity
+          value: "warning|info"
+          regex: true
       equal:
         - namespace
         - alertname
     - sourceMatch:
-        severity: warning
+        - name: severity
+          value: warning
       targetMatch:
-        severity: info
+        - name: severity
+          value: info
       equal:
         - namespace
         - alertname
     - sourceMatch:
-        alertname: InfoInhibitor
+        - name: alertname
+          value: InfoInhibitor
       targetMatch:
-        severity: info
+        - name: severity
+          value: info
       equal:
         - namespace
