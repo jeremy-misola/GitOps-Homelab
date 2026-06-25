@@ -33,4 +33,5 @@ terraform.rc
 
 # Virtual Environments
 venv-*
-provisioning/terraform/venv-*
+provisioning/terraform/venv-*.DS_Store # if not already there
+.DS_Store
