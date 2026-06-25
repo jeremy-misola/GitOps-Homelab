@@ -1,0 +1,45 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: pv-usage-alerts
+  namespace: monitoring
+  labels:
+    # Picked up by kube-prometheus-stack's Prometheus instance
+    release: kube-prometheus-helm
+spec:
+  groups:
+    - name: persistent-volume-usage
+      interval: 1m
+      rules:
+        - alert: PersistentVolumeUsageHigh
+          expr: |
+            (
+              kubelet_volume_stats_used_bytes
+              /
+              kubelet_volume_stats_capacity_bytes
+            ) > 0.75
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "PersistentVolume usage above 75%"
+            description: >-
+              PVC {{ $labels.persistentvolumeclaim }} in namespace {{ $labels.namespace }}
+              on node {{ $labels.node }} is {{ $value | humanizePercentage }} full.
+
+        - alert: PersistentVolumeUsageCritical
+          expr: |
+            (
+              kubelet_volume_stats_used_bytes
+              /
+              kubelet_volume_stats_capacity_bytes
+            ) > 0.90
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "PersistentVolume usage above 90%"
+            description: >-
+              PVC {{ $labels.persistentvolumeclaim }} in namespace {{ $labels.namespace }}
+              on node {{ $labels.node }} is {{ $value | humanizePercentage }} full.
+              Immediate action required.
