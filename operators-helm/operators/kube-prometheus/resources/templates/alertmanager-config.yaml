@@ -26,35 +26,23 @@ spec:
             key: discord-webhook-url
           sendResolved: true
   inhibitRules:
-    - sourceMatchers:
-        - name: severity
-          matchType: "="
-          value: critical
-      targetMatchers:
-        - name: severity
-          matchType: "=~"
-          value: warning|info
+    - sourceMatch:
+        severity: critical
+      targetMatchRE:
+        severity: "warning|info"
       equal:
         - namespace
         - alertname
-    - sourceMatchers:
-        - name: severity
-          matchType: "="
-          value: warning
-      targetMatchers:
-        - name: severity
-          matchType: "="
-          value: info
+    - sourceMatch:
+        severity: warning
+      targetMatch:
+        severity: info
       equal:
         - namespace
         - alertname
-    - sourceMatchers:
-        - name: alertname
-          matchType: "="
-          value: InfoInhibitor
-      targetMatchers:
-        - name: severity
-          matchType: "="
-          value: info
+    - sourceMatch:
+        alertname: InfoInhibitor
+      targetMatch:
+        severity: info
       equal:
         - namespace
