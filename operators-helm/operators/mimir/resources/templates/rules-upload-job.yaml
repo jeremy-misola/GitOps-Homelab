@@ -1,0 +1,32 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: mimir-rules-upload
+  namespace: mimir
+  annotations:
+    # Run after all resources in this Application are synced, re-creates on each sync
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+spec:
+  ttlSecondsAfterFinished: 600
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: upload
+          # mimirtool version matches mimir-distributed chart 5.6.0 = mimir 2.16.0
+          image: grafana/mimirtool:2.16.0
+          command:
+            - mimirtool
+            - rules
+            - load
+            - /rules/persistent-volumes.yaml
+            - --address=http://mimir-helm-nginx.mimir.svc.cluster.local
+            - --id=prod
+          volumeMounts:
+            - name: rules
+              mountPath: /rules
+      volumes:
+        - name: rules
+          configMap:
+            name: mimir-rules-persistent-volumes
