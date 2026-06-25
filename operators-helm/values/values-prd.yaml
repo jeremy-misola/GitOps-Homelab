@@ -230,7 +230,10 @@ operators:
     syncWave: 60
     repoURL: https://jeremy-misola.github.io/kubesandbox/
     chart: kubesandbox-frontend
-    targetRevision: 0.1.6
+    targetRevision: 0.1.7
+    preResources:
+      enabled: true
+      templated: true
 
   - name: immich
     namespace: immich
