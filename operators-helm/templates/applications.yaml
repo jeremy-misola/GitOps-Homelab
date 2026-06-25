@@ -60,6 +60,9 @@ metadata:
   namespace: argocd
   annotations:
     argocd.argoproj.io/sync-wave: "{{ $operator.syncWave }}"
+    {{- with $operator.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:

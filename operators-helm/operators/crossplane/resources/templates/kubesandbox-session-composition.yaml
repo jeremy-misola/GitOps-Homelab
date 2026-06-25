@@ -118,6 +118,42 @@ spec:
                   string:
                     fmt: "%s-%s"
                 toFieldPath: spec.forProvider.manifest.metadata.namespace
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.profile
+                toFieldPath: spec.forProvider.manifest.spec.hard[requests.cpu]
+                transforms:
+                  - type: map
+                    map:
+                      starter: "1"
+                      standard: "2"
+                      advanced: "4"
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.profile
+                toFieldPath: spec.forProvider.manifest.spec.hard[limits.cpu]
+                transforms:
+                  - type: map
+                    map:
+                      starter: "1"
+                      standard: "2"
+                      advanced: "4"
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.profile
+                toFieldPath: spec.forProvider.manifest.spec.hard[requests.memory]
+                transforms:
+                  - type: map
+                    map:
+                      starter: 2Gi
+                      standard: 4Gi
+                      advanced: 8Gi
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.profile
+                toFieldPath: spec.forProvider.manifest.spec.hard[limits.memory]
+                transforms:
+                  - type: map
+                    map:
+                      starter: 2Gi
+                      standard: 4Gi
+                      advanced: 8Gi
 
           - name: vcluster-release
             base:
