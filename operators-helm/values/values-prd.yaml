@@ -7,7 +7,7 @@ operators:
     syncWave: 10
     repoURL: https://charts.external-secrets.io
     chart: external-secrets
-    targetRevision: 2.2.0
+    targetRevision: 2.6.0
     postResources:
       enabled: true
 
@@ -16,17 +16,17 @@ operators:
     syncWave: 20
     repoURL: https://metallb.github.io/metallb
     chart: metallb
-    targetRevision: 0.15.3
+    targetRevision: 0.16.1
     postResources:
       enabled: true
       templated: true
 
   - name: cert-manager
     namespace: cert-manager
-    syncWave: 30
+    syncWave: 20
     repoURL: https://charts.jetstack.io
     chart: cert-manager
-    targetRevision: v1.19.2
+    targetRevision: v1.20.2
     preResources:
       enabled: true
     postResources:
@@ -41,10 +41,10 @@ operators:
 
   - name: crossplane
     namespace: crossplane-system
-    syncWave: 50
+    syncWave: 20
     repoURL: https://charts.crossplane.io/stable
     chart: crossplane
-    targetRevision: 1.18.2
+    targetRevision: 2.2.1
     preResources:
       enabled: true
     postResources:
@@ -54,16 +54,16 @@ operators:
 
   - name: garage
     namespace: garage
-    syncWave: 70
+    syncWave: 20
     repoURL: https://datahub-local.github.io/garage-helm
     chart: garage
-    targetRevision: 0.2.1
+    targetRevision: 0.6.0
     preResources:
       enabled: true
 
   - name: envoy-gateway
     namespace: envoy-gateway-system
-    syncWave: 80
+    syncWave: 20
     repoURL: docker.io/envoyproxy
     chart: gateway-helm
     targetRevision: v1.7.1
@@ -75,10 +75,10 @@ operators:
 
   - name: authentik
     namespace: authentik
-    syncWave: 90
+    syncWave: 20
     repoURL: https://charts.goauthentik.io/
     chart: authentik
-    targetRevision: 2025.10.3
+    targetRevision: 2026.2.2
     preResources:
       enabled: true
     postResources:
@@ -87,7 +87,7 @@ operators:
 
   - name: cloudflare
     namespace: cloudflare
-    syncWave: 100
+    syncWave: 20
     preResources:
       enabled: true
       templated: true
@@ -96,37 +96,47 @@ operators:
 
   - name: otel-operator
     namespace: opentelemetry-operator
-    syncWave: 110
+    syncWave: 20
     repoURL: https://open-telemetry.github.io/opentelemetry-helm-charts
     chart: opentelemetry-operator
-    targetRevision: 0.102.0
+    targetRevision: 0.117.0
     postResources:
       enabled: true
-      syncWave: 205
       namespace: opentelemetry-collector
 
   - name: loki
     namespace: loki
-    syncWave: 160
+    syncWave: 30
     repoURL: https://grafana.github.io/helm-charts
     chart: loki
-    targetRevision: 6.49.0
+    targetRevision: 7.0.0
     preResources:
       enabled: true
 
   - name: tempo
     namespace: tempo
-    syncWave: 170
+    syncWave: 30
     repoURL: https://grafana.github.io/helm-charts
     chart: tempo
-    targetRevision: 1.24.2
+    targetRevision: 1.24.4
+
+  - name: mimir
+    namespace: mimir
+    syncWave: 30
+    repoURL: https://grafana.github.io/helm-charts
+    chart: mimir-distributed
+    targetRevision: 5.6.0
+    preResources:
+      enabled: true
+    postResources:
+      enabled: true
 
   - name: kube-prometheus
     namespace: monitoring
-    syncWave: 180
+    syncWave: 40
     repoURL: https://prometheus-community.github.io/helm-charts
     chart: kube-prometheus-stack
-    targetRevision: 80.13.3
+    targetRevision: 84.5.0
     preResources:
       enabled: true
       templated: true
@@ -136,31 +146,35 @@ operators:
 
   - name: cloudnativepg
     namespace: cloudnativepg
-    syncWave: 190
+    syncWave: 50
     repoURL: https://cloudnative-pg.io/charts/
     chart: cloudnative-pg
-    targetRevision: 0.28.0
+    targetRevision: 0.28.3
 
   - name: otel-collector
     namespace: opentelemetry-collector
-    syncWave: 200
+    syncWave: 50
     repoURL: https://open-telemetry.github.io/opentelemetry-helm-charts
     chart: opentelemetry-collector
-    targetRevision: 0.143.0
+    targetRevision: 0.159.0
     preResources:
       enabled: true
       templated: true
 
   - name: blackbox-exporter
     namespace: monitoring
-    syncWave: 210
+    syncWave: 50
     repoURL: https://prometheus-community.github.io/helm-charts
     chart: prometheus-blackbox-exporter
-    targetRevision: 11.7.0
+    targetRevision: 11.13.0
+
+#################################
+############ APPS ###############
+#################################
 
   - name: stirling-pdf
     namespace: stirling-pdf
-    syncWave: 220
+    syncWave: 60
     repoURL: https://docs.stirlingpdf.com/Stirling-PDF-chart/
     chart: stirling-pdf-chart
     targetRevision: 3.1.0
@@ -173,20 +187,20 @@ operators:
 
   - name: backstage
     namespace: backstage
-    syncWave: 220
+    syncWave: 60
     repoURL: https://backstage.github.io/charts
     chart: backstage
-    targetRevision: 2.6.3
+    targetRevision: 2.8.2
     preResources:
-      templated: true
       enabled: true
+      templated: true
     postResources:
       enabled: true
       templated: true
 
   - name: adguard
     namespace: adguard
-    syncWave: 220
+    syncWave: 60
     repoURL: oci://ghcr.io/gabe565/charts/adguard-home
     chart: adguard
     targetRevision: 0.3.25
@@ -197,23 +211,30 @@ operators:
       enabled: true
       templated: true
 
+  - name: home-assistant
+    namespace: home-assistant
+    syncWave: 60
+    repoURL: http://pajikos.github.io/home-assistant-helm-chart
+    chart: home-assistant
+    targetRevision: 0.3.67
+
   - name: kubesandbox-backend
     namespace: kubesandbox
-    syncWave: 220
+    syncWave: 60
     repoURL: https://jeremy-misola.github.io/kubesandbox/
     chart: kubesandbox-backend
     targetRevision: 0.1.5
 
   - name: kubesandbox-frontend
     namespace: kubesandbox
-    syncWave: 220
+    syncWave: 60
     repoURL: https://jeremy-misola.github.io/kubesandbox/
     chart: kubesandbox-frontend
     targetRevision: 0.1.6
 
   - name: immich
     namespace: immich
-    syncWave: 220
+    syncWave: 60
     repoURL: https://immich-app.github.io/immich-charts
     chart: immich
     targetRevision: 0.12.0
@@ -226,7 +247,7 @@ operators:
 
   - name: vaultwarden
     namespace: vaultwarden
-    syncWave: 220
+    syncWave: 60
     repoURL: https://guerzon.github.io/vaultwarden
     chart: vaultwarden
     targetRevision: 0.39.0
@@ -237,26 +258,19 @@ operators:
       enabled: true
       templated: true
 
-  - name: home-assistant
-    namespace: home-assistant
-    syncWave: 220
-    repoURL: http://pajikos.github.io/home-assistant-helm-chart
-    chart: home-assistant
-    targetRevision: 0.3.66
-
   - name: portfolio
     namespace: portfolio
-    syncWave: 220
+    syncWave: 60
     repoURL: docker.io/jurassicjey
     chart: portfolio-helm
     targetRevision: 0.1.1779414165-e96116f
 
   - name: code-server
     namespace: code-server
-    syncWave: 220
+    syncWave: 60
     repoURL: https://general-intelligence-systems.github.io/code-server-helm
     chart: code-server
-    targetRevision: 3.38.0
+    targetRevision: 3.39.0
     preResources:
       enabled: true
       templated: true
@@ -266,7 +280,7 @@ operators:
 
   - name: homepage
     namespace: homepage
-    syncWave: 220
+    syncWave: 60
     repoURL: https://jameswynn.github.io/helm-charts
     chart: homepage
     targetRevision: 2.1.0
@@ -277,14 +291,38 @@ operators:
       enabled: true
       templated: true
 
-  - name: minecraft
-    namespace: minecraft
-    syncWave: 155
+  - name: kubernetes-dashboard
+    namespace: kubernetes-dashboard
+    syncWave: 60
+    repoURL: https://kubernetes.github.io/dashboard
+    chart: kubernetes-dashboard
+    targetRevision: 7.14.0
     preResources:
       enabled: true
-      syncWave: 155
+      templated: true
+    postResources:
+      enabled: true
+      templated: true
+
+  - name: headlamp
+    namespace: headlamp
+    syncWave: 60
+    repoURL: https://kubernetes-sigs.github.io/headlamp/
+    chart: headlamp
+    targetRevision: 0.43.0
+    preResources:
+      enabled: true
+      templated: true
+    postResources:
+      enabled: true
+      templated: true
+
+  - name: minecraft
+    namespace: minecraft
+    syncWave: 60
+    preResources:
+      enabled: true
       namespace: crossplane-system
     postResources:
       enabled: true
-      syncWave: 165
       namespace: minecraft

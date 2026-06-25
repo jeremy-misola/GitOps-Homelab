@@ -4,6 +4,7 @@ metadata:
   name: provider-terraform
   annotations:
     argocd.argoproj.io/sync-wave: "0"
+    argocd.argoproj.io/sync-options: Wait=true
 spec:
   package: xpkg.upbound.io/upbound/provider-terraform:v0.19.0
   ignoreCrossplaneConstraints: true

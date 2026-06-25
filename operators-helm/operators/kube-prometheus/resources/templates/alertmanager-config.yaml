@@ -1,4 +1,4 @@
-apiVersion: monitoring.coreos.com/v1beta1
+apiVersion: monitoring.coreos.com/v1alpha1
 kind: AlertmanagerConfig
 metadata:
   name: discord-alertmanager-config
@@ -26,35 +26,30 @@ spec:
             key: discord-webhook-url
           sendResolved: true
   inhibitRules:
-    - sourceMatchers:
+    - sourceMatch:
         - name: severity
-          matchType: "="
           value: critical
-      targetMatchers:
+      targetMatch:
         - name: severity
-          matchType: "=~"
-          value: warning|info
+          value: "warning|info"
+          regex: true
       equal:
         - namespace
         - alertname
-    - sourceMatchers:
+    - sourceMatch:
         - name: severity
-          matchType: "="
           value: warning
-      targetMatchers:
+      targetMatch:
         - name: severity
-          matchType: "="
           value: info
       equal:
         - namespace
         - alertname
-    - sourceMatchers:
+    - sourceMatch:
         - name: alertname
-          matchType: "="
           value: InfoInhibitor
-      targetMatchers:
+      targetMatch:
         - name: severity
-          matchType: "="
           value: info
       equal:
         - namespace

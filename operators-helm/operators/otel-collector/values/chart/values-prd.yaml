@@ -66,11 +66,6 @@ config:
       endpoint: tempo-helm.tempo.svc.cluster.local:4317
       tls:
         insecure: true
-    # Grafana Cloud - logs & traces via OTLP
-    otlphttp/grafana:
-      endpoint: https://otlp-gateway-prod-ca-east-0.grafana.net/otlp
-      headers:
-        authorization: "${env:GRAFANA_CLOUD_BASIC_AUTH_HEADER}"
 
   service:
     extensions: [health_check]
@@ -78,15 +73,8 @@ config:
       logs:
         receivers: [otlp, filelog]
         processors: [k8sattributes, batch]
-        exporters: [otlphttp/loki, otlphttp/grafana]
+        exporters: [otlphttp/loki]
       traces:
         receivers: [otlp]
         processors: [k8sattributes, batch]
-        exporters: [otlp/tempo, otlphttp/grafana]
-
-extraEnvs:
-  - name: GRAFANA_CLOUD_BASIC_AUTH_HEADER
-    valueFrom:
-      secretKeyRef:
-        name: grafana-cloud-otel
-        key: basic-auth-header
+        exporters: [otlp/tempo]

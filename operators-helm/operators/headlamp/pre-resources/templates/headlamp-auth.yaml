@@ -1,7 +1,7 @@
 apiVersion: tf.upbound.io/v1beta1
 kind: Workspace
 metadata:
-  name: nextcloud-auth
+  name: headlamp-auth
   namespace: {{ .Release.Namespace }}
   annotations:
     argocd.argoproj.io/sync-wave: "17"
@@ -35,6 +35,10 @@ spec:
         type = string
       }
 
+      variable "env_suffix" {
+        type = string
+      }
+
       provider "authentik" {
         url   = var.authentik_url
         token = var.authentik_token
@@ -48,34 +52,34 @@ spec:
         slug = var.invalidation_flow
       }
 
-      resource "authentik_provider_oauth2" "nextcloud" {
-        name               = "Nextcloud"
+      resource "authentik_provider_oauth2" "headlamp" {
+        name               = "Headlamp"
+        client_id          = "headlamp"
         authorization_flow = data.authentik_flow.authorization.id
         invalidation_flow  = data.authentik_flow.invalidation.id
         client_type        = "confidential"
-        client_id          = "nextcloud"
 
         allowed_redirect_uris = [
           {
             matching_mode = "strict"
-            url           = "https://nextcloud{{ .Values.envSuffix }}.jeremymr.dev/oauth2/callback"
+            url           = "https://headlamp${var.env_suffix}.jeremymr.dev/oauth2/callback"
           }
         ]
       }
 
-      resource "authentik_application" "nextcloud" {
-        name               = "Nextcloud"
-        slug               = "nextcloud"
-        protocol_provider  = authentik_provider_oauth2.nextcloud.id
+      resource "authentik_application" "headlamp" {
+        name               = "Headlamp"
+        slug               = "headlamp"
+        protocol_provider  = authentik_provider_oauth2.headlamp.id
         policy_engine_mode = "any"
       }
 
       output "client-id" {
-        value = authentik_provider_oauth2.nextcloud.client_id
+        value = authentik_provider_oauth2.headlamp.client_id
       }
 
       output "client-secret" {
-        value     = authentik_provider_oauth2.nextcloud.client_secret
+        value     = authentik_provider_oauth2.headlamp.client_secret
         sensitive = true
       }
 
@@ -86,6 +90,9 @@ spec:
         value: "default-provider-authorization-explicit-consent"
       - key: invalidation_flow
         value: "default-provider-invalidation-flow"
+      - key: env_suffix
+        value: "{{ .Values.envSuffix }}"
+
     env:
       - name: TF_VAR_authentik_token
         secretKeyRef:
@@ -94,8 +101,8 @@ spec:
           key: token
 
   writeConnectionSecretToRef:
-    name: nextcloud-client-secret
-    namespace: nextcloud
+    name: headlamp-client-secret
+    namespace: headlamp
 
   providerConfigRef:
     name: terraform-config

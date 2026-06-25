@@ -1,0 +1,113 @@
+apiVersion: tf.upbound.io/v1beta1
+kind: Workspace
+metadata:
+  name: garage-mimir-buckets
+  namespace: crossplane-system
+  annotations:
+    argocd.argoproj.io/sync-wave: "17"
+spec:
+  forProvider:
+    source: Inline
+    module: |
+      terraform {
+        required_providers {
+          garage = {
+            source  = "arsolitt/garagehq"
+            version = ">= 0.0.1"
+          }
+        }
+      }
+
+      variable "garage_host" {
+        type = string
+      }
+
+      variable "garage_scheme" {
+        type    = string
+        default = "http"
+      }
+
+      variable "garage_token" {
+        type      = string
+        sensitive = true
+      }
+
+      provider "garage" {
+        host   = var.garage_host
+        scheme = var.garage_scheme
+        token  = var.garage_token
+      }
+
+      # Create Mimir buckets
+      resource "garage_bucket" "mimir_blocks" {
+        global_alias = "mimir-blocks"
+      }
+
+      resource "garage_bucket" "mimir_alertmanager" {
+        global_alias = "mimir-alertmanager"
+      }
+
+      resource "garage_bucket" "mimir_ruler" {
+        global_alias = "mimir-ruler"
+      }
+
+      # Create a single access key for Mimir
+      resource "garage_key" "mimir" {
+        name = "mimir-key"
+      }
+
+      # Grant access to all buckets
+      resource "garage_bucket_key" "mimir_blocks" {
+        bucket_id     = garage_bucket.mimir_blocks.id
+        access_key_id = garage_key.mimir.access_key_id
+        read          = true
+        write         = true
+        owner         = false
+      }
+
+      resource "garage_bucket_key" "mimir_alertmanager" {
+        bucket_id     = garage_bucket.mimir_alertmanager.id
+        access_key_id = garage_key.mimir.access_key_id
+        read          = true
+        write         = true
+        owner         = false
+      }
+
+      resource "garage_bucket_key" "mimir_ruler" {
+        bucket_id     = garage_bucket.mimir_ruler.id
+        access_key_id = garage_key.mimir.access_key_id
+        read          = true
+        write         = true
+        owner         = false
+      }
+
+      # Outputs for Kubernetes secret
+      output "access-key-id" {
+        value = garage_key.mimir.access_key_id
+      }
+
+      output "secret-access-key" {
+        value     = garage_key.mimir.secret_access_key
+        sensitive = true
+      }
+
+    vars:
+      - key: garage_host
+        value: "garage.garage.svc:3903"
+      - key: garage_scheme
+        value: "http"
+
+    env:
+      - name: TF_VAR_garage_token
+        secretKeyRef:
+          namespace: crossplane-system
+          name: garage-admin-credentials
+          key: garage-admin-token
+
+  # Write outputs to a secret consumed by Mimir
+  writeConnectionSecretToRef:
+    name: mimir-s3-credentials
+    namespace: mimir
+
+  providerConfigRef:
+    name: terraform-config
