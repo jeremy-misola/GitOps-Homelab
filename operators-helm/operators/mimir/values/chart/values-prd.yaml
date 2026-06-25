@@ -27,6 +27,10 @@ mimir:
         bucket_name: mimir-ruler
         bucket_lookup_type: path
 
+    ingester:
+      ring:
+        replication_factor: 1
+
     limits:
       ingestion_rate: 100000
       max_global_series_per_user: 1000000
