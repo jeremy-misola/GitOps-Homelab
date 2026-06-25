@@ -1,5 +1,5 @@
 defaultRules:
-  create: true
+  create: false
 additionalPrometheusRulesMap:
   custom-alerts:
     groups:
