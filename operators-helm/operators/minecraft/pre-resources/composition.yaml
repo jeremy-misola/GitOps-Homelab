@@ -186,6 +186,64 @@ spec:
                 fieldPath: status.atProvider.state
                 matchString: deployed
 
+          # ── Minecraft Service Observer ────────────────────────────────────────
+          # Observes the LoadBalancer Service created by the Helm chart and
+          # patches its external IP back to status.serverIP on the composite.
+          - name: minecraft-service-observer
+            base:
+              apiVersion: kubernetes.crossplane.io/v1alpha2
+              kind: Object
+              spec:
+                managementPolicies: ["Observe"]
+                providerConfigRef:
+                  name: kubernetes-incluster
+                forProvider:
+                  manifest:
+                    apiVersion: v1
+                    kind: Service
+                    metadata:
+                      name: placeholder
+                      namespace: placeholder
+            patches:
+              - type: CombineFromComposite
+                combine:
+                  variables:
+                    - fromFieldPath: metadata.labels[crossplane.io/claim-namespace]
+                    - fromFieldPath: metadata.labels[crossplane.io/claim-name]
+                  strategy: string
+                  string:
+                    fmt: "%s-%s-minecraft-svc-observer"
+                toFieldPath: metadata.name
+
+              - type: CombineFromComposite
+                combine:
+                  variables:
+                    - fromFieldPath: metadata.labels[crossplane.io/claim-namespace]
+                    - fromFieldPath: metadata.labels[crossplane.io/claim-name]
+                  strategy: string
+                  string:
+                    fmt: "%s-%s-minecraft"
+                toFieldPath: spec.forProvider.manifest.metadata.name
+
+              - type: CombineFromComposite
+                combine:
+                  variables:
+                    - fromFieldPath: metadata.labels[crossplane.io/claim-namespace]
+                    - fromFieldPath: metadata.labels[crossplane.io/claim-name]
+                  strategy: string
+                  string:
+                    fmt: "%s-%s"
+                toFieldPath: spec.forProvider.manifest.metadata.namespace
+
+              - type: ToCompositeFieldPath
+                fromFieldPath: status.atProvider.manifest.status.loadBalancer.ingress[0].ip
+                toFieldPath: status.serverIP
+                policy:
+                  fromFieldPath: Optional
+
+            readinessChecks:
+              - type: None
+
     - step: automatically-detect-ready-composed-resources
       functionRef:
         name: function-auto-ready

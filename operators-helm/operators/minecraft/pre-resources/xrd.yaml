@@ -117,3 +117,6 @@ spec:
                 helmRelease:
                   type: string
                   description: Name of the Crossplane Helm Release managing the server.
+                serverIP:
+                  type: string
+                  description: LoadBalancer IP address assigned to the Minecraft service.
