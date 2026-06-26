@@ -1,0 +1,6 @@
+apiVersion: v2
+name: kubesandbox-backend-pre-resources
+description: Pre-requisite resources for KubeSandbox Backend (Authentik OIDC)
+type: application
+version: 0.1.0
+appVersion: "1.0"

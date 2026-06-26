@@ -223,13 +223,16 @@ operators:
     syncWave: 60
     repoURL: https://jeremy-misola.github.io/kubesandbox/
     chart: kubesandbox-backend
-    targetRevision: 0.1.5
+    targetRevision: 0.1.6
     annotations:
       argocd-image-updater.argoproj.io/image-list: backend=jurassicjey/kubesandbox-backend:latest
       argocd-image-updater.argoproj.io/backend.update-strategy: digest
       argocd-image-updater.argoproj.io/backend.helm.image-name: image.repository
       argocd-image-updater.argoproj.io/backend.helm.image-tag: image.tag
       argocd-image-updater.argoproj.io/write-back-method: argocd
+    preResources:
+      enabled: true
+      templated: true
 
   - name: kubesandbox-frontend
     namespace: kubesandbox

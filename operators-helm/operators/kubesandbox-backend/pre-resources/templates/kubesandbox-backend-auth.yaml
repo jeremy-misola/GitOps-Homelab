@@ -1,0 +1,132 @@
+apiVersion: tf.upbound.io/v1beta1
+kind: Workspace
+metadata:
+  name: kubesandbox-backend-auth
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "17"
+spec:
+  forProvider:
+    source: Inline
+    module: |
+      terraform {
+        required_providers {
+          authentik = {
+            source  = "goauthentik/authentik"
+            version = "~> 2025.2.0"
+          }
+        }
+      }
+
+      variable "authentik_url" {
+        type = string
+      }
+
+      variable "authentik_token" {
+        type      = string
+        sensitive = true
+      }
+
+      variable "authorization_flow" {
+        type = string
+      }
+
+      variable "invalidation_flow" {
+        type = string
+      }
+
+      # Name of the certificate-key pair Authentik uses to sign the OAuth2
+      # access/ID tokens (RS256). A signing key is REQUIRED here: the backend's
+      # Envoy JWT SecurityPolicy validates bearer tokens against this provider's
+      # JWKS endpoint, which is only populated when an asymmetric signing key is
+      # set. Defaults to the built-in self-signed cert; override if yours differs.
+      variable "signing_key_name" {
+        type = string
+      }
+
+      provider "authentik" {
+        url   = var.authentik_url
+        token = var.authentik_token
+      }
+
+      data "authentik_flow" "authorization" {
+        slug = var.authorization_flow
+      }
+
+      data "authentik_flow" "invalidation" {
+        slug = var.invalidation_flow
+      }
+
+      data "authentik_certificate_key_pair" "signing" {
+        name = var.signing_key_name
+      }
+
+      resource "authentik_provider_oauth2" "kubesandbox_backend" {
+        name               = "KubeSandbox Backend"
+        client_id          = "kubesandbox-backend"
+        authorization_flow = data.authentik_flow.authorization.id
+        invalidation_flow  = data.authentik_flow.invalidation.id
+        client_type        = "confidential"
+
+        # Issue RS256-signed JWTs and publish the public key at the provider's
+        # JWKS endpoint so Envoy can validate bearer tokens offline.
+        signing_key = data.authentik_certificate_key_pair.signing.id
+        issuer_mode = "per_provider"
+
+        allowed_redirect_uris = [
+          {
+            matching_mode = "strict"
+            url           = "https://kubesandbox.com/auth/callback"
+          }
+        ]
+      }
+
+      resource "authentik_application" "kubesandbox_backend" {
+        name               = "KubeSandbox Backend"
+        slug               = "kubesandbox-backend"
+        protocol_provider  = authentik_provider_oauth2.kubesandbox_backend.id
+        policy_engine_mode = "any"
+        meta_launch_url    = "https://api.kubesandbox.com"
+      }
+
+      output "client-id" {
+        value = authentik_provider_oauth2.kubesandbox_backend.client_id
+      }
+
+      output "client-secret" {
+        value     = authentik_provider_oauth2.kubesandbox_backend.client_secret
+        sensitive = true
+      }
+
+      # Issuer + JWKS URLs the backend chart's JWT SecurityPolicy must use.
+      output "issuer-url" {
+        value = "${var.authentik_url}/application/o/${authentik_application.kubesandbox_backend.slug}/"
+      }
+
+      output "jwks-uri" {
+        value = "${var.authentik_url}/application/o/${authentik_application.kubesandbox_backend.slug}/jwks/"
+      }
+
+    vars:
+      - key: authentik_url
+        value: "https://auth{{ .Values.envSuffix }}.jeremymr.dev"
+      - key: authorization_flow
+        value: "default-provider-authorization-explicit-consent"
+      - key: invalidation_flow
+        value: "default-provider-invalidation-flow"
+      - key: signing_key_name
+        value: {{ .Values.signingKeyName | default "authentik Self-signed Certificate" | quote }}
+
+    env:
+      - name: TF_VAR_authentik_token
+        secretKeyRef:
+          namespace: crossplane-system
+          name: authentik-api-token
+          key: token
+
+  writeConnectionSecretToRef:
+    name: kubesandbox-backend-client-secret
+    namespace: kubesandbox
+
+  providerConfigRef:
+    name: terraform-config

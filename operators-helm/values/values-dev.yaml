@@ -205,7 +205,10 @@ operators:
     syncWave: 60
     repoURL: https://jeremy-misola.github.io/kubesandbox/
     chart: kubesandbox-backend
-    targetRevision: 0.1.5
+    targetRevision: 0.1.6
+    preResources:
+      enabled: true
+      templated: true
 
   - name: kubesandbox-frontend
     namespace: kubesandbox

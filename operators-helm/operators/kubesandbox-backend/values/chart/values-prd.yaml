@@ -1,1 +1,17 @@
-# No chart overrides for prd.
+# Enable the backend JWT SecurityPolicy (G1 identity source).
+#
+# The Authentik backend OIDC client is created by the pre-resources Workspace
+# (kubesandbox-backend-auth.yaml), application slug "kubesandbox-backend".
+# Issuer mode is per_provider, so:
+#   issuer  = https://auth.jeremymr.dev/application/o/kubesandbox-backend/
+#   jwksUri = https://auth.jeremymr.dev/application/o/kubesandbox-backend/jwks/
+#
+# `issuer` must exactly match the `iss` claim in issued tokens (including the
+# trailing slash). If Authentik is fronted by an internal CA that Envoy doesn't
+# already trust, add a BackendTLSPolicy so Envoy can fetch the JWKS over TLS.
+authentication:
+  enabled: true
+  jwt:
+    providerName: authentik
+    issuer: "https://auth.jeremymr.dev/application/o/kubesandbox-backend/"
+    jwksUri: "https://auth.jeremymr.dev/application/o/kubesandbox-backend/jwks/"

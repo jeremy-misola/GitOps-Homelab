@@ -432,6 +432,19 @@ spec:
                   string:
                     fmt: "vc-%s-%s-vcluster"
                 toFieldPath: spec.forProvider.manifest.spec.volumes[0].secret.secretName
+              # Serve ttyd under the per-session base path /s/<ns>-<name> so it
+              # works behind the shared kubesandbox.com gateway (path-based
+              # routing). The HTTPRoute forwards the prefix unchanged; ttyd's -b
+              # flag makes its UI + websocket resolve under that path.
+              - type: CombineFromComposite
+                combine:
+                  variables:
+                    - fromFieldPath: metadata.labels[crossplane.io/claim-namespace]
+                    - fromFieldPath: metadata.labels[crossplane.io/claim-name]
+                  strategy: string
+                  string:
+                    fmt: "cp /kubeconfig/config /tmp/kubeconfig && export KUBECONFIG=/tmp/kubeconfig && (kubectl config set-context --current --namespace=default >/dev/null 2>&1 || true) && cd /tmp && exec ttyd -W -b /s/%s-%s -p 8080 sh"
+                toFieldPath: spec.forProvider.manifest.spec.containers[0].command[2]
               - type: ToCompositeFieldPath
                 fromFieldPath: metadata.name
                 toFieldPath: status.workspacePod
@@ -545,9 +558,13 @@ spec:
                         - name: kubesandbox
                           namespace: envoy-gateway-system
                       hostnames:
-                        - placeholder
+                        - kubesandbox.com
                       rules:
-                        - backendRefs:
+                        - matches:
+                            - path:
+                                type: PathPrefix
+                                value: /s/placeholder
+                          backendRefs:
                             - name: shell
                               port: 80
             patches:
@@ -576,8 +593,8 @@ spec:
                     - fromFieldPath: metadata.labels[crossplane.io/claim-name]
                   strategy: string
                   string:
-                    fmt: "%s-%s.kubesandbox.com"
-                toFieldPath: spec.forProvider.manifest.spec.hostnames[0]
+                    fmt: "/s/%s-%s"
+                toFieldPath: spec.forProvider.manifest.spec.rules[0].matches[0].path.value
     - step: automatically-detect-ready-composed-resources
       functionRef:
         name: function-auto-ready

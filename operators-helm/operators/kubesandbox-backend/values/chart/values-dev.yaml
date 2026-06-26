@@ -1,1 +1,11 @@
-# No chart overrides for dev.
+# Enable the backend JWT SecurityPolicy (G1 identity source) — dev.
+#
+# Authentik backend OIDC client (slug "kubesandbox-backend") on the -dev host.
+# issuer  = https://auth-dev.jeremymr.dev/application/o/kubesandbox-backend/
+# jwksUri = https://auth-dev.jeremymr.dev/application/o/kubesandbox-backend/jwks/
+authentication:
+  enabled: true
+  jwt:
+    providerName: authentik
+    issuer: "https://auth-dev.jeremymr.dev/application/o/kubesandbox-backend/"
+    jwksUri: "https://auth-dev.jeremymr.dev/application/o/kubesandbox-backend/jwks/"
