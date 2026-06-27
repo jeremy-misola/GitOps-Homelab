@@ -15,3 +15,16 @@ authentication:
     providerName: authentik
     issuer: "https://auth.jeremymr.dev/application/o/kubesandbox-backend/"
     jwksUri: "https://auth.jeremymr.dev/application/o/kubesandbox-backend/jwks/"
+
+# G2 Option B: backend-owned session auth (PKCE + signed session cookie).
+# Set enabled: true after verifying the Workspace has run and
+# kubesandbox-backend-client-secret contains client-secret + session-secret.
+sessionAuth:
+  enabled: false
+  oidc:
+    issuer: "https://auth.jeremymr.dev/application/o/kubesandbox-backend/"
+    clientID: "kubesandbox-backend"
+    redirectURI: "https://kubesandbox.com/oauth2/callback"
+    clientSecret:
+      name: kubesandbox-backend-client-secret
+      namespace: kubesandbox

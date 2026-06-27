@@ -40,12 +40,20 @@ data:
       # Client secret will be auto-generated if not provided
       client_type        = "confidential"
       
-      allowed_redirect_uris = [
-        {
+      # Merge the primary redirect_uri with any additional_redirect_uris.
+      # All URIs use strict matching. existing callers that only set redirect_uri
+      # are unaffected; set additional_redirect_uris for multiple callback paths
+      # (e.g. both /auth/callback and /oauth2/callback).
+      allowed_redirect_uris = concat(
+        var.redirect_uri != "" ? [{
           matching_mode = "strict"
           url           = var.redirect_uri
-        }
-      ]
+        }] : [],
+        [for uri in var.additional_redirect_uris : {
+          matching_mode = "strict"
+          url           = uri
+        }]
+      )
       
       property_mappings = var.property_mappings
       
@@ -117,7 +125,14 @@ data:
 
     variable "redirect_uri" {
       type        = string
-      description = "OAuth2 redirect URI"
+      default     = ""
+      description = "Primary OAuth2 redirect URI (strict match)."
+    }
+
+    variable "additional_redirect_uris" {
+      type        = list(string)
+      default     = []
+      description = "Extra OAuth2 redirect URIs (all strict). Use when an app needs more than one callback path."
     }
 
     variable "client_id" {

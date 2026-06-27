@@ -15,6 +15,10 @@ spec:
             source  = "goauthentik/authentik"
             version = "~> 2025.2.0"
           }
+          random = {
+            source  = "hashicorp/random"
+            version = "~> 3.0"
+          }
         }
       }
 
@@ -36,10 +40,14 @@ spec:
       }
 
       # Name of the certificate-key pair Authentik uses to sign the OAuth2
-      # access/ID tokens (RS256). A signing key is REQUIRED here: the backend's
-      # Envoy JWT SecurityPolicy validates bearer tokens against this provider's
-      # JWKS endpoint, which is only populated when an asymmetric signing key is
-      # set. Defaults to the built-in self-signed cert; override if yours differs.
+      # access/ID tokens (RS256). A signing key is REQUIRED here for two reasons:
+      #   1. The Envoy JWT SecurityPolicy on /api validates bearer tokens against
+      #      this provider's JWKS endpoint, which is only populated when an
+      #      asymmetric key is configured.
+      #   2. The backend-owned session auth (G2 Option B) parses the ID token
+      #      returned during the PKCE code exchange; RS256 + per_provider issuer
+      #      mode ensures a stable, resolvable JWKS if JWKS validation is added later.
+      # Defaults to the built-in self-signed cert; override if yours differs.
       variable "signing_key_name" {
         type = string
       }
@@ -61,6 +69,19 @@ spec:
         name = var.signing_key_name
       }
 
+      # Session cookie signing secret — generated once and never rotated by
+      # Terraform (lifecycle ignore_changes). The same secret is used to sign and
+      # verify kubesandbox session cookies (G2 Option B) and PKCE state tokens.
+      # Rotating this value invalidates all active sessions.
+      resource "random_password" "session_secret" {
+        length  = 64
+        special = false # URL-safe; no quoting issues in env vars or YAML
+
+        lifecycle {
+          ignore_changes = all # Generate once; do not regenerate on re-apply.
+        }
+      }
+
       resource "authentik_provider_oauth2" "kubesandbox_backend" {
         name               = "KubeSandbox Backend"
         client_id          = "kubesandbox-backend"
@@ -68,17 +89,25 @@ spec:
         invalidation_flow  = data.authentik_flow.invalidation.id
         client_type        = "confidential"
 
-        # Issue RS256-signed JWTs and publish the public key at the provider's
-        # JWKS endpoint so Envoy can validate bearer tokens offline.
+        # RS256-signed JWTs via the per-provider JWKS endpoint. Required for the
+        # Envoy JWT SecurityPolicy on /api (JWKS is only populated with an
+        # asymmetric signing key).
         signing_key = data.authentik_certificate_key_pair.signing.id
         issuer_mode = "per_provider"
 
+        # /oauth2/callback — the backend-owned PKCE callback (G2 Option B).
+        # The backend receives ?code=...&state=..., exchanges the code for tokens,
+        # sets an HMAC-signed session cookie, and redirects to the original URL.
         allowed_redirect_uris = [
           {
             matching_mode = "strict"
-            url           = "https://kubesandbox.com/auth/callback"
+            url           = "https://kubesandbox.com/oauth2/callback"
           }
         ]
+
+        # Authorization codes are consumed immediately by the backend's token
+        # exchange; keep validity short to match the signed state token TTL.
+        access_code_validity = "minutes=5"
       }
 
       resource "authentik_application" "kubesandbox_backend" {
@@ -86,8 +115,17 @@ spec:
         slug               = "kubesandbox-backend"
         protocol_provider  = authentik_provider_oauth2.kubesandbox_backend.id
         policy_engine_mode = "any"
-        meta_launch_url    = "https://api.kubesandbox.com"
+        meta_launch_url    = "https://kubesandbox.com"
       }
+
+      # --- Outputs ---
+      # Crossplane writes all outputs to the Secret named in writeConnectionSecretToRef
+      # (kubesandbox-backend-client-secret, namespace kubesandbox). Keys:
+      #   client-id      — OAuth2 client_id
+      #   client-secret  — OAuth2 client_secret (sensitive)
+      #   session-secret — HMAC key for session cookies + PKCE state (sensitive)
+      #   issuer-url     — provider issuer URL for the JWT SecurityPolicy
+      #   jwks-uri       — JWKS endpoint for the JWT SecurityPolicy
 
       output "client-id" {
         value = authentik_provider_oauth2.kubesandbox_backend.client_id
@@ -98,7 +136,13 @@ spec:
         sensitive = true
       }
 
-      # Issuer + JWKS URLs the backend chart's JWT SecurityPolicy must use.
+      output "session-secret" {
+        value     = random_password.session_secret.result
+        sensitive = true
+      }
+
+      # Issuer + JWKS URLs consumed by the backend chart's JWT SecurityPolicy
+      # (authentication.jwt.*) and by the sessionAuth.oidc.* values.
       output "issuer-url" {
         value = "${var.authentik_url}/application/o/${authentik_application.kubesandbox_backend.slug}/"
       }
