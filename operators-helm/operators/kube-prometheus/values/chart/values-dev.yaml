@@ -3,7 +3,7 @@ envSuffix: ""
 authentikUrl: https://auth.jeremymr.dev
 
 defaultRules:
-  create: true
+  create: false
 additionalPrometheusRulesMap:
   custom-alerts:
     groups:
