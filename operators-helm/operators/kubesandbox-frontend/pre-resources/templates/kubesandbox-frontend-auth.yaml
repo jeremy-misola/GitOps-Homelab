@@ -35,6 +35,15 @@ spec:
         type = string
       }
 
+      # Name of the Authentik certificate-keypair used to RS256-sign this
+      # provider's tokens. WITHOUT this, the provider publishes an empty JWKS
+      # ({}) and the Envoy JWT SecurityPolicy on /api cannot verify the SPA's
+      # bearer -> "Jwks remote fetch is failed" (401). Must match the backend's
+      # signing_key_name so both /jwks/ endpoints resolve.
+      variable "signing_key_name" {
+        type = string
+      }
+
       provider "authentik" {
         url   = var.authentik_url
         token = var.authentik_token
@@ -48,6 +57,10 @@ spec:
         slug = var.invalidation_flow
       }
 
+      data "authentik_certificate_key_pair" "signing" {
+        name = var.signing_key_name
+      }
+
       resource "authentik_provider_oauth2" "kubesandbox_frontend" {
         name               = "KubeSandbox Frontend"
         client_id          = "kubesandbox-frontend"
@@ -58,6 +71,16 @@ spec:
         # §4.1. A public client issues no secret; the client-secret output below is
         # therefore empty and unused (the frontend chart's edge OIDC is disabled).
         client_type        = "public"
+
+        # RS256-signed JWTs via the per-provider JWKS endpoint. Required so the
+        # Envoy JWT SecurityPolicy on /api can validate the SPA's bearer token.
+        # (JWKS is only populated when an asymmetric signing key is set.)
+        signing_key = data.authentik_certificate_key_pair.signing.id
+        issuer_mode = "per_provider"
+
+        # Match the backend provider so `sub` is the same hashed uid for a given
+        # user across both clients -> ownerRef checks on /api and /s/{id} line up.
+        sub_mode = "hashed_user_id"
 
         allowed_redirect_uris = [
           {
@@ -91,6 +114,8 @@ spec:
         value: "default-provider-authorization-explicit-consent"
       - key: invalidation_flow
         value: "default-provider-invalidation-flow"
+      - key: signing_key_name
+        value: {{ .Values.signingKeyName | default "authentik Self-signed Certificate" | quote }}
 
     env:
       - name: TF_VAR_authentik_token
