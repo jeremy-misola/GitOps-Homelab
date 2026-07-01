@@ -20,7 +20,7 @@ authentication:
 # Set enabled: true after verifying the Workspace has run and
 # kubesandbox-backend-client-secret contains client-secret + session-secret.
 sessionAuth:
-  enabled: false
+  enabled: true
   oidc:
     issuer: "https://auth.jeremymr.dev/application/o/kubesandbox-backend/"
     clientID: "kubesandbox-backend"
