@@ -53,7 +53,11 @@ spec:
         client_id          = "kubesandbox-frontend"
         authorization_flow = data.authentik_flow.authorization.id
         invalidation_flow  = data.authentik_flow.invalidation.id
-        client_type        = "confidential"
+        # PUBLIC client: the browser SPA runs Authorization Code + PKCE and cannot
+        # safely hold a client_secret. See kubesandbox docs/06-frontend-architecture.md
+        # §4.1. A public client issues no secret; the client-secret output below is
+        # therefore empty and unused (the frontend chart's edge OIDC is disabled).
+        client_type        = "public"
 
         allowed_redirect_uris = [
           {
