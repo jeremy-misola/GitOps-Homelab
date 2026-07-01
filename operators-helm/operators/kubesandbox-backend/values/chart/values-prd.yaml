@@ -25,6 +25,11 @@ sessionAuth:
     issuer: "https://auth.jeremymr.dev/application/o/kubesandbox-backend/"
     clientID: "kubesandbox-backend"
     redirectURI: "https://kubesandbox.com/oauth2/callback"
+    # Authentik's actual OIDC endpoints live at /application/o/{action}/,
+    # not at {issuer}{action}/ — the issuer is per-provider but the endpoints
+    # are shared. Without these overrides the backend derives the wrong URL.
+    authEndpoint: "https://auth.jeremymr.dev/application/o/authorize/"
+    tokenEndpoint: "https://auth.jeremymr.dev/application/o/token/"
     clientSecret:
       name: kubesandbox-backend-client-secret
       namespace: kubesandbox
