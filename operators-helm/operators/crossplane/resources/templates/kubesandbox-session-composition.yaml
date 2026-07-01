@@ -552,7 +552,17 @@ spec:
                     kind: HTTPRoute
                     metadata:
                       name: shell
-                      namespace: placeholder
+                      # Option A (G2): HTTPRoute lives in the shared kubesandbox
+                      # namespace so the shared SecurityPolicy (also in kubesandbox)
+                      # can attach to it via targetSelectors. SecurityPolicy attaches
+                      # same-namespace only on EG v1.7.1+, so session routes must
+                      # share the policy's namespace.
+                      namespace: kubesandbox
+                      # Label used by the shared session SecurityPolicy to attach
+                      # ext-authz ownership enforcement to every per-session route
+                      # via spec.targetSelectors — no per-session policy needed.
+                      labels:
+                        kubesandbox.com/session-route: "true"
                     spec:
                       parentRefs:
                         - name: kubesandbox
@@ -565,8 +575,13 @@ spec:
                                 type: PathPrefix
                                 value: /s/placeholder
                           backendRefs:
+                            # Cross-namespace backendRef: shell Service is in the
+                            # per-session namespace; namespace is patched below.
+                            # A ReferenceGrant (shell-referencegrant below) in the
+                            # session namespace permits this reference.
                             - name: shell
                               port: 80
+                              namespace: placeholder
             patches:
               - type: CombineFromComposite
                 combine:
@@ -577,6 +592,8 @@ spec:
                   string:
                     fmt: "%s-%s-httproute"
                 toFieldPath: metadata.name
+              # HTTPRoute is always in the kubesandbox namespace (fixed above);
+              # only the backendRef namespace is per-session.
               - type: CombineFromComposite
                 combine:
                   variables:
@@ -585,7 +602,7 @@ spec:
                   strategy: string
                   string:
                     fmt: "%s-%s"
-                toFieldPath: spec.forProvider.manifest.metadata.namespace
+                toFieldPath: spec.forProvider.manifest.spec.rules[0].backendRefs[0].namespace
               - type: CombineFromComposite
                 combine:
                   variables:
@@ -595,6 +612,57 @@ spec:
                   string:
                     fmt: "/s/%s-%s"
                 toFieldPath: spec.forProvider.manifest.spec.rules[0].matches[0].path.value
+
+          - name: shell-referencegrant
+            base:
+              apiVersion: kubernetes.crossplane.io/v1alpha2
+              kind: Object
+              metadata:
+                name: placeholder
+                annotations:
+                  argocd.argoproj.io/sync-wave: "18"
+              spec:
+                providerConfigRef:
+                  name: kubernetes-incluster
+                forProvider:
+                  manifest:
+                    # ReferenceGrant placed in the per-session namespace to allow
+                    # the HTTPRoute in the kubesandbox namespace to reference the
+                    # shell Service in this namespace. Required for cross-namespace
+                    # backendRefs in Gateway API.
+                    apiVersion: gateway.networking.k8s.io/v1beta1
+                    kind: ReferenceGrant
+                    metadata:
+                      name: shell-httproute-grant
+                      namespace: placeholder
+                    spec:
+                      from:
+                        - group: gateway.networking.k8s.io
+                          kind: HTTPRoute
+                          namespace: kubesandbox
+                      to:
+                        - group: ""
+                          kind: Service
+                          name: shell
+            patches:
+              - type: CombineFromComposite
+                combine:
+                  variables:
+                    - fromFieldPath: metadata.labels[crossplane.io/claim-namespace]
+                    - fromFieldPath: metadata.labels[crossplane.io/claim-name]
+                  strategy: string
+                  string:
+                    fmt: "%s-%s-referencegrant"
+                toFieldPath: metadata.name
+              - type: CombineFromComposite
+                combine:
+                  variables:
+                    - fromFieldPath: metadata.labels[crossplane.io/claim-namespace]
+                    - fromFieldPath: metadata.labels[crossplane.io/claim-name]
+                  strategy: string
+                  string:
+                    fmt: "%s-%s"
+                toFieldPath: spec.forProvider.manifest.metadata.namespace
     - step: automatically-detect-ready-composed-resources
       functionRef:
         name: function-auto-ready
