@@ -52,3 +52,10 @@ sessionAuth:
     clientSecret:
       name: kubesandbox-backend-client-secret
       namespace: kubesandbox
+
+pool:
+  enabled: true
+  targetWarm: 50
+  maxTotal: 100
+  maxWarmAgeHours: 24
+  resyncSeconds: 30
