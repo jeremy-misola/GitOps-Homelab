@@ -61,6 +61,22 @@ spec:
         name = var.signing_key_name
       }
 
+      # Scope mappings for the provider. Authentik auto-attaches the default
+      # openid/email/profile mappings when none are specified, but offline_access
+      # must be explicit — the SPA persists only a refresh token (sessionStorage)
+      # and renews via the token endpoint, because cross-site iframe silent renew
+      # (kubesandbox.com -> auth.jeremymr.dev) is blocked by SameSite cookies.
+      # Without this mapping Authentik ignores the offline_access scope and
+      # issues no refresh token, so every page reload logs the user out.
+      data "authentik_property_mapping_provider_scope" "scopes" {
+        managed_list = [
+          "goauthentik.io/providers/oauth2/scope-openid",
+          "goauthentik.io/providers/oauth2/scope-email",
+          "goauthentik.io/providers/oauth2/scope-profile",
+          "goauthentik.io/providers/oauth2/scope-offline_access",
+        ]
+      }
+
       resource "authentik_provider_oauth2" "kubesandbox_frontend" {
         name               = "KubeSandbox Frontend"
         client_id          = "kubesandbox-frontend"
@@ -81,6 +97,10 @@ spec:
         # Match the backend provider so `sub` is the same hashed uid for a given
         # user across both clients -> ownerRef checks on /api and /s/{id} line up.
         sub_mode = "hashed_user_id"
+
+        # openid/email/profile (previously auto-attached defaults, now pinned)
+        # plus offline_access for refresh tokens — see data block above.
+        property_mappings = data.authentik_property_mapping_provider_scope.scopes.ids
 
         allowed_redirect_uris = [
           {
