@@ -223,7 +223,7 @@ operators:
     syncWave: 60
     repoURL: https://jeremy-misola.github.io/kubesandbox/
     chart: kubesandbox-backend
-    targetRevision: 0.1.13
+    targetRevision: 0.1.14
     annotations:
       argocd-image-updater.argoproj.io/image-list: backend=jurassicjey/kubesandbox-backend:latest
       argocd-image-updater.argoproj.io/backend.update-strategy: digest
