@@ -55,7 +55,7 @@ sessionAuth:
 
 pool:
   enabled: true
-  targetWarm: 10
-  maxTotal: 50
+  targetWarm: 2
+  maxTotal: 10
   maxWarmAgeHours: 24
   resyncSeconds: 30
