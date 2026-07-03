@@ -1,5 +1,11 @@
+# The config below uses the `prometheusremotewrite/mimir` exporter, which is
+# NOT bundled in the minimal `-k8s` distro (only debug/otlp/otlphttp/... are).
+# That mismatch made the agent crash-loop with:
+#   'exporters' unknown type: "prometheusremotewrite".
+# The `-contrib` distro includes prometheusremotewrite (and every other
+# receiver/processor/exporter used here), so switch to it.
 image:
-  repository: "ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-k8s"
+  repository: "ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib"
 mode: daemonset
 service:
   enabled: true
