@@ -14,7 +14,26 @@ global:
     - secretRef:
         name: authentik-secrets
 
+# Keep authentik workloads OFF the 2-core control-plane/etcd nodes.
+# Those nodes sit at ~100% CPU, which starves Postgres (pg_isready > 5s) and
+# the app health probes, causing the server/worker crash-loop. Anti-affinity
+# against the control-plane role pins these pods to the larger worker nodes.
+_affinity: &avoidControlPlane
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: node-role.kubernetes.io/control-plane
+              operator: DoesNotExist
+
 server:
+  affinity: *avoidControlPlane
+  resources:
+    requests:
+      cpu: 200m
+      memory: 512Mi
+    limits:
+      memory: 1Gi
   env:
     # Allowed hosts - required when behind reverse proxy with TLS termination
     - name: AUTHENTIK_ALLOWED_HOSTS
@@ -26,6 +45,13 @@ server:
       value: "misolarellinj06@gmail.com"
 
 worker:
+  affinity: *avoidControlPlane
+  resources:
+    requests:
+      cpu: 200m
+      memory: 512Mi
+    limits:
+      memory: 1Gi
   env:
     # Allowed hosts - required when behind reverse proxy with TLS termination
     - name: AUTHENTIK_ALLOWED_HOSTS
@@ -44,6 +70,20 @@ postgresql:
       # Map the keys defined in your ExternalSecret
       adminPasswordKey: "POSTGRESQL_PASSWORD"
       userPasswordKey: "POSTGRESQL_PASSWORD"
+  primary:
+    # NOTE: data-authentik-helm-postgresql-0 uses the node-local `local-path`
+    # storage class, so this pod is pinned to its current node (prod-cp-2) by
+    # its volume and must NOT get control-plane anti-affinity, or it will be
+    # unschedulable. A CPU request gives it a guaranteed share once the
+    # server/worker crash-loop is off these nodes. To move Postgres onto a
+    # worker node later, migrate the data to non-local storage (e.g. the
+    # cloudnative-pg operator already installed) first.
+    resources:
+      requests:
+        cpu: 250m
+        memory: 256Mi
+      limits:
+        memory: 512Mi
 
 redis:
   enabled: true
