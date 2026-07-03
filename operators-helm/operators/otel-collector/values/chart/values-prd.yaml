@@ -66,6 +66,20 @@ config:
       endpoint: tempo-helm.tempo.svc.cluster.local:4317
       tls:
         insecure: true
+    # Self-hosted Mimir — same push endpoint + tenant as the Prometheus
+    # remote-write path, so OTLP metrics land in the "prod" tenant and are
+    # queryable via the existing Grafana "Mimir" datasource.
+    prometheusremotewrite/mimir:
+      endpoint: http://mimir-helm-nginx.mimir.svc.cluster.local/api/v1/push
+      headers:
+        X-Scope-OrgID: prod
+      # Match Prometheus' externalLabels for a unified prod view.
+      external_labels:
+        cluster: prod
+      # Promote k8s.* resource attributes (from the k8sattributes processor)
+      # to series labels: namespace, pod, node, etc.
+      resource_to_telemetry_conversion:
+        enabled: true
 
   service:
     extensions: [health_check]
@@ -78,3 +92,10 @@ config:
         receivers: [otlp]
         processors: [k8sattributes, batch]
         exporters: [otlp/tempo]
+      # Only the exporters list is overridden here; the chart's default metrics
+      # receivers ([otlp, prometheus]) and processors ([k8sattributes,
+      # memory_limiter, batch]) are preserved via deep-merge. "debug" is kept so
+      # it remains a referenced component (the collector errors on any defined
+      # but unused component).
+      metrics:
+        exporters: [debug, prometheusremotewrite/mimir]
