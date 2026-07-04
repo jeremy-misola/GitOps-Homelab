@@ -1,0 +1,6 @@
+envSuffix: ""
+# Authentik certificate-key pair used to RS256-sign the OAuth2 tokens for BOTH the
+# backend and frontend providers. Must publish a JWKS the Envoy JWT policy can fetch.
+# Both auth Workspaces read this same value, so the two /jwks/ endpoints resolve
+# against the same signing key. Override if your prod Authentik uses a different cert.
+signingKeyName: "authentik Self-signed Certificate"

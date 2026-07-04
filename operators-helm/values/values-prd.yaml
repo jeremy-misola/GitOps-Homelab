@@ -218,33 +218,28 @@ operators:
     chart: home-assistant
     targetRevision: 0.3.67
 
-  - name: kubesandbox-backend
+  # KubeSandbox umbrella: one ArgoCD app deploys backend + frontend, sourced
+  # straight from the kubesandbox Git repo (no packaged Helm repo, no version bump).
+  # Pushing to the repo's `main` branch auto-syncs via automated + selfHeal.
+  # Chart values are nested under each subchart name in the chart values file, so
+  # the image-updater helm paths are prefixed with the subchart name too.
+  - name: kubesandbox
     namespace: kubesandbox
     syncWave: 60
-    repoURL: https://jeremy-misola.github.io/kubesandbox/
-    chart: kubesandbox-backend
-    targetRevision: 0.1.20
+    gitChart:
+      repoURL: https://github.com/jeremy-misola/kubesandbox
+      path: kubesandbox-charts/kubesandbox
+      targetRevision: main
     annotations:
-      argocd-image-updater.argoproj.io/image-list: backend=jurassicjey/kubesandbox-backend:latest
+      argocd-image-updater.argoproj.io/image-list: >-
+        backend=jurassicjey/kubesandbox-backend,
+        frontend=jurassicjey/kubesandbox-frontend
       argocd-image-updater.argoproj.io/backend.update-strategy: digest
-      argocd-image-updater.argoproj.io/backend.helm.image-name: image.repository
-      argocd-image-updater.argoproj.io/backend.helm.image-tag: image.tag
-      argocd-image-updater.argoproj.io/write-back-method: argocd
-    preResources:
-      enabled: true
-      templated: true
-
-  - name: kubesandbox-frontend
-    namespace: kubesandbox
-    syncWave: 60
-    repoURL: https://jeremy-misola.github.io/kubesandbox/
-    chart: kubesandbox-frontend
-    targetRevision: 0.1.10
-    annotations:
-      argocd-image-updater.argoproj.io/image-list: frontend=jurassicjey/kubesandbox-frontend:latest
+      argocd-image-updater.argoproj.io/backend.helm.image-name: kubesandbox-backend.image.repository
+      argocd-image-updater.argoproj.io/backend.helm.image-tag: kubesandbox-backend.image.tag
       argocd-image-updater.argoproj.io/frontend.update-strategy: digest
-      argocd-image-updater.argoproj.io/frontend.helm.image-name: image.repository
-      argocd-image-updater.argoproj.io/frontend.helm.image-tag: image.tag
+      argocd-image-updater.argoproj.io/frontend.helm.image-name: kubesandbox-frontend.image.repository
+      argocd-image-updater.argoproj.io/frontend.helm.image-tag: kubesandbox-frontend.image.tag
       argocd-image-updater.argoproj.io/write-back-method: argocd
     preResources:
       enabled: true

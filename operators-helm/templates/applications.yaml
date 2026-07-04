@@ -3,6 +3,11 @@
 {{- $preResources := default dict $operator.preResources }}
 {{- $postResources := default dict $operator.postResources }}
 {{- $hasHelm := and (not (empty $operator.repoURL)) (not (empty $operator.chart)) (not (empty $operator.targetRevision)) }}
+{{- /* Git-sourced Helm chart: rendered straight from a repo path (no packaged Helm repo). */}}
+{{- $gitChart := default dict $operator.gitChart }}
+{{- $hasGitChart := and (not (empty $gitChart.repoURL)) (not (empty $gitChart.path)) }}
+{{- /* `not not` coerces to a strict bool so `ternary` below never sees nil. */}}
+{{- $hasChart := not (not (or $hasHelm $hasGitChart)) }}
 {{- if $preResources.enabled }}
 ---
 # 1. PRE-REQUISITE RESOURCES
@@ -50,7 +55,7 @@ spec:
         factor: 2
         maxDuration: 3m
 {{- end }}
-{{- if $hasHelm }}
+{{- if $hasChart }}
 ---
 # 2. THE HELM OPERATOR
 apiVersion: argoproj.io/v1alpha1
@@ -68,12 +73,23 @@ metadata:
 spec:
   project: default
   sources:
+    {{- if $hasGitChart }}
+    # Helm chart rendered directly from a Git repo path — no packaged Helm repo,
+    # no chart version bump. targetRevision tracks a branch, so a push auto-syncs.
+    - repoURL: {{ $operator.gitChart.repoURL }}
+      path: {{ $operator.gitChart.path }}
+      targetRevision: {{ default "main" $operator.gitChart.targetRevision }}
+      helm:
+        valueFiles:
+          - $values-repo/operators-helm/operators/{{ $operator.name }}/values/chart/values-{{ $.Values.environment }}.yaml
+    {{- else }}
     - repoURL: {{ $operator.repoURL }}
       chart: {{ $operator.chart }}
       targetRevision: {{ $operator.targetRevision }}
       helm:
         valueFiles:
           - $values-repo/operators-helm/operators/{{ $operator.name }}/values/chart/values-{{ $.Values.environment }}.yaml
+    {{- end }}
     - repoURL: https://github.com/jeremy-misola/GitOps-Homelab
       targetRevision: {{ default "develop" $.Values.repoRevision }}
       ref: values-repo
@@ -103,7 +119,7 @@ metadata:
   name: {{ $operator.name }}-resources
   namespace: argocd
   annotations:
-    argocd.argoproj.io/sync-wave: "{{ default (ternary (add (int $operator.syncWave) 1) (int $operator.syncWave) $hasHelm) $postResources.syncWave }}"
+    argocd.argoproj.io/sync-wave: "{{ default (ternary (add (int $operator.syncWave) 1) (int $operator.syncWave) $hasChart) $postResources.syncWave }}"
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:

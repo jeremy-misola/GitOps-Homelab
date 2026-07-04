@@ -1,0 +1,29 @@
+# Umbrella chart values for dev. Component values nested under each subchart name.
+
+kubesandbox-backend:
+  # Enable the backend JWT SecurityPolicy (G1 identity source) — dev.
+  #
+  # Authentik backend OIDC client (slug "kubesandbox-backend") on the -dev host.
+  # issuer  = https://auth-dev.jeremymr.dev/application/o/kubesandbox-backend/
+  # jwksUri = https://auth-dev.jeremymr.dev/application/o/kubesandbox-backend/jwks/
+  authentication:
+    enabled: true
+    jwt:
+      providerName: authentik
+      issuer: "https://auth-dev.jeremymr.dev/application/o/kubesandbox-backend/"
+      jwksUri: "https://auth-dev.jeremymr.dev/application/o/kubesandbox-backend/jwks/"
+
+  # G2 Option B: backend-owned session auth (PKCE + signed session cookie).
+  # Flip enabled: true here first to validate on dev before promoting to prd.
+  sessionAuth:
+    enabled: false
+    oidc:
+      issuer: "https://auth-dev.jeremymr.dev/application/o/kubesandbox-backend/"
+      clientID: "kubesandbox-backend"
+      redirectURI: "https://kubesandbox-dev.com/oauth2/callback"
+      clientSecret:
+        name: kubesandbox-backend-client-secret
+        namespace: kubesandbox
+
+kubesandbox-frontend: {}
+  # No overrides needed - defaults in Chart.yaml/values.yaml are sufficient.

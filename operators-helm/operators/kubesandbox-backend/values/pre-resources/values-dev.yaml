@@ -1,3 +1,0 @@
-envSuffix: -dev
-# Authentik certificate-key pair used to sign backend OAuth2 tokens (RS256).
-signingKeyName: "authentik Self-signed Certificate"

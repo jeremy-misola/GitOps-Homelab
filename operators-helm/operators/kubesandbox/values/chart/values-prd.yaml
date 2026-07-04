@@ -1,0 +1,69 @@
+# Umbrella chart values for prd. Each component's values are nested under its
+# subchart name (the `name:` in each subchart's Chart.yaml), because the umbrella
+# renders them as Helm dependencies.
+
+kubesandbox-backend:
+  # Enable the backend JWT SecurityPolicy (G1 identity source).
+  #
+  # The Authentik backend OIDC client is created by the pre-resources Workspace
+  # (kubesandbox-backend-auth.yaml), application slug "kubesandbox-backend".
+  # Issuer mode is per_provider, so:
+  #   issuer  = https://auth.jeremymr.dev/application/o/kubesandbox-backend/
+  #   jwksUri = https://auth.jeremymr.dev/application/o/kubesandbox-backend/jwks/
+  #
+  # `issuer` must exactly match the `iss` claim in issued tokens (including the
+  # trailing slash). If Authentik is fronted by an internal CA that Envoy doesn't
+  # already trust, add a BackendTLSPolicy so Envoy can fetch the JWKS over TLS.
+  authentication:
+    enabled: true
+    jwt:
+      providerName: authentik
+      issuer: "https://auth.jeremymr.dev/application/o/kubesandbox-backend/"
+      jwksUri: "https://auth.jeremymr.dev/application/o/kubesandbox-backend/jwks/"
+      # Also trust bearers minted by the SPA's public `kubesandbox-frontend` client.
+      # Its tokens carry a different `iss`, so without this entry the SPA's valid
+      # tokens would 401 on /api (frontend-architecture §4.1 / action item #2).
+      # Authentik uses per_provider issuer mode, so the frontend app has its own
+      # issuer + JWKS. claimToHeaders mirrors the primary provider so the backend's
+      # IdentityMiddleware sees X-User-* regardless of which client issued the token.
+      additionalProviders:
+        - name: kubesandbox-frontend
+          issuer: "https://auth.jeremymr.dev/application/o/kubesandbox-frontend/"
+          jwksUri: "https://auth.jeremymr.dev/application/o/kubesandbox-frontend/jwks/"
+          claimToHeaders:
+            - claim: sub
+              header: X-User-Id
+            - claim: email
+              header: X-User-Email
+            - claim: name
+              header: X-User-Name
+            - claim: groups
+              header: X-User-Groups
+
+  # G2 Option B: backend-owned session auth (PKCE + signed session cookie).
+  # Set enabled: true after verifying the Workspace has run and
+  # kubesandbox-backend-client-secret contains client-secret + session-secret.
+  sessionAuth:
+    enabled: true
+    oidc:
+      issuer: "https://auth.jeremymr.dev/application/o/kubesandbox-backend/"
+      clientID: "kubesandbox-backend"
+      redirectURI: "https://kubesandbox.com/oauth2/callback"
+      # Authentik's actual OIDC endpoints live at /application/o/{action}/,
+      # not at {issuer}{action}/ — the issuer is per-provider but the endpoints
+      # are shared. Without these overrides the backend derives the wrong URL.
+      authEndpoint: "https://auth.jeremymr.dev/application/o/authorize/"
+      tokenEndpoint: "https://auth.jeremymr.dev/application/o/token/"
+      clientSecret:
+        name: kubesandbox-backend-client-secret
+        namespace: kubesandbox
+
+  pool:
+    enabled: true
+    targetWarm: 2
+    maxTotal: 10
+    maxWarmAgeHours: 24
+    resyncSeconds: 30
+
+kubesandbox-frontend: {}
+  # No chart overrides for prd.
