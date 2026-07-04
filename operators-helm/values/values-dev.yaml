@@ -200,17 +200,22 @@ operators:
     chart: home-assistant
     targetRevision: 0.3.67
 
-  # KubeSandbox umbrella: one ArgoCD app deploys backend + frontend, sourced
-  # straight from the kubesandbox Git repo. targetRevision tracks a branch, so a
-  # push auto-syncs — no chart version bump. Point it at `develop` if you want dev
-  # to track a pre-release branch instead of main.
-  - name: kubesandbox
+  - name: kubesandbox-backend
     namespace: kubesandbox
     syncWave: 60
-    gitChart:
-      repoURL: https://github.com/jeremy-misola/kubesandbox
-      path: kubesandbox-charts/kubesandbox
-      targetRevision: main
+    repoURL: https://jeremy-misola.github.io/kubesandbox/
+    chart: kubesandbox-backend
+    targetRevision: 0.1.6
+    preResources:
+      enabled: true
+      templated: true
+
+  - name: kubesandbox-frontend
+    namespace: kubesandbox
+    syncWave: 60
+    repoURL: https://jeremy-misola.github.io/kubesandbox/
+    chart: kubesandbox-frontend
+    targetRevision: 0.1.7
     preResources:
       enabled: true
       templated: true
@@ -240,13 +245,6 @@ operators:
     postResources:
       enabled: true
       templated: true
-
-  - name: portfolio
-    namespace: portfolio
-    syncWave: 60
-    repoURL: docker.io/jurassicjey
-    chart: portfolio-helm
-    targetRevision: 0.1.1779414165-e96116f
 
   - name: code-server
     namespace: code-server
