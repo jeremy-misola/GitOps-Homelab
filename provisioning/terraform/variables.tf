@@ -105,35 +105,39 @@ variable "clusters" {
     })
   }))
 
+  # NOTE: the "dev" cluster is temporarily decommissioned to free up hardware
+  # for prod (its cores/memory were folded into the prod nodes below). Its
+  # config is preserved in the commented block underneath so it can be
+  # restored later just by uncommenting and moving it back into this map.
   default = {
     prod = {
       control_plane = {
         ips       = ["192.168.0.210", "192.168.0.211", "192.168.0.212"]
-        cores     = 2
-        memory    = 6144
+        cores     = 6
+        memory    = 13312
         disk_size = "100G"
       }
       worker = {
         ips       = ["192.168.0.213", "192.168.0.214", "192.168.0.215"]
-        cores     = 6
-        memory    = 16384
+        cores     = 8
+        memory    = 23552
         disk_size = "200G"
       }
     }
-    dev = {
-      control_plane = {
-        ips       = ["192.168.0.220"]
-        cores     = 2
-        memory    = 6144
-        disk_size = "100G"
-      }
-      worker = {
-        ips       = ["192.168.0.221", "192.168.0.222"]
-        cores     = 4
-        memory    = 20480
-        disk_size = "200G"
-      }
-    }
+    # dev = {
+    #   control_plane = {
+    #     ips       = ["192.168.0.220"]
+    #     cores     = 2
+    #     memory    = 6144
+    #     disk_size = "100G"
+    #   }
+    #   worker = {
+    #     ips       = ["192.168.0.221", "192.168.0.222"]
+    #     cores     = 4
+    #     memory    = 20480
+    #     disk_size = "200G"
+    #   }
+    # }
   }
 
   validation {

@@ -155,7 +155,10 @@ spec:
       - key: authentik_url
         value: "https://auth{{ .Values.envSuffix }}.jeremymr.dev"
       - key: authorization_flow
-        value: "default-provider-authorization-explicit-consent"
+        # Dedicated KubeSandbox login flow (kubesandbox-signup-auth.yaml,
+        # wave 16) instead of the shared default -- this is what scopes the
+        # "Sign up" link to KubeSandbox's login screen only.
+        value: "kubesandbox-authorization"
       - key: invalidation_flow
         value: "default-provider-invalidation-flow"
       - key: signing_key_name

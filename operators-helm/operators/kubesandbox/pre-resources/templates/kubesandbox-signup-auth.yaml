@@ -1,0 +1,229 @@
+apiVersion: tf.upbound.io/v1beta1
+kind: Workspace
+metadata:
+  name: kubesandbox-signup-auth
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    # Must apply BEFORE every other app's *-auth.yaml (sync-wave 17+, vaultwarden
+    # is 221) because they all do a `data "authentik_group"` lookup by name for
+    # "kubesandbox-users", and kubesandbox-frontend/backend-auth (wave 17) look
+    # up the "kubesandbox-authorization" flow slug created here.
+    argocd.argoproj.io/sync-wave: "16"
+spec:
+  forProvider:
+    source: Inline
+    module: |
+      terraform {
+        required_providers {
+          authentik = {
+            source  = "goauthentik/authentik"
+            version = "~> 2025.2.0"
+          }
+        }
+      }
+
+      variable "authentik_url" {
+        type = string
+      }
+
+      variable "authentik_token" {
+        type      = string
+        sensitive = true
+      }
+
+      provider "authentik" {
+        url   = var.authentik_url
+        token = var.authentik_token
+      }
+
+      # --- Isolation group ---
+      # Every self-service KubeSandbox signup lands in this group (see the
+      # user_write stage below). Every OTHER app in the homelab (adguard,
+      # code-server, devdocs, grafana, headlamp, homepage, immich,
+      # stirling-pdf, vaultwarden) carries a negated authentik_policy_binding
+      # against this group's ID in its own *-auth.yaml -- that's what actually
+      # walls a KubeSandbox signup off from the rest of the homelab. KubeSandbox
+      # itself has NO such binding, so members can still reach it.
+      resource "authentik_group" "kubesandbox_users" {
+        name = "kubesandbox-users"
+      }
+
+      # --- Sign-up (enrollment) flow ---
+      # Kept separate from any shared/default enrollment flow so the "Sign up"
+      # link only ever shows up on KubeSandbox's own login screen (wired in via
+      # the identification stage in kubesandbox_authorization below), not on
+      # every other app's login page.
+      resource "authentik_flow" "kubesandbox_enrollment" {
+        name           = "KubeSandbox Enrollment"
+        title          = "Sign up for KubeSandbox"
+        slug           = "kubesandbox-enrollment"
+        designation    = "enrollment"
+        authentication = "require_unauthenticated"
+      }
+
+      resource "authentik_stage_prompt_field" "enrollment_username" {
+        name      = "kubesandbox-enrollment-username"
+        field_key = "username"
+        label     = "Username"
+        type      = "username"
+        required  = true
+        order     = 0
+      }
+
+      resource "authentik_stage_prompt_field" "enrollment_email" {
+        name      = "kubesandbox-enrollment-email"
+        field_key = "email"
+        label     = "Email"
+        type      = "email"
+        required  = true
+        order     = 10
+      }
+
+      resource "authentik_stage_prompt_field" "enrollment_password" {
+        name      = "kubesandbox-enrollment-password"
+        field_key = "password"
+        label     = "Password"
+        type      = "password"
+        required  = true
+        order     = 20
+      }
+
+      resource "authentik_stage_prompt_field" "enrollment_password_repeat" {
+        name      = "kubesandbox-enrollment-password-repeat"
+        field_key = "password_repeat"
+        label     = "Confirm password"
+        type      = "password"
+        required  = true
+        order     = 30
+      }
+
+      resource "authentik_stage_prompt" "kubesandbox_enrollment_prompt" {
+        name = "kubesandbox-enrollment-prompt"
+        fields = [
+          authentik_stage_prompt_field.enrollment_username.id,
+          authentik_stage_prompt_field.enrollment_email.id,
+          authentik_stage_prompt_field.enrollment_password.id,
+          authentik_stage_prompt_field.enrollment_password_repeat.id,
+        ]
+      }
+
+      # Creates the user AND drops them straight into kubesandbox-users --
+      # this is the actual isolation mechanism, not an afterthought. No email
+      # verification (create_users_as_inactive = false): account is usable
+      # immediately, per the "no verification" call for this signup flow.
+      resource "authentik_stage_user_write" "kubesandbox_enrollment_write" {
+        name                     = "kubesandbox-enrollment-write"
+        create_users_as_inactive = false
+        create_users_group       = authentik_group.kubesandbox_users.id
+        user_creation_mode       = "always_create"
+      }
+
+      resource "authentik_stage_user_login" "kubesandbox_enrollment_login" {
+        name = "kubesandbox-enrollment-login"
+      }
+
+      resource "authentik_flow_stage_binding" "enrollment_prompt" {
+        target = authentik_flow.kubesandbox_enrollment.uuid
+        stage  = authentik_stage_prompt.kubesandbox_enrollment_prompt.id
+        order  = 10
+      }
+
+      resource "authentik_flow_stage_binding" "enrollment_write" {
+        target = authentik_flow.kubesandbox_enrollment.uuid
+        stage  = authentik_stage_user_write.kubesandbox_enrollment_write.id
+        order  = 20
+      }
+
+      resource "authentik_flow_stage_binding" "enrollment_login" {
+        target = authentik_flow.kubesandbox_enrollment.uuid
+        stage  = authentik_stage_user_login.kubesandbox_enrollment_login.id
+        order  = 30
+      }
+
+      # --- KubeSandbox's own login/authorization flow ---
+      # Self-contained (identification -> password -> login -> consent) instead
+      # of reusing the shared "default-provider-authorization-explicit-consent"
+      # flow every other app uses. This is specifically so the "Sign up" link
+      # (via enrollment_flow below) is scoped to KubeSandbox's login screen only.
+      resource "authentik_flow" "kubesandbox_authorization" {
+        name        = "KubeSandbox Authorization"
+        title       = "Sign in to KubeSandbox"
+        slug        = "kubesandbox-authorization"
+        designation = "authorization"
+      }
+
+      resource "authentik_stage_password" "kubesandbox_password" {
+        name     = "kubesandbox-password"
+        backends = ["authentik.core.auth.InbuiltBackend"]
+      }
+
+      resource "authentik_stage_identification" "kubesandbox_identification" {
+        name                      = "kubesandbox-identification"
+        user_fields               = ["username", "email"]
+        case_insensitive_matching = true
+        password_stage            = authentik_stage_password.kubesandbox_password.id
+        enrollment_flow           = authentik_flow.kubesandbox_enrollment.id
+      }
+
+      resource "authentik_stage_user_login" "kubesandbox_login" {
+        name = "kubesandbox-user-login"
+      }
+
+      resource "authentik_stage_consent" "kubesandbox_consent" {
+        name = "kubesandbox-consent"
+        mode = "always_require"
+      }
+
+      resource "authentik_flow_stage_binding" "authorization_identification" {
+        target = authentik_flow.kubesandbox_authorization.uuid
+        stage  = authentik_stage_identification.kubesandbox_identification.id
+        order  = 10
+      }
+
+      resource "authentik_flow_stage_binding" "authorization_password" {
+        target = authentik_flow.kubesandbox_authorization.uuid
+        stage  = authentik_stage_password.kubesandbox_password.id
+        order  = 20
+      }
+
+      resource "authentik_flow_stage_binding" "authorization_login" {
+        target = authentik_flow.kubesandbox_authorization.uuid
+        stage  = authentik_stage_user_login.kubesandbox_login.id
+        order  = 30
+      }
+
+      resource "authentik_flow_stage_binding" "authorization_consent" {
+        target = authentik_flow.kubesandbox_authorization.uuid
+        stage  = authentik_stage_consent.kubesandbox_consent.id
+        order  = 40
+      }
+
+      output "group-name" {
+        value = authentik_group.kubesandbox_users.name
+      }
+
+      output "authorization-flow-slug" {
+        value = authentik_flow.kubesandbox_authorization.slug
+      }
+
+      output "enrollment-flow-slug" {
+        value = authentik_flow.kubesandbox_enrollment.slug
+      }
+
+    vars:
+      - key: authentik_url
+        value: "https://auth{{ .Values.envSuffix }}.jeremymr.dev"
+
+    env:
+      - name: TF_VAR_authentik_token
+        secretKeyRef:
+          namespace: crossplane-system
+          name: authentik-api-token
+          key: token
+
+  writeConnectionSecretToRef:
+    name: kubesandbox-signup-auth-outputs
+    namespace: kubesandbox
+
+  providerConfigRef:
+    name: terraform-config

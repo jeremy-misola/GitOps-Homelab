@@ -74,6 +74,21 @@ spec:
         policy_engine_mode = "any"
       }
 
+      # Deny KubeSandbox signups. That group is created in
+      # kubesandbox-signup-auth.yaml (sync-wave 16, applies before this
+      # workspace's wave 17) -- every self-service KubeSandbox account lands
+      # in it and should only ever be able to reach KubeSandbox itself.
+      data "authentik_group" "kubesandbox_users" {
+        name = "kubesandbox-users"
+      }
+
+      resource "authentik_policy_binding" "deny_kubesandbox_users" {
+        target = authentik_application.stirling_pdf.uuid
+        group  = data.authentik_group.kubesandbox_users.id
+        negate = true
+        order  = 0
+      }
+
       output "client-id" {
         value = authentik_provider_oauth2.stirling_pdf.client_id
       }
