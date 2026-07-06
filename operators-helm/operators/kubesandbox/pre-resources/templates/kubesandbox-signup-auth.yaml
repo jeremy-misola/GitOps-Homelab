@@ -202,6 +202,89 @@ spec:
         order  = 40
       }
 
+      # --- THE FIX: surface "Sign up" on the flow OAuth actually logs in with ---
+      # authentik's OAuth2 authorize endpoint authenticates UNAUTHENTICATED users
+      # with the BRAND's authentication flow (default-authentication-flow), NOT
+      # with a provider's authorization_flow. The authorization_flow
+      # (kubesandbox-authorization above) only runs the consent step AFTER the
+      # user is already authenticated. So the enrollment_flow wired into
+      # kubesandbox-authorization's identification stage is never shown on the
+      # real login screen: a brand-new user hitting "Sign in" on kubesandbox.com
+      # lands on default-authentication-flow, whose identification stage had
+      # enrollment_flow=null -> no "Sign up" link -> dead end. (The dedicated
+      # authorization flow only ever re-prompts an already-authenticated user,
+      # and its Sign up link then hits kubesandbox-enrollment while authenticated
+      # -> "Flow does not apply to current user".)
+      #
+      # We patch the shared identification stage to point at kubesandbox-enrollment
+      # so the Sign up link appears during OAuth login and, because enrollment is
+      # reached inside the authorize flow, completion resumes ?next= and redirects
+      # the new user back to the app with tokens.
+      #
+      # Done via the API (terraform_data local-exec) rather than a Terraform
+      # resource ON PURPOSE: default-authentication-identification is an authentik
+      # built-in we must not own or delete. The destroy provisioner clears the
+      # link so we never leave the built-in flow pointing at a deleted enrollment
+      # flow when this workspace is torn down.
+      #
+      # SCOPING CAVEAT: default-authentication-flow is shared by every app, so the
+      # Sign up link now shows on all their login screens too. That is cosmetic
+      # only -- every other app carries a negated policy binding against
+      # kubesandbox-users, so a self-service signup still can't reach anything but
+      # KubeSandbox. Per-app scoping isn't possible with a single authentik brand
+      # (the authentication flow is brand-global, not per-provider).
+      resource "terraform_data" "default_flow_enrollment_link" {
+        triggers_replace = [
+          authentik_flow.kubesandbox_enrollment.uuid,
+          var.authentik_url,
+        ]
+
+        input = {
+          url             = var.authentik_url
+          enrollment_flow = authentik_flow.kubesandbox_enrollment.uuid
+        }
+
+        # Set enrollment_flow on the shared identification stage (looked up by
+        # name so we never hardcode its UUID across rebuilds).
+        provisioner "local-exec" {
+          interpreter = ["/bin/bash", "-c"]
+          command     = <<-EOT
+            set -eu
+            SID=$(curl -sf -H "Authorization: Bearer $TF_VAR_authentik_token" \
+              "${self.input.url}/api/v3/stages/identification/?search=default-authentication-identification" \
+              | tr '{' '\n' \
+              | grep '"name":"default-authentication-identification"' \
+              | grep -oE '"pk":"[a-f0-9-]{36}"' | head -1 | grep -oE '[a-f0-9-]{36}')
+            test -n "$SID"
+            curl -sf -X PATCH \
+              "${self.input.url}/api/v3/stages/identification/$SID/" \
+              -H "Authorization: Bearer $TF_VAR_authentik_token" \
+              -H "Content-Type: application/json" \
+              -d "{\"enrollment_flow\":\"${self.input.enrollment_flow}\",\"user_fields\":[\"email\",\"username\"]}" >/dev/null
+          EOT
+        }
+
+        # On teardown, clear the link again.
+        provisioner "local-exec" {
+          when        = destroy
+          interpreter = ["/bin/bash", "-c"]
+          command     = <<-EOT
+            set -eu
+            SID=$(curl -sf -H "Authorization: Bearer $TF_VAR_authentik_token" \
+              "${self.input.url}/api/v3/stages/identification/?search=default-authentication-identification" \
+              | tr '{' '\n' \
+              | grep '"name":"default-authentication-identification"' \
+              | grep -oE '"pk":"[a-f0-9-]{36}"' | head -1 | grep -oE '[a-f0-9-]{36}')
+            test -n "$SID"
+            curl -sf -X PATCH \
+              "${self.input.url}/api/v3/stages/identification/$SID/" \
+              -H "Authorization: Bearer $TF_VAR_authentik_token" \
+              -H "Content-Type: application/json" \
+              -d "{\"enrollment_flow\":null,\"user_fields\":[\"email\",\"username\"]}" >/dev/null
+          EOT
+        }
+      }
+
       output "group-name" {
         value = authentik_group.kubesandbox_users.name
       }
