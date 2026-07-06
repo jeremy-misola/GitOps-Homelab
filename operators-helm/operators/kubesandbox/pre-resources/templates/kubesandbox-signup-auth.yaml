@@ -162,7 +162,11 @@ spec:
         user_fields               = ["username", "email"]
         case_insensitive_matching = true
         password_stage            = authentik_stage_password.kubesandbox_password.id
-        enrollment_flow           = authentik_flow.kubesandbox_enrollment.id
+        # NOTE: .uuid, not .id -- for a `resource "authentik_flow"` block, .id
+        # is the Terraform-managed external-name (the slug), while .uuid is
+        # the real API primary key. enrollment_flow needs the real UUID or
+        # Authentik 400s with '"kubesandbox-enrollment" is not a valid UUID'.
+        enrollment_flow           = authentik_flow.kubesandbox_enrollment.uuid
       }
 
       resource "authentik_stage_user_login" "kubesandbox_login" {
