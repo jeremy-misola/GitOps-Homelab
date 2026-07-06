@@ -131,10 +131,17 @@ spec:
       - key: authentik_url
         value: "https://auth{{ .Values.envSuffix }}.jeremymr.dev"
       - key: authorization_flow
-        # Dedicated KubeSandbox login flow (kubesandbox-signup-auth.yaml,
-        # wave 16) instead of the shared default -- this is what scopes the
-        # "Sign up" link to KubeSandbox's login screen only.
-        value: "kubesandbox-authorization"
+        # Consent-only flow (authentication=require_authenticated). It does NOT
+        # re-authenticate: it relies on the user's existing Authentik SSO session
+        # and, if absent, defers to the brand's default-authentication-flow --
+        # which is where the "Sign up" link now lives (see kubesandbox-signup-auth
+        # default_flow_enrollment_link). We deliberately do NOT use the custom
+        # kubesandbox-authorization flow here: that flow has authentication=none
+        # plus identification+password stages, so it forced a SECOND login after
+        # signup (and again when opening a sandbox). implicit_consent = no extra
+        # consent screen either, so the SPA login and the /s/ redirect are silent
+        # once the user has an SSO session.
+        value: "default-provider-authorization-implicit-consent"
       - key: invalidation_flow
         value: "default-provider-invalidation-flow"
       - key: signing_key_name

@@ -155,10 +155,14 @@ spec:
       - key: authentik_url
         value: "https://auth{{ .Values.envSuffix }}.jeremymr.dev"
       - key: authorization_flow
-        # Dedicated KubeSandbox login flow (kubesandbox-signup-auth.yaml,
-        # wave 16) instead of the shared default -- this is what scopes the
-        # "Sign up" link to KubeSandbox's login screen only.
-        value: "kubesandbox-authorization"
+        # Consent-only flow (authentication=require_authenticated). Critical for
+        # the /s/{id}/ (vcluster) ext-authz redirect: when the backend /authz
+        # bounces an unauthenticated request to Authentik, this flow honors the
+        # user's existing SSO session and redirects straight back to
+        # /oauth2/callback -- no second login. The old kubesandbox-authorization
+        # flow (authentication=none + identification+password) forced users to
+        # sign in again every time they opened a sandbox.
+        value: "default-provider-authorization-implicit-consent"
       - key: invalidation_flow
         value: "default-provider-invalidation-flow"
       - key: signing_key_name
