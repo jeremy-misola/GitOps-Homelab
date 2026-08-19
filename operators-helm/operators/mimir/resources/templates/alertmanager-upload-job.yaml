@@ -37,7 +37,7 @@ spec:
       containers:
         - name: upload
           # mimirtool version matches mimir-distributed chart 5.6.0 = mimir 2.16.0
-          image: grafana/mimirtool:2.16.0
+          image: grafana/mimirtool:3.2.0
           command:
             - mimirtool
             - alertmanager
