@@ -14,7 +14,7 @@ spec:
       restartPolicy: OnFailure
       initContainers:
         - name: render-config
-          image: alpine:3.21
+          image: alpine:3.24
           command:
             - sh
             - -c
@@ -37,7 +37,7 @@ spec:
       containers:
         - name: upload
           # mimirtool version matches mimir-distributed chart 5.6.0 = mimir 2.16.0
-          image: grafana/mimirtool:2.16.0
+          image: grafana/mimirtool:2.17.11
           command:
             - mimirtool
             - alertmanager
