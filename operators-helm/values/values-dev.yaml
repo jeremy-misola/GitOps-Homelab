@@ -7,7 +7,7 @@ operators:
     syncWave: 10
     repoURL: https://charts.external-secrets.io
     chart: external-secrets
-    targetRevision: 2.6.0
+    targetRevision: 2.10.0
     postResources:
       enabled: true
 
@@ -26,7 +26,7 @@ operators:
     syncWave: 20
     repoURL: https://charts.jetstack.io
     chart: cert-manager
-    targetRevision: v1.20.2
+    targetRevision: v1.21.1
     preResources:
       enabled: true
     postResources:
@@ -37,7 +37,7 @@ operators:
     syncWave: 20
     repoURL: https://charts.crossplane.io/stable
     chart: crossplane
-    targetRevision: 2.2.1
+    targetRevision: 2.4.0
     preResources:
       enabled: true
     postResources:
@@ -50,7 +50,7 @@ operators:
     syncWave: 20
     repoURL: https://datahub-local.github.io/garage-helm
     chart: garage
-    targetRevision: 0.6.0
+    targetRevision: 0.7.1
     preResources:
       enabled: true
 
@@ -71,7 +71,7 @@ operators:
     syncWave: 20
     repoURL: https://charts.goauthentik.io/
     chart: authentik
-    targetRevision: 2026.2.2
+    targetRevision: 2026.8.1
     preResources:
       enabled: true
     postResources:
@@ -92,7 +92,7 @@ operators:
     syncWave: 20
     repoURL: https://open-telemetry.github.io/opentelemetry-helm-charts
     chart: opentelemetry-operator
-    targetRevision: 0.117.0
+    targetRevision: 0.122.0
     postResources:
       enabled: true
       namespace: opentelemetry-collector
@@ -102,7 +102,7 @@ operators:
     syncWave: 30
     repoURL: https://grafana.github.io/helm-charts
     chart: loki
-    targetRevision: 7.0.0
+    targetRevision: 7.3.0
     preResources:
       enabled: true
 
@@ -131,14 +131,14 @@ operators:
     syncWave: 50
     repoURL: https://cloudnative-pg.io/charts/
     chart: cloudnative-pg
-    targetRevision: 0.28.3
+    targetRevision: 0.29.0
 
   - name: otel-collector
     namespace: opentelemetry-collector
     syncWave: 50
     repoURL: https://open-telemetry.github.io/opentelemetry-helm-charts
     chart: opentelemetry-collector
-    targetRevision: 0.159.0
+    targetRevision: 0.172.1
     preResources:
       enabled: true
       templated: true
@@ -148,7 +148,7 @@ operators:
     syncWave: 50
     repoURL: https://prometheus-community.github.io/helm-charts
     chart: prometheus-blackbox-exporter
-    targetRevision: 11.13.0
+    targetRevision: 11.18.0
     
 #################################
 ############ APPS ###############
@@ -172,7 +172,7 @@ operators:
     syncWave: 60
     repoURL: https://backstage.github.io/charts
     chart: backstage
-    targetRevision: 2.8.2
+    targetRevision: 2.10.0
     preResources:
       enabled: true
       templated: true
@@ -198,21 +198,21 @@ operators:
     syncWave: 60
     repoURL: http://pajikos.github.io/home-assistant-helm-chart
     chart: home-assistant
-    targetRevision: 0.3.67
+    targetRevision: 0.3.80
 
   - name: kubesandbox-backend
     namespace: kubesandbox
     syncWave: 60
     repoURL: https://jeremy-misola.github.io/kubesandbox/
     chart: kubesandbox-backend
-    targetRevision: 0.1.5
+    targetRevision: 0.1.20
 
   - name: kubesandbox-frontend
     namespace: kubesandbox
     syncWave: 60
     repoURL: https://jeremy-misola.github.io/kubesandbox/
     chart: kubesandbox-frontend
-    targetRevision: 0.1.6
+    targetRevision: 0.1.10
 
   - name: immich
     namespace: immich
@@ -232,7 +232,7 @@ operators:
     syncWave: 60
     repoURL: https://guerzon.github.io/vaultwarden
     chart: vaultwarden
-    targetRevision: 0.39.0
+    targetRevision: 0.46.1
     preResources:
       enabled: true
       templated: true
@@ -252,7 +252,7 @@ operators:
     syncWave: 60
     repoURL: https://general-intelligence-systems.github.io/code-server-helm
     chart: code-server
-    targetRevision: 3.39.0
+    targetRevision: 3.50.0
     preResources:
       enabled: true
       templated: true
