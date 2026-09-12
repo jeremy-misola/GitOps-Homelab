@@ -14,7 +14,7 @@ cnpg:
   instances: 3
   storage:
     size: 10Gi
-    storageClass: longhorn
+    storageClass: local-path
 
 resources:
   requests:
