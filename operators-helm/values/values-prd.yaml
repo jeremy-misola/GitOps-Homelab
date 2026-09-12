@@ -326,3 +326,13 @@ operators:
     postResources:
       enabled: true
       namespace: minecraft
+
+  - name: navidrome
+    namespace: navidrome
+    syncWave: 60
+    repoURL: https://djjudas21.github.io/charts/
+    chart: navidrome
+    targetRevision: 6.8.4
+    postResources:
+      enabled: true
+      templated: true
