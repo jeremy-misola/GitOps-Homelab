@@ -14,6 +14,13 @@ spec:
     metadata:
       labels:
         app: soularr
+      annotations:
+        # Forces a rollout whenever the rendered config template changes --
+        # the render-config init container only runs once at pod start, so
+        # without this a ConfigMap-only sync leaves the running pod on stale
+        # settings (e.g. stalled/remote_queue timeouts) until it happens to
+        # restart for some other reason.
+        checksum/config: {{ include (print $.Template.BasePath "/soularr-config.yaml") . | sha256sum }}
     spec:
       # slskd-downloads is a node-local (local-path) PVC pinned to prod-worker-1 --
       # see the comment on slskd's defaultPodOptions.nodeSelector.
