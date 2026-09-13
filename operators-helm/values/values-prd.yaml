@@ -336,3 +336,16 @@ operators:
     postResources:
       enabled: true
       templated: true
+
+  - name: filebrowser
+    namespace: navidrome
+    syncWave: 61
+    repoURL: https://k8s-at-home.com/charts/
+    chart: filebrowser
+    targetRevision: 1.4.2
+    preResources:
+      enabled: true
+      templated: true
+    postResources:
+      enabled: true
+      templated: true

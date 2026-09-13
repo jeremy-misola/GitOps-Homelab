@@ -1,0 +1,36 @@
+fullnameOverride: filebrowser
+
+env:
+  TZ: America/Toronto
+
+config: |
+  {
+    "port": 80,
+    "baseURL": "",
+    "address": "",
+    "log": "stdout",
+    "database": "/config/database.db",
+    "root": "/music",
+    "auth": {
+      "method": "noauth"
+    }
+  }
+
+persistence:
+  config:
+    enabled: true
+    storageClass: local-path
+    accessMode: ReadWriteOnce
+    size: 512Mi
+  data:
+    enabled: true
+    existingClaim: navidrome-music
+    mountPath: /music
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    cpu: 500m
+    memory: 256Mi

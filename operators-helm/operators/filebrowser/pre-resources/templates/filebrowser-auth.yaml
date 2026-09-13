@@ -1,0 +1,123 @@
+apiVersion: tf.upbound.io/v1beta1
+kind: Workspace
+metadata:
+  name: filebrowser-auth
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "17"
+spec:
+  forProvider:
+    source: Inline
+    module: |
+      terraform {
+        required_providers {
+          authentik = {
+            source  = "goauthentik/authentik"
+            version = "~> 2025.2.0"
+          }
+        }
+      }
+
+      variable "authentik_url" {
+        type = string
+      }
+
+      variable "authentik_token" {
+        type      = string
+        sensitive = true
+      }
+
+      variable "authorization_flow" {
+        type = string
+      }
+
+      variable "invalidation_flow" {
+        type = string
+      }
+
+      variable "env_suffix" {
+        type = string
+      }
+
+      provider "authentik" {
+        url   = var.authentik_url
+        token = var.authentik_token
+      }
+
+      data "authentik_flow" "authorization" {
+        slug = var.authorization_flow
+      }
+
+      data "authentik_flow" "invalidation" {
+        slug = var.invalidation_flow
+      }
+
+      resource "authentik_provider_oauth2" "filebrowser" {
+        name               = "filebrowser"
+        client_id          = "filebrowser"
+        authorization_flow = data.authentik_flow.authorization.id
+        invalidation_flow  = data.authentik_flow.invalidation.id
+        client_type        = "confidential"
+
+        allowed_redirect_uris = [
+          {
+            matching_mode = "strict"
+            url           = "https://navidrome-upload${var.env_suffix}.jeremymr.dev/oauth2/callback"
+          }
+        ]
+      }
+
+      resource "authentik_application" "filebrowser" {
+        name               = "filebrowser"
+        slug               = "filebrowser"
+        protocol_provider  = authentik_provider_oauth2.filebrowser.id
+        policy_engine_mode = "any"
+      }
+
+      # Deny KubeSandbox signups. That group is created in
+      # kubesandbox-signup-auth.yaml (sync-wave 16, applies before this
+      # workspace's wave 17) -- every self-service KubeSandbox account lands
+      # in it and should only ever be able to reach KubeSandbox itself.
+      data "authentik_group" "kubesandbox_users" {
+        name = "kubesandbox-users"
+      }
+
+      resource "authentik_policy_binding" "deny_kubesandbox_users" {
+        target = authentik_application.filebrowser.uuid
+        group  = data.authentik_group.kubesandbox_users.id
+        negate = true
+        order  = 0
+      }
+
+      output "client-id" {
+        value = authentik_provider_oauth2.filebrowser.client_id
+      }
+
+      output "client-secret" {
+        value     = authentik_provider_oauth2.filebrowser.client_secret
+        sensitive = true
+      }
+
+    vars:
+      - key: authentik_url
+        value: "https://auth{{ .Values.envSuffix }}.jeremymr.dev"
+      - key: authorization_flow
+        value: "default-provider-authorization-explicit-consent"
+      - key: invalidation_flow
+        value: "default-provider-invalidation-flow"
+      - key: env_suffix
+        value: "{{ .Values.envSuffix }}"
+
+    env:
+      - name: TF_VAR_authentik_token
+        secretKeyRef:
+          namespace: crossplane-system
+          name: authentik-api-token
+          key: token
+
+  writeConnectionSecretToRef:
+    name: filebrowser-client-secret
+    namespace: navidrome
+
+  providerConfigRef:
+    name: terraform-config
