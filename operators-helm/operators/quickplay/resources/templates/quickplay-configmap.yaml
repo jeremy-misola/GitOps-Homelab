@@ -107,6 +107,8 @@ data:
     
         def title_matches(t):
             n = normalize(t)
+            if not norm_song or not n:
+                return False
             return norm_song == n or norm_song in n or n in norm_song
     
         singles = [a for a in albums if a.get("albumType") == "Single"]
@@ -189,7 +191,7 @@ data:
       const btn = f.querySelector('button');
       const result = document.getElementById('result');
       btn.disabled = true; btn.textContent = 'Searching...';
-      result.className = ''; result.style.display = 'none';
+      result.className = ''; result.style.display = '';
       try {
         const resp = await fetch('/grab', {
           method: 'POST', headers: {'Content-Type': 'application/json'},
