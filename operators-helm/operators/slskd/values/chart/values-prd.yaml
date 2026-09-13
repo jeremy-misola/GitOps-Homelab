@@ -1,6 +1,13 @@
 global:
   fullnameOverride: slskd
 
+# local-path volumes are node-local: navidrome-music and lidarr-config already
+# live on prod-cp-3, and lidarr also mounts slskd-downloads, so slskd-downloads
+# has to be provisioned on that same node or lidarr becomes unschedulable.
+defaultPodOptions:
+  nodeSelector:
+    kubernetes.io/hostname: prod-cp-3
+
 controllers:
   main:
     containers:

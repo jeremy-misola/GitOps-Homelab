@@ -15,6 +15,10 @@ spec:
       labels:
         app: soularr
     spec:
+      # slskd-downloads is a node-local (local-path) PVC pinned to prod-cp-3 --
+      # see the comment on slskd's defaultPodOptions.nodeSelector.
+      nodeSelector:
+        kubernetes.io/hostname: prod-cp-3
       # Renders config.ini from the template ConfigMap, substituting in the
       # Lidarr API key pulled from Doppler -- soularr itself only reads a
       # plain config.ini file, it has no way to source secrets directly.
