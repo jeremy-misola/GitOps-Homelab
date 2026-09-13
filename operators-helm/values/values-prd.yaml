@@ -333,6 +333,9 @@ operators:
     repoURL: https://djjudas21.github.io/charts/
     chart: navidrome
     targetRevision: 6.8.4
+    preResources:
+      enabled: true
+      templated: true
     postResources:
       enabled: true
       templated: true

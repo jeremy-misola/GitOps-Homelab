@@ -2,6 +2,17 @@ fullnameOverride: navidrome
 
 env:
   TZ: America/Toronto
+  ND_LASTFM_ENABLED: "true"
+  ND_LASTFM_APIKEY:
+    valueFrom:
+      secretKeyRef:
+        name: navidrome-lastfm-credentials
+        key: apiKey
+  ND_LASTFM_SECRET:
+    valueFrom:
+      secretKeyRef:
+        name: navidrome-lastfm-credentials
+        key: apiSecret
 
 persistence:
   config:
