@@ -352,3 +352,13 @@ operators:
     postResources:
       enabled: true
       templated: true
+
+  - name: lidarr
+    namespace: navidrome
+    syncWave: 61
+    repoURL: https://k8s-at-home.com/charts/
+    chart: lidarr
+    targetRevision: 9.1.0
+    postResources:
+      enabled: true
+      templated: true
