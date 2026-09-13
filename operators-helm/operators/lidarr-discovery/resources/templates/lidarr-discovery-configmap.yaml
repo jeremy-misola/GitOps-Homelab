@@ -183,6 +183,18 @@ data:
         return candidates
     
     
+    def pick_best_lookup_result(results):
+        """Same-named artists collide a lot (dozens of "Jennie"s exist in
+        MusicBrainz). Lidarr's lookup ranks by raw text relevance, not fame, so
+        an obscure stub can outrank who was actually meant. A populated
+        overview/bio is the best fame signal available -- real, well-known
+        artists almost always have one; stub entries almost never do."""
+        for r in results:
+            if r.get("overview"):
+                return r
+        return results[0]
+    
+    
     def add_to_lidarr(name, mbid, existing, auto_discovery_tag_id):
         if mbid and mbid in existing:
             return  # already have this artist
@@ -195,7 +207,7 @@ data:
         if not results:
             log.info("No Lidarr metadata match for %r, skipping", name)
             return
-        match = results[0]
+        match = pick_best_lookup_result(results)
         fid = match["foreignArtistId"]
         if fid in existing:
             return  # resolved to an artist we already have

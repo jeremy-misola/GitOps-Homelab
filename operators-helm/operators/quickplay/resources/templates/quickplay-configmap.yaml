@@ -71,19 +71,20 @@ data:
         return re.sub(r"[^a-z0-9]", "", title.lower())
     
     
-    def find_existing_artist(name):
-        norm = normalize(name)
-        for a in lidarr_get("artist") or []:
-            if normalize(a["artistName"]) == norm:
-                return a
-        return None
+    def pick_best_lookup_result(results):
+        """Same-named artists collide a lot (there are dozens of "Jennie"s in
+        MusicBrainz). Lidarr's lookup ranks by raw text relevance, not fame, so
+        an obscure stub can outrank who you actually meant. A populated
+        overview/bio is the best fame signal Lidarr's metadata actually gives
+        us -- real, well-known artists almost always have one; stub entries
+        almost never do. Ties keep the original (relevance-ranked) order."""
+        for r in results:
+            if r.get("overview"):
+                return r
+        return results[0]
     
     
-    def add_artist(name, tag_id):
-        results = lidarr_get("artist/lookup", params={"term": name})
-        if not results:
-            return None, f"No Lidarr metadata match for artist {name!r}"
-        match = results[0]
+    def add_artist_from_match(match, tag_id):
         body = {
             "artistName": match["artistName"],
             "foreignArtistId": match["foreignArtistId"],
@@ -94,8 +95,7 @@ data:
             "tags": [tag_id],
             "addOptions": {"monitor": "none", "searchForMissingAlbums": False},
         }
-        created = lidarr_post("artist", body)
-        return created, None
+        return lidarr_post("artist", body)
     
     
     def find_matching_release(artist_id, song_title):
@@ -131,12 +131,19 @@ data:
     def grab(artist_name, song_title):
         tag_id = get_or_create_tag(QUICK_GRAB_TAG)
     
-        artist = find_existing_artist(artist_name)
+        results = lidarr_get("artist/lookup", params={"term": artist_name})
+        if not results:
+            return {"status": "not_found", "message": f"No Lidarr metadata match for artist {artist_name!r}"}
+        best = pick_best_lookup_result(results)
+    
+        # Key off the resolved identity (foreignArtistId), not the display name --
+        # a same-named-but-wrong stub already in the library must never shadow
+        # the artist we actually just picked.
+        existing_by_id = {a["foreignArtistId"]: a for a in lidarr_get("artist") or []}
+        artist = existing_by_id.get(best["foreignArtistId"])
         just_added = False
         if artist is None:
-            artist, err = add_artist(artist_name, tag_id)
-            if err:
-                return {"status": "not_found", "message": err}
+            artist = add_artist_from_match(best, tag_id)
             just_added = True
     
         if not artist.get("statistics", {}).get("albumCount"):
