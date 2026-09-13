@@ -11,9 +11,7 @@ config: |
     "log": "stdout",
     "database": "/config/database.db",
     "root": "/music",
-    "auth": {
-      "method": "noauth"
-    }
+    "noauth": true
   }
 
 persistence:
