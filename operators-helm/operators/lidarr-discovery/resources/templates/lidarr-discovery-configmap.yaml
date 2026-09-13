@@ -283,19 +283,21 @@ data:
                     continue
                 try:
                     lidarr_put("album/monitor", {"albumIds": [best["id"]], "monitored": True})
-                    lidarr_post("command", {"name": "AlbumSearch", "albumIds": [best["id"]]})
                     log.info("Auto-picked album for %s: %s", artist["artistName"], best["title"])
                 except urllib.error.HTTPError as e:
-                    log.warning("Failed to monitor/search album for %s: %s",
+                    log.warning("Failed to monitor album for %s: %s",
                                 artist["artistName"], e)
                     continue
+                # The artist itself must also be monitored -- Lidarr's
+                # wanted/missing view (what soularr actually polls) requires
+                # both, so monitoring only the album silently does nothing.
+                artist["monitored"] = True
     
-            new_tags = list(set(artist.get("tags", []) + [auto_picked_tag_id]))
-            artist["tags"] = new_tags
+            artist["tags"] = list(set(artist.get("tags", []) + [auto_picked_tag_id]))
             try:
                 lidarr_put(f"artist/{artist['id']}", artist)
             except urllib.error.HTTPError as e:
-                log.warning("Failed to tag %s as auto-picked: %s", artist["artistName"], e)
+                log.warning("Failed to update %s as auto-picked: %s", artist["artistName"], e)
     
     
     def run_once():
