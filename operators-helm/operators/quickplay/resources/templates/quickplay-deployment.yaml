@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: quickplay
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: quickplay
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: quickplay
+  template:
+    metadata:
+      labels:
+        app: quickplay
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/quickplay-configmap.yaml") . | sha256sum }}
+    spec:
+      containers:
+      - name: quickplay
+        image: python:3.12-slim
+        command: ["python3", "/app/quickplay.py"]
+        env:
+        - name: TZ
+          value: America/Toronto
+        - name: LIDARR_URL
+          value: http://lidarr:8686
+        - name: ROOT_FOLDER_PATH
+          value: /music/
+        - name: QUALITY_PROFILE_ID
+          value: "1"
+        - name: METADATA_PROFILE_ID
+          value: "1"
+        - name: PORT
+          value: "8080"
+        - name: LIDARR_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: quickplay-credentials
+              key: lidarrApiKey
+        ports:
+        - containerPort: 8080
+        volumeMounts:
+        - name: script
+          mountPath: /app
+        resources:
+          requests:
+            cpu: 25m
+            memory: 64Mi
+          limits:
+            cpu: 250m
+            memory: 128Mi
+      volumes:
+      - name: script
+        configMap:
+          name: quickplay-script

@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: quickplay
+  namespace: {{ .Release.Namespace }}
+spec:
+  selector:
+    app: quickplay
+  ports:
+  - port: 8080
+    targetPort: 8080

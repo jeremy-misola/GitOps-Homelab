@@ -1,0 +1,6 @@
+apiVersion: v2
+name: quickplay-pre-resources
+description: Pre-resources for quickplay (Lidarr API key, Authentik OIDC client)
+type: application
+version: 0.1.0
+appVersion: "1.0"

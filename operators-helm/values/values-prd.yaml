@@ -401,3 +401,13 @@ operators:
     postResources:
       enabled: true
       templated: true
+
+  - name: quickplay
+    namespace: navidrome
+    syncWave: 62
+    preResources:
+      enabled: true
+      templated: true
+    postResources:
+      enabled: true
+      templated: true
