@@ -18,6 +18,7 @@ data:
     import json
     import os
     import re
+    import time
     import urllib.error
     import urllib.parse
     import urllib.request
@@ -31,6 +32,9 @@ data:
     PORT = int(os.environ.get("PORT", "8080"))
     QUICK_GRAB_TAG = "quick-grab"
     MAX_ALBUMS_TO_SCAN = 40
+    MAX_CANDIDATES_TO_TRY = 3
+    METADATA_POLL_ATTEMPTS = 5
+    METADATA_POLL_INTERVAL = 3
     
     
     def lidarr_get(path, params=None):
@@ -60,6 +64,12 @@ data:
             return json.loads(raw) if raw else None
     
     
+    def lidarr_delete(path):
+        req = urllib.request.Request(f"{LIDARR_URL}/api/v1/{path}", method="DELETE",
+                                      headers={"X-Api-Key": LIDARR_API_KEY})
+        urllib.request.urlopen(req, timeout=30)
+    
+    
     def get_or_create_tag(label):
         for t in lidarr_get("tag") or []:
             if t["label"] == label:
@@ -71,17 +81,14 @@ data:
         return re.sub(r"[^a-z0-9]", "", title.lower())
     
     
-    def pick_best_lookup_result(results, query):
+    def rank_lookup_results(results, query):
         """Same-named artists collide a lot (dozens of "Jennie"s exist in
-        MusicBrainz). Lidarr's lookup ranks by raw text relevance, not fame, so
-        a wrong-but-similarly-named result can outrank who was actually meant --
-        e.g. "Jennie Muskett" (a composer) has a bio same as "JENNIE" (the
-        K-pop artist) does, so bio alone doesn't disambiguate between them.
-    
-        Rank by: exact name match with a bio > exact name match > any bio > the
-        original relevance order. Exact-name-with-bio wins over a differently
-        spelled name that also happens to have a bio -- someone querying a
-        mononymous stage name almost always means the exact-name candidate."""
+        MusicBrainz), and Lidarr's lookup ranks by raw text relevance, not fame.
+        A populated bio is a decent *hint* but Lidarr's metadata backend returns
+        it inconsistently (confirmed: the same real artist showed a bio on one
+        call and none on the next) -- so this is only used to pick a sensible
+        TRY ORDER, never as the final word. The actual decision in grab() is
+        made by checking which candidate really has the requested song."""
         norm_query = normalize(query)
     
         def score(r):
@@ -89,7 +96,7 @@ data:
             has_bio = bool(r.get("overview"))
             return (exact and has_bio, exact, has_bio)
     
-        return max(results, key=score)
+        return sorted(results, key=score, reverse=True)
     
     
     def add_artist_from_match(match, tag_id):
@@ -136,45 +143,69 @@ data:
         return None
     
     
-    def grab(artist_name, song_title):
-        tag_id = get_or_create_tag(QUICK_GRAB_TAG)
+    def wait_for_metadata(artist_id):
+        """Poll briefly for Lidarr to finish fetching a freshly-added artist's
+        catalog. Returns the artist once albumCount>0, or None on timeout."""
+        for _ in range(METADATA_POLL_ATTEMPTS):
+            artist = lidarr_get(f"artist/{artist_id}")
+            if artist.get("statistics", {}).get("albumCount"):
+                return artist
+            time.sleep(METADATA_POLL_INTERVAL)
+        return None
     
-        results = lidarr_get("artist/lookup", params={"term": artist_name})
-        if not results:
-            return {"status": "not_found", "message": f"No Lidarr metadata match for artist {artist_name!r}"}
-        best = pick_best_lookup_result(results, artist_name)
     
-        # Key off the resolved identity (foreignArtistId), not the display name --
-        # a same-named-but-wrong stub already in the library must never shadow
-        # the artist we actually just picked.
-        existing_by_id = {a["foreignArtistId"]: a for a in lidarr_get("artist") or []}
-        artist = existing_by_id.get(best["foreignArtistId"])
-        just_added = False
-        if artist is None:
-            artist = add_artist_from_match(best, tag_id)
-            just_added = True
-    
-        if not artist.get("statistics", {}).get("albumCount"):
-            if just_added:
-                return {"status": "pending",
-                        "message": f"Added {artist['artistName']} -- Lidarr is still fetching their "
-                                    "catalog metadata, try again in ~30s"}
-            return {"status": "pending",
-                    "message": f"{artist['artistName']}'s catalog isn't loaded yet, try again shortly"}
-    
-        album = find_matching_release(artist["id"], song_title)
-        if album is None:
-            return {"status": "not_found",
-                    "message": f"Couldn't find a release matching {song_title!r} by {artist['artistName']}"}
-    
+    def commit_match(artist, album, tag_id):
         if not album["monitored"]:
             lidarr_put("album/monitor", {"albumIds": [album["id"]], "monitored": True})
         if not artist["monitored"]:
             artist["monitored"] = True
             artist["tags"] = list(set(artist.get("tags", []) + [tag_id]))
             lidarr_put(f"artist/{artist['id']}", artist)
-    
         return {"status": "queued", "artist": artist["artistName"], "album": album["title"]}
+    
+    
+    def grab(artist_name, song_title):
+        tag_id = get_or_create_tag(QUICK_GRAB_TAG)
+    
+        results = lidarr_get("artist/lookup", params={"term": artist_name})
+        if not results:
+            return {"status": "not_found", "message": f"No Lidarr metadata match for artist {artist_name!r}"}
+        candidates = rank_lookup_results(results, artist_name)[:MAX_CANDIDATES_TO_TRY]
+    
+        # Key off resolved identity (foreignArtistId), not display name -- a
+        # same-named-but-wrong stub already in the library must never shadow a
+        # different candidate we're now trying.
+        existing_by_id = {a["foreignArtistId"]: a for a in lidarr_get("artist") or []}
+    
+        still_loading = []
+        for match in candidates:
+            artist = existing_by_id.get(match["foreignArtistId"])
+            just_added = False
+            if artist is None:
+                artist = add_artist_from_match(match, tag_id)
+                just_added = True
+    
+            if not artist.get("statistics", {}).get("albumCount"):
+                artist = wait_for_metadata(artist["id"])
+                if artist is None:
+                    still_loading.append(match["artistName"])
+                    continue
+    
+            album = find_matching_release(artist["id"], song_title)
+            if album is not None:
+                return commit_match(artist, album, tag_id)
+    
+            # This candidate's catalog is loaded and confirmed NOT to have the
+            # song -- if we added it on a wrong guess, remove it rather than
+            # leave dead clutter behind.
+            if just_added:
+                lidarr_delete(f"artist/{artist['id']}?deleteFiles=false")
+    
+        if still_loading:
+            return {"status": "pending",
+                    "message": f"Still fetching catalog metadata for {', '.join(still_loading)} -- try again shortly"}
+        return {"status": "not_found",
+                "message": f"Couldn't find {song_title!r} in any Lidarr metadata match for {artist_name!r}"}
     
     
     PAGE = """<!doctype html>
