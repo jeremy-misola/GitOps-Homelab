@@ -12,9 +12,7 @@ data:
     disable_sync = False
 
     [Slskd]
-    # SLSKD_NO_AUTH is set on slskd, so this key is never actually checked --
-    # it just has to be non-empty for soularr's own config validation.
-    api_key = not-required-no-auth-enabled
+    api_key = __SLSKD_API_KEY__
     host_url = http://slskd:5030
     url_base = /
     download_dir = /downloads

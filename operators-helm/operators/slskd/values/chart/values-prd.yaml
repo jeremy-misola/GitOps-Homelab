@@ -40,6 +40,13 @@ controllers:
               secretKeyRef:
                 name: slskd-webui-credentials
                 key: password
+          # Enabling native auth above locked down slskd's REST API too, not
+          # just the web UI -- soularr needs a real key to call it now.
+          SLSKD_API_KEY:
+            valueFrom:
+              secretKeyRef:
+                name: slskd-webui-credentials
+                key: apiKey
           SLSKD_DOWNLOADS_DIR: /downloads
           SLSKD_INCOMPLETE_DIR: /incomplete
           SLSKD_SLSK_USERNAME:

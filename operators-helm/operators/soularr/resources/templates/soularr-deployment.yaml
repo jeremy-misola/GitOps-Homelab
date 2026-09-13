@@ -38,11 +38,16 @@ spec:
             secretKeyRef:
               name: soularr-lidarr-credentials
               key: apiKey
+        - name: SLSKD_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: slskd-webui-credentials
+              key: apiKey
         command:
         - /bin/sh
         - -c
         - |
-          sed "s/__LIDARR_API_KEY__/$LIDARR_API_KEY/g" /template/config.ini.tpl > /data/config.ini
+          sed -e "s/__LIDARR_API_KEY__/$LIDARR_API_KEY/g" -e "s/__SLSKD_API_KEY__/$SLSKD_API_KEY/g" /template/config.ini.tpl > /data/config.ini
         volumeMounts:
         - name: config-template
           mountPath: /template
