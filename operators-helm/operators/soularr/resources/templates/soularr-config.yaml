@@ -17,8 +17,8 @@ data:
     url_base = /
     download_dir = /downloads
     delete_searches = False
-    stalled_timeout = 3600
-    remote_queue_timeout = 300
+    stalled_timeout = 900
+    remote_queue_timeout = 60
 
     [Release Settings]
     use_selected_lidarr_release = False
