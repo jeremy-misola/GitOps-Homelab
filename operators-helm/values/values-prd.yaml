@@ -359,6 +359,9 @@ operators:
     repoURL: https://k8s-at-home.com/charts/
     chart: lidarr
     targetRevision: 9.1.0
+    preResources:
+      enabled: true
+      templated: true
     postResources:
       enabled: true
       templated: true
