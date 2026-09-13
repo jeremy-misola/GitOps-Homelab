@@ -60,7 +60,7 @@ spec:
         - name: TZ
           value: America/Toronto
         - name: SCRIPT_INTERVAL
-          value: "300"
+          value: "60"
         volumeMounts:
         - name: data
           mountPath: /data
