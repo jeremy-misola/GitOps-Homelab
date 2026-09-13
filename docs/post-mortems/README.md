@@ -29,3 +29,4 @@ Each post-mortem follows the same structure:
 | Date | Incident | Severity |
 |------|----------|----------|
 | 2026-06-24 | [Crossplane Workspace deletion loop](./2026-06-24-crossplane-workspace-deletion-loop.md) | High |
+| 2026-09-13 | [Music stack storage migration (prod-cp-3 → prod-worker-1)](./2026-09-13-music-stack-storage-migration.md) | Medium |
