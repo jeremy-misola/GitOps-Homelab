@@ -13,6 +13,10 @@ persistence:
     enabled: true
     existingClaim: navidrome-music
     mountPath: /music
+  downloads:
+    enabled: true
+    existingClaim: slskd-downloads
+    mountPath: /downloads
 
 resources:
   requests:

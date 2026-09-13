@@ -340,6 +340,22 @@ operators:
       enabled: true
       templated: true
 
+  # slskd owns the shared "downloads" PVC that lidarr and soularr both mount,
+  # so it must sync at the same wave as navidrome (which owns the music PVC) --
+  # anything at wave 61 that references these claims needs them to already exist.
+  - name: slskd
+    namespace: navidrome
+    syncWave: 60
+    repoURL: https://bjw-s-labs.github.io/helm-charts
+    chart: app-template
+    targetRevision: 5.1.0
+    preResources:
+      enabled: true
+      templated: true
+    postResources:
+      enabled: true
+      templated: true
+
   - name: filebrowser
     namespace: navidrome
     syncWave: 61
@@ -359,6 +375,13 @@ operators:
     repoURL: https://k8s-at-home.com/charts/
     chart: lidarr
     targetRevision: 9.1.0
+    postResources:
+      enabled: true
+      templated: true
+
+  - name: soularr
+    namespace: navidrome
+    syncWave: 62
     preResources:
       enabled: true
       templated: true

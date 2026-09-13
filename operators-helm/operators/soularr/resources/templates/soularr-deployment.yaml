@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: soularr
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: soularr
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: soularr
+  template:
+    metadata:
+      labels:
+        app: soularr
+    spec:
+      # Renders config.ini from the template ConfigMap, substituting in the
+      # Lidarr API key pulled from Doppler -- soularr itself only reads a
+      # plain config.ini file, it has no way to source secrets directly.
+      initContainers:
+      - name: render-config
+        image: alpine:3.20
+        env:
+        - name: LIDARR_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: soularr-lidarr-credentials
+              key: apiKey
+        command:
+        - /bin/sh
+        - -c
+        - |
+          sed "s/__LIDARR_API_KEY__/$LIDARR_API_KEY/g" /template/config.ini.tpl > /data/config.ini
+        volumeMounts:
+        - name: config-template
+          mountPath: /template
+        - name: data
+          mountPath: /data
+      containers:
+      - name: soularr
+        image: mrusse08/soularr:v1.2.2
+        env:
+        - name: TZ
+          value: America/Toronto
+        - name: SCRIPT_INTERVAL
+          value: "300"
+        volumeMounts:
+        - name: data
+          mountPath: /data
+        - name: downloads
+          mountPath: /downloads
+        resources:
+          requests:
+            cpu: 50m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+      volumes:
+      - name: config-template
+        configMap:
+          name: soularr-config-template
+      - name: data
+        emptyDir: {}
+      - name: downloads
+        persistentVolumeClaim:
+          claimName: slskd-downloads

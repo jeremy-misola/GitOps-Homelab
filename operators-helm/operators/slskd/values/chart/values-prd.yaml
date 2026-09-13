@@ -1,0 +1,60 @@
+global:
+  fullnameOverride: slskd
+
+controllers:
+  main:
+    containers:
+      main:
+        image:
+          repository: ghcr.io/slskd/slskd
+          tag: 0.26.0
+        env:
+          TZ: America/Toronto
+          # Envoy's SecurityPolicy handles auth in front of this at the gateway,
+          # so slskd's own login would just be a second, redundant prompt.
+          SLSKD_NO_AUTH: "true"
+          SLSKD_DOWNLOADS_DIR: /downloads
+          SLSKD_INCOMPLETE_DIR: /downloads/incomplete
+          SLSKD_SLSK_USERNAME:
+            valueFrom:
+              secretKeyRef:
+                name: slskd-soulseek-credentials
+                key: username
+          SLSKD_SLSK_PASSWORD:
+            valueFrom:
+              secretKeyRef:
+                name: slskd-soulseek-credentials
+                key: password
+
+service:
+  main:
+    controller: main
+    ports:
+      http:
+        port: 5030
+
+persistence:
+  config:
+    type: persistentVolumeClaim
+    accessMode: ReadWriteOnce
+    storageClass: local-path
+    size: 1Gi
+    globalMounts:
+      - path: /app
+  # Shared with lidarr and soularr (existingClaim: slskd-downloads) as the
+  # staging area slskd downloads into and lidarr imports from.
+  downloads:
+    type: persistentVolumeClaim
+    accessMode: ReadWriteOnce
+    storageClass: local-path
+    size: 20Gi
+    globalMounts:
+      - path: /downloads
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 1000m
+    memory: 1Gi
