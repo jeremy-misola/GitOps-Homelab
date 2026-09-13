@@ -24,9 +24,22 @@ controllers:
           tag: 0.26.0
         env:
           TZ: America/Toronto
-          # Envoy's SecurityPolicy handles auth in front of this at the gateway,
-          # so slskd's own login would just be a second, redundant prompt.
-          SLSKD_NO_AUTH: "true"
+          # slskd's own web UI login -- Authentik OIDC was tried here but the
+          # frontend's background /api/v0/session polling races the OIDC
+          # redirect flow (every poll re-triggers a fresh Authentik login
+          # attempt), which corrupts the flow you're actively logging into
+          # ("No identification provided"). Native auth doesn't redirect, so
+          # it doesn't have that problem.
+          SLSKD_USERNAME:
+            valueFrom:
+              secretKeyRef:
+                name: slskd-webui-credentials
+                key: username
+          SLSKD_PASSWORD:
+            valueFrom:
+              secretKeyRef:
+                name: slskd-webui-credentials
+                key: password
           SLSKD_DOWNLOADS_DIR: /downloads
           SLSKD_INCOMPLETE_DIR: /incomplete
           SLSKD_SLSK_USERNAME:
