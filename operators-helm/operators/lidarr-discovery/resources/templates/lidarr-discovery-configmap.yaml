@@ -1,0 +1,221 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: lidarr-discovery-script
+  namespace: {{ .Release.Namespace }}
+data:
+  discover.py: |
+    #!/usr/bin/env python3
+    """Feeds Lidarr with unmonitored artist candidates from two discovery sources:
+    Last.fm similar-artists (seeded from your own top scrobbles) and ListenBrainz's
+    auto-generated recommendation playlists (Weekly Jams / Weekly Exploration).
+    
+    Everything is added to Lidarr with monitor=none -- this only surfaces
+    candidates in your library for you to review and monitor albums for
+    yourself, it never auto-downloads anything.
+    """
+    import json
+    import logging
+    import os
+    import sys
+    import time
+    import urllib.error
+    import urllib.parse
+    import urllib.request
+    
+    logging.basicConfig(
+        level=os.environ.get("LOG_LEVEL", "INFO"),
+        format="[%(asctime)s] %(levelname)s: %(message)s",
+        datefmt="%Y-%m-%dT%H:%M:%S%z",
+    )
+    log = logging.getLogger("discover")
+    
+    LIDARR_URL = os.environ.get("LIDARR_URL", "http://lidarr:8686").rstrip("/")
+    LIDARR_API_KEY = os.environ["LIDARR_API_KEY"]
+    LASTFM_API_KEY = os.environ["LASTFM_API_KEY"]
+    LASTFM_USERNAME = os.environ["LASTFM_USERNAME"]
+    LISTENBRAINZ_USERNAME = os.environ.get("LISTENBRAINZ_USERNAME", "")
+    LISTENBRAINZ_TOKEN = os.environ.get("LISTENBRAINZ_TOKEN", "")
+    ROOT_FOLDER_PATH = os.environ.get("ROOT_FOLDER_PATH", "/music/")
+    QUALITY_PROFILE_ID = int(os.environ.get("QUALITY_PROFILE_ID", "1"))
+    METADATA_PROFILE_ID = int(os.environ.get("METADATA_PROFILE_ID", "1"))
+    RUN_INTERVAL_SECONDS = int(os.environ.get("RUN_INTERVAL_SECONDS", "86400"))
+    SIMILAR_ARTIST_SEED_COUNT = int(os.environ.get("SIMILAR_ARTIST_SEED_COUNT", "10"))
+    SIMILAR_ARTIST_PER_SEED = int(os.environ.get("SIMILAR_ARTIST_PER_SEED", "5"))
+    MIN_MATCH_SCORE = float(os.environ.get("MIN_MATCH_SCORE", "0.3"))
+    
+    
+    def http_json(url, headers=None, method="GET", body=None):
+        data = json.dumps(body).encode() if body is not None else None
+        req = urllib.request.Request(url, data=data, method=method, headers=headers or {})
+        if data is not None:
+            req.add_header("Content-Type", "application/json")
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            raw = resp.read()
+            return json.loads(raw) if raw else None
+    
+    
+    def lidarr_get(path, params=None):
+        qs = f"?{urllib.parse.urlencode(params)}" if params else ""
+        url = f"{LIDARR_URL}/api/v1/{path}{qs}"
+        return http_json(url, headers={"X-Api-Key": LIDARR_API_KEY})
+    
+    
+    def lidarr_post(path, body):
+        url = f"{LIDARR_URL}/api/v1/{path}"
+        return http_json(url, headers={"X-Api-Key": LIDARR_API_KEY}, method="POST", body=body)
+    
+    
+    def lastfm_get(method, **params):
+        params.update({"method": method, "api_key": LASTFM_API_KEY, "format": "json"})
+        url = f"https://ws.audioscrobbler.com/2.0/?{urllib.parse.urlencode(params)}"
+        return http_json(url)
+    
+    
+    def listenbrainz_get(path):
+        url = f"https://api.listenbrainz.org/1/{path}"
+        headers = {"Authorization": f"Token {LISTENBRAINZ_TOKEN}"} if LISTENBRAINZ_TOKEN else {}
+        return http_json(url, headers=headers)
+    
+    
+    def get_existing_artists():
+        """Returns {foreignArtistId: artistName} for everything already in Lidarr."""
+        artists = lidarr_get("artist") or []
+        return {a["foreignArtistId"]: a["artistName"] for a in artists if a.get("foreignArtistId")}
+    
+    
+    def discover_lastfm_similar():
+        """Seed from your top scrobbled artists, expand via Last.fm's similar-artist graph."""
+        candidates = {}  # name -> mbid (may be "")
+        top = lastfm_get("user.gettopartists", user=LASTFM_USERNAME, period="3month",
+                          limit=SIMILAR_ARTIST_SEED_COUNT)
+        seeds = [a["name"] for a in (top or {}).get("topartists", {}).get("artist", [])]
+        log.info("Last.fm seed artists (your top %d, 3mo): %s", len(seeds), ", ".join(seeds))
+    
+        for seed in seeds:
+            try:
+                resp = lastfm_get("artist.getsimilar", artist=seed, limit=SIMILAR_ARTIST_PER_SEED)
+                similar = (resp or {}).get("similarartists", {}).get("artist", [])
+            except urllib.error.HTTPError as e:
+                log.warning("Last.fm getsimilar failed for %r: %s", seed, e)
+                continue
+            for a in similar:
+                try:
+                    score = float(a.get("match", 0))
+                except (TypeError, ValueError):
+                    score = 0.0
+                if score < MIN_MATCH_SCORE:
+                    continue
+                candidates[a["name"]] = a.get("mbid", "")
+        log.info("Last.fm similar-artist candidates above threshold: %d", len(candidates))
+        return candidates
+    
+    
+    def discover_listenbrainz_recommendations():
+        """Pull artists out of ListenBrainz's auto-generated weekly playlists, if any exist yet."""
+        candidates = {}
+        if not (LISTENBRAINZ_USERNAME and LISTENBRAINZ_TOKEN):
+            log.info("ListenBrainz not configured, skipping")
+            return candidates
+    
+        try:
+            resp = listenbrainz_get(f"user/{LISTENBRAINZ_USERNAME}/playlists/createdfor")
+        except urllib.error.HTTPError as e:
+            log.warning("ListenBrainz playlists/createdfor failed: %s", e)
+            return candidates
+    
+        playlists = (resp or {}).get("playlists", [])
+        targets = [p for p in playlists
+                   if any(k in p.get("playlist", {}).get("title", "").lower()
+                          for k in ("weekly jams", "weekly exploration", "daily jams"))]
+        if not targets:
+            log.info("No ListenBrainz recommendation playlists yet -- needs more listening "
+                      "history before it generates any (usually a couple of weeks).")
+            return candidates
+    
+        for p in targets:
+            mbid = p["playlist"]["identifier"].rsplit("/", 1)[-1]
+            title = p["playlist"]["title"]
+            try:
+                detail = listenbrainz_get(f"playlist/{mbid}")
+            except urllib.error.HTTPError as e:
+                log.warning("Failed to fetch playlist %r (%s): %s", title, mbid, e)
+                continue
+            tracks = detail.get("playlist", {}).get("track", [])
+            log.info("ListenBrainz playlist %r: %d tracks", title, len(tracks))
+            for t in tracks:
+                name = t.get("creator")
+                if not name:
+                    continue
+                artist_mbid = ""
+                ext = t.get("extension", {}).get(
+                    "https://musicbrainz.org/doc/jspf#track", {})
+                ids = ext.get("artist_identifiers") or []
+                if ids:
+                    artist_mbid = ids[0].rsplit("/", 1)[-1]
+                candidates[name] = artist_mbid
+        log.info("ListenBrainz recommendation candidates: %d", len(candidates))
+        return candidates
+    
+    
+    def add_to_lidarr(name, mbid, existing):
+        if mbid and mbid in existing:
+            return  # already have this artist
+        term = f"lidarr:{mbid}" if mbid else name
+        try:
+            results = lidarr_get("artist/lookup", params={"term": term})
+        except urllib.error.HTTPError as e:
+            log.warning("Lookup failed for %r: %s", name, e)
+            return
+        if not results:
+            log.info("No Lidarr metadata match for %r, skipping", name)
+            return
+        match = results[0]
+        fid = match["foreignArtistId"]
+        if fid in existing:
+            return  # resolved to an artist we already have
+        body = {
+            "artistName": match["artistName"],
+            "foreignArtistId": fid,
+            "qualityProfileId": QUALITY_PROFILE_ID,
+            "metadataProfileId": METADATA_PROFILE_ID,
+            "rootFolderPath": ROOT_FOLDER_PATH,
+            "monitored": False,
+            "addOptions": {"monitor": "none", "searchForMissingAlbums": False},
+        }
+        try:
+            lidarr_post("artist", body)
+            log.info("Added candidate artist: %s", match["artistName"])
+            existing[fid] = match["artistName"]
+        except urllib.error.HTTPError as e:
+            if e.code == 400:
+                log.debug("Artist %r already exists or invalid: %s", name, e)
+            else:
+                log.warning("Failed to add %r: %s", name, e)
+    
+    
+    def run_once():
+        existing = get_existing_artists()
+        log.info("Lidarr currently has %d artists", len(existing))
+    
+        candidates = {}
+        candidates.update(discover_lastfm_similar())
+        candidates.update(discover_listenbrainz_recommendations())
+    
+        log.info("Total unique discovery candidates this run: %d", len(candidates))
+        for name, mbid in candidates.items():
+            add_to_lidarr(name, mbid, existing)
+    
+    
+    def main():
+        while True:
+            try:
+                run_once()
+            except Exception:
+                log.exception("Discovery run failed")
+            log.info("Sleeping %ds until next run", RUN_INTERVAL_SECONDS)
+            time.sleep(RUN_INTERVAL_SECONDS)
+    
+    
+    if __name__ == "__main__":
+        sys.exit(main())

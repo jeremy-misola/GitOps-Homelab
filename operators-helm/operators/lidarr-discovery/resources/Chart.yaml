@@ -1,0 +1,6 @@
+apiVersion: v2
+name: lidarr-discovery-resources
+description: Managed resources for lidarr-discovery (Last.fm/ListenBrainz -> Lidarr discovery bridge)
+type: application
+version: 0.1.0
+appVersion: "1.0"

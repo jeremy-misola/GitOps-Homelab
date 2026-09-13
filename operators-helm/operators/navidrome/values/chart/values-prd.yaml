@@ -10,6 +10,10 @@ nodeSelector:
 env:
   TZ: America/Toronto
   ND_LASTFM_ENABLED: "true"
+  # No API key/secret needed -- unlike Last.fm, ListenBrainz scrobbling only
+  # needs each user's personal token, entered in Navidrome's own UI
+  # (Settings > ListenBrainz), not a developer app registration.
+  ND_LISTENBRAINZ_ENABLED: "true"
   ND_LASTFM_APIKEY:
     valueFrom:
       secretKeyRef:

@@ -1,0 +1,78 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lidarr-discovery
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: lidarr-discovery
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: lidarr-discovery
+  template:
+    metadata:
+      labels:
+        app: lidarr-discovery
+      annotations:
+        # See the equivalent annotation on soularr's deployment -- without
+        # this, a ConfigMap-only sync leaves the running pod on the stale
+        # script/settings until something else happens to restart it.
+        checksum/config: {{ include (print $.Template.BasePath "/lidarr-discovery-configmap.yaml") . | sha256sum }}
+    spec:
+      containers:
+      - name: lidarr-discovery
+        image: python:3.12-slim
+        command: ["python3", "/app/discover.py"]
+        env:
+        - name: TZ
+          value: America/Toronto
+        - name: LIDARR_URL
+          value: http://lidarr:8686
+        - name: LASTFM_USERNAME
+          value: jurassicjey
+        - name: ROOT_FOLDER_PATH
+          value: /music/
+        - name: QUALITY_PROFILE_ID
+          value: "1"
+        - name: METADATA_PROFILE_ID
+          value: "1"
+        # Discovery sources don't change fast enough to justify polling more
+        # often than daily -- Last.fm similar-artist data is static and
+        # ListenBrainz only regenerates its weekly playlists once a week.
+        - name: RUN_INTERVAL_SECONDS
+          value: "86400"
+        - name: LIDARR_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: lidarr-discovery-credentials
+              key: lidarrApiKey
+        - name: LASTFM_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: lidarr-discovery-credentials
+              key: lastfmApiKey
+        - name: LISTENBRAINZ_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: lidarr-discovery-credentials
+              key: listenbrainzUsername
+        - name: LISTENBRAINZ_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: lidarr-discovery-credentials
+              key: listenbrainzToken
+        volumeMounts:
+        - name: script
+          mountPath: /app
+        resources:
+          requests:
+            cpu: 25m
+            memory: 64Mi
+          limits:
+            cpu: 250m
+            memory: 256Mi
+      volumes:
+      - name: script
+        configMap:
+          name: lidarr-discovery-script
