@@ -14,7 +14,7 @@ controllers:
           # so slskd's own login would just be a second, redundant prompt.
           SLSKD_NO_AUTH: "true"
           SLSKD_DOWNLOADS_DIR: /downloads
-          SLSKD_INCOMPLETE_DIR: /downloads/incomplete
+          SLSKD_INCOMPLETE_DIR: /incomplete
           SLSKD_SLSK_USERNAME:
             valueFrom:
               secretKeyRef:
@@ -50,6 +50,12 @@ persistence:
     size: 20Gi
     globalMounts:
       - path: /downloads
+  # In-progress transfers only -- doesn't need to survive a pod restart, and
+  # doesn't need to exist as a subdirectory of /downloads for other pods to see.
+  incomplete:
+    type: emptyDir
+    globalMounts:
+      - path: /incomplete
 
 resources:
   requests:
