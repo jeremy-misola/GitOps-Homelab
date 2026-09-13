@@ -19,6 +19,13 @@ spec:
       # see the comment on slskd's defaultPodOptions.nodeSelector.
       nodeSelector:
         kubernetes.io/hostname: prod-cp-3
+      # lidarr's image runs as a fixed uid/gid 568 with no PUID/PGID override --
+      # soularr renames files in /downloads before lidarr imports them, so it
+      # needs to write as that same uid or lidarr can't take ownership after.
+      securityContext:
+        runAsUser: 568
+        runAsGroup: 568
+        fsGroup: 568
       # Renders config.ini from the template ConfigMap, substituting in the
       # Lidarr API key pulled from Doppler -- soularr itself only reads a
       # plain config.ini file, it has no way to source secrets directly.

@@ -7,6 +7,13 @@ global:
 defaultPodOptions:
   nodeSelector:
     kubernetes.io/hostname: prod-cp-3
+  # lidarr's image runs as a fixed uid/gid 568 with no PUID/PGID override --
+  # files slskd downloads have to be owned by that same uid or lidarr can't
+  # move them into /music (UnauthorizedAccessException on import).
+  securityContext:
+    runAsUser: 568
+    runAsGroup: 568
+    fsGroup: 568
 
 controllers:
   main:
