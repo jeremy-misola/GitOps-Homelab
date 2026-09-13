@@ -1,5 +1,9 @@
 fullnameOverride: filebrowser
 
+# Follows navidrome-music's PV, which is moving to prod-worker-1.
+nodeSelector:
+  kubernetes.io/hostname: prod-worker-1
+
 env:
   TZ: America/Toronto
 

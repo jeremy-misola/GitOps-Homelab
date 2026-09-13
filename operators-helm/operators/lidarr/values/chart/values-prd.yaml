@@ -1,5 +1,9 @@
 fullnameOverride: lidarr
 
+# Follows navidrome-music's and slskd-downloads' PVs, both moving to prod-worker-1.
+nodeSelector:
+  kubernetes.io/hostname: prod-worker-1
+
 env:
   TZ: America/Toronto
 

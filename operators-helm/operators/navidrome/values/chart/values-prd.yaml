@@ -1,5 +1,12 @@
 fullnameOverride: navidrome
 
+# Migrating off prod-cp-3 (memory-constrained, ~100G disk) onto prod-worker-1
+# (~200G disk, plenty of free capacity). filebrowser and lidarr follow via
+# existingClaim: navidrome-music, so pinning navidrome here is what actually
+# determines where the whole music stack's storage lives.
+nodeSelector:
+  kubernetes.io/hostname: prod-worker-1
+
 env:
   TZ: America/Toronto
   ND_LASTFM_ENABLED: "true"

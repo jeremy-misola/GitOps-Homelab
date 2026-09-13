@@ -15,10 +15,10 @@ spec:
       labels:
         app: soularr
     spec:
-      # slskd-downloads is a node-local (local-path) PVC pinned to prod-cp-3 --
+      # slskd-downloads is a node-local (local-path) PVC pinned to prod-worker-1 --
       # see the comment on slskd's defaultPodOptions.nodeSelector.
       nodeSelector:
-        kubernetes.io/hostname: prod-cp-3
+        kubernetes.io/hostname: prod-worker-1
       # lidarr's image runs as a fixed uid/gid 568 with no PUID/PGID override --
       # soularr renames files in /downloads before lidarr imports them, so it
       # needs to write as that same uid or lidarr can't take ownership after.
