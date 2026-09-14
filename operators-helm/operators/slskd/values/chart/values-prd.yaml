@@ -68,9 +68,28 @@ controllers:
 service:
   main:
     controller: main
+    # Adding the p2p service below makes app-template suffix every service
+    # name with its key by default -- forceRename keeps this one exactly
+    # "slskd", since soularr's config and slskd's own HTTPRoute both
+    # hardcode that hostname (http://slskd:5030).
+    forceRename: slskd
     ports:
       http:
         port: 5030
+  # slskd's own P2P listen port (default 50300) was never exposed past the
+  # cluster -- the web UI worked externally but incoming peer connections
+  # for actual transfers had nowhere to land. LoadBalancer here gets it a
+  # real LAN IP via MetalLB (same pattern as Minecraft/AdGuard's raw TCP
+  # ports); the router still needs its own port-forward to this IP:50300
+  # for it to be reachable from the internet, same as any home-hosted
+  # Soulseek/torrent client.
+  p2p:
+    controller: main
+    type: LoadBalancer
+    ports:
+      p2p:
+        port: 50300
+        protocol: TCP
 
 persistence:
   config:
