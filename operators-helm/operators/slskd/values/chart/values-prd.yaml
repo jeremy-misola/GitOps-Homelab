@@ -49,6 +49,11 @@ controllers:
                 key: apiKey
           SLSKD_DOWNLOADS_DIR: /downloads
           SLSKD_INCOMPLETE_DIR: /incomplete
+          # Without this slskd only ever downloads, never uploads -- peers on
+          # the network flag/ban accounts that share nothing back. Shares the
+          # actual finished library (read-only) rather than /downloads, which
+          # is just a staging area soularr/Lidarr move files out of.
+          SLSKD_SHARED_DIR: /music
           SLSKD_SLSK_USERNAME:
             valueFrom:
               secretKeyRef:
@@ -90,6 +95,16 @@ persistence:
     type: emptyDir
     globalMounts:
       - path: /incomplete
+  # Navidrome's actual library (owned by the navidrome chart) -- mounted
+  # read-only purely so slskd has something real to share back to the
+  # network. Safe to co-mount: both pods are pinned to prod-worker-1, same
+  # as every other local-path volume shared across this stack.
+  music:
+    type: persistentVolumeClaim
+    existingClaim: navidrome-music
+    globalMounts:
+      - path: /music
+        readOnly: true
 
 resources:
   requests:
