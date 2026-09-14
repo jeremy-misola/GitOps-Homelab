@@ -205,7 +205,10 @@ data:
             return {"status": "pending",
                     "message": f"Still fetching catalog metadata for {', '.join(still_loading)} -- try again shortly"}
         return {"status": "not_found",
-                "message": f"Couldn't find {song_title!r} in any Lidarr metadata match for {artist_name!r}"}
+                "message": f"Couldn't find {song_title!r} among the top Lidarr metadata matches for {artist_name!r}. "
+                            "Common first names return dozens of same-named artists and Lidarr's search only "
+                            "returns a handful -- try adding the band/group name, e.g. "
+                            f"'{artist_name} <band name>' instead of just '{artist_name}'."}
     
     
     PAGE = """<!doctype html>
