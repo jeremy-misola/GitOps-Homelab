@@ -86,16 +86,26 @@ data:
         MusicBrainz), and Lidarr's lookup ranks by raw text relevance, not fame.
         A populated bio is a decent *hint* but Lidarr's metadata backend returns
         it inconsistently (confirmed: the same real artist showed a bio on one
-        call and none on the next) -- so this is only used to pick a sensible
-        TRY ORDER, never as the final word. The actual decision in grab() is
-        made by checking which candidate really has the requested song."""
+        call and none on the next -- BLACKPINK's Lisa has no overview at all
+        despite obscure same-named artists having one) -- so this is only used
+        to pick a sensible TRY ORDER, never as the final word. The actual
+        decision in grab() is made by checking which candidate really has the
+        requested song.
+
+        When the user types extra words beyond the bare name (e.g. "Lisa
+        Blackpink" to disambiguate from every other "Lisa"), a match between
+        those extra words and the candidate's disambiguation field is a much
+        stronger signal than bio presence and is checked first."""
         norm_query = normalize(query)
-    
+
         def score(r):
-            exact = normalize(r["artistName"]) == norm_query
+            norm_name = normalize(r["artistName"])
+            exact = norm_name == norm_query
+            extra = norm_query.replace(norm_name, "", 1) if norm_name in norm_query else ""
+            qualifier_hit = bool(extra) and extra in normalize(r.get("disambiguation") or "")
             has_bio = bool(r.get("overview"))
-            return (exact and has_bio, exact, has_bio)
-    
+            return (qualifier_hit, exact and has_bio, exact, has_bio)
+
         return sorted(results, key=score, reverse=True)
     
     
