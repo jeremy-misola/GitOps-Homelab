@@ -7,7 +7,11 @@ controllers:
       main:
         image:
           repository: ghost
-          tag: 5-alpine
+          # Current official themes (Casper/Source/Edition/etc) require the
+          # `social_accounts` helper, only present in Ghost 6+. No content
+          # exists yet -- just the owner account -- so upgrading in place
+          # from the old 5.x line is low-risk.
+          tag: 6.63.0-alpine
         env:
           NODE_ENV: production
           url: https://blog.jeremymr.dev
