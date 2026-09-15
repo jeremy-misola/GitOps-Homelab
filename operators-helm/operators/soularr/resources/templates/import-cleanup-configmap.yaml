@@ -1,0 +1,206 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: soularr-import-cleanup-script
+  namespace: {{ .Release.Namespace }}
+data:
+  clean_and_import.py: |
+    #!/usr/bin/env python3
+    """
+    Scans /downloads for folders soularr/slskd have populated, detects the
+    "duplicate pollution" pattern (multiple files claiming the same Lidarr
+    track, left behind by repeated retries against the same destination
+    folder), keeps one clean file per track, and triggers a Lidarr manual
+    import so the album actually leaves the missing list instead of being
+    re-downloaded forever.
+
+    Runs as a periodic CronJob. Best-effort: one folder failing never stops
+    the others, and the script always exits 0.
+    """
+    import json
+    import os
+    import sys
+    import time
+    import urllib.error
+    import urllib.parse
+    import urllib.request
+
+    LIDARR_URL = os.environ.get("LIDARR_URL", "http://lidarr:8686").rstrip("/")
+    LIDARR_API_KEY = os.environ["LIDARR_API_KEY"]
+    DOWNLOADS_DIR = os.environ.get("DOWNLOADS_DIR", "/downloads")
+    DUPLICATES_DIR = os.environ.get("DUPLICATES_DIR", "/downloads/_duplicates")
+    STALE_MINUTES = float(os.environ.get("STALE_MINUTES", "5"))
+    IMPORT_POLL_SECONDS = 30
+
+    # Preference order when several files claim the same track: lower index wins.
+    EXT_PREFERENCE = [".flac", ".alac", ".m4a", ".ogg", ".opus", ".mp3", ".wav"]
+
+
+    def log(msg):
+        print(f"[{time.strftime('%Y-%m-%dT%H:%M:%S')}] {msg}", flush=True)
+
+
+    def api(method, path, params=None, body=None):
+        url = f"{LIDARR_URL}{path}"
+        if params:
+            url += "?" + urllib.parse.urlencode(params)
+        data = json.dumps(body).encode() if body is not None else None
+        req = urllib.request.Request(url, data=data, method=method)
+        req.add_header("X-Api-Key", LIDARR_API_KEY)
+        if data is not None:
+            req.add_header("Content-Type", "application/json")
+        with urllib.request.urlopen(req, timeout=60) as resp:
+            raw = resp.read()
+            return json.loads(raw) if raw else None
+
+
+    def ext_rank(path):
+        ext = os.path.splitext(path)[1].lower()
+        return EXT_PREFERENCE.index(ext) if ext in EXT_PREFERENCE else len(EXT_PREFERENCE)
+
+
+    def folder_is_stale(folder):
+        """True if nothing in the folder has been touched recently (safe to act on)."""
+        cutoff = time.time() - STALE_MINUTES * 60
+        newest = 0
+        for root, _dirs, files in os.walk(folder):
+            for f in files:
+                try:
+                    newest = max(newest, os.path.getmtime(os.path.join(root, f)))
+                except OSError:
+                    pass
+        return newest != 0 and newest < cutoff
+
+
+    def dedupe_folder(folder, candidates):
+        """Groups confidently-matched candidates by track id; moves losers aside.
+        Returns True if any files were moved (folder was polluted)."""
+        by_track = {}
+        for c in candidates:
+            tracks = c.get("tracks") or []
+            if len(tracks) != 1 or c.get("rejections"):
+                continue  # ambiguous or already flagged by Lidarr -- leave it alone
+            by_track.setdefault(tracks[0]["id"], []).append(c)
+
+        moved = False
+        dest_root = os.path.join(DUPLICATES_DIR, os.path.basename(folder))
+        for track_id, entries in by_track.items():
+            if len(entries) <= 1:
+                continue
+            entries.sort(key=lambda c: (ext_rank(c["path"]), -c.get("size", 0)))
+            keeper, losers = entries[0], entries[1:]
+            os.makedirs(dest_root, exist_ok=True)
+            for loser in losers:
+                src = loser["path"]
+                if not os.path.isfile(src):
+                    continue
+                dest = os.path.join(dest_root, os.path.basename(src))
+                n = 1
+                base, ext = os.path.splitext(dest)
+                while os.path.exists(dest):
+                    dest = f"{base}.{n}{ext}"
+                    n += 1
+                os.rename(src, dest)
+                moved = True
+                log(f"  moved duplicate: {os.path.basename(src)} -> _duplicates/{os.path.basename(folder)}/")
+            log(f"  track {track_id}: kept {os.path.basename(keeper['path'])}, "
+                f"moved {len(losers)} duplicate(s)")
+        return moved
+
+
+    def build_import_files(candidates):
+        files = []
+        for c in candidates:
+            tracks = c.get("tracks") or []
+            if len(tracks) != 1 or c.get("rejections"):
+                continue
+            if not os.path.isfile(c["path"]):
+                continue
+            files.append({
+                "path": c["path"],
+                "artistId": c["artist"]["id"],
+                "albumId": c["album"]["id"],
+                "albumReleaseId": c["albumReleaseId"],
+                "trackIds": [tracks[0]["id"]],
+                "quality": c["quality"],
+                "disableReleaseSwitching": False,
+            })
+        return files
+
+
+    def process_folder(folder):
+        name = os.path.basename(folder)
+        if not folder_is_stale(folder):
+            log(f"{name}: skipping, still being written to")
+            return
+
+        try:
+            candidates = api("GET", "/api/v1/manualimport", params={"folder": folder})
+        except urllib.error.URLError as e:
+            log(f"{name}: Lidarr lookup failed ({e}), skipping")
+            return
+
+        if not candidates:
+            return  # Lidarr doesn't recognize anything here -- not our problem
+
+        matched = [c for c in candidates if len(c.get("tracks") or []) == 1 and not c.get("rejections")]
+        if not matched:
+            return  # nothing confidently matched -- leave the folder alone
+
+        track_ids = [c["tracks"][0]["id"] for c in matched]
+        duplicate_count = len(track_ids) - len(set(track_ids))
+        if duplicate_count == 0:
+            return  # clean already, nothing to do
+
+        log(f"{name}: {len(matched)} matched files, {duplicate_count} duplicate(s) detected")
+        dedupe_folder(folder, candidates)
+
+        # Re-scan post-cleanup so the import uses the surviving file paths.
+        try:
+            fresh = api("GET", "/api/v1/manualimport", params={"folder": folder})
+        except urllib.error.URLError as e:
+            log(f"{name}: re-scan after cleanup failed ({e})")
+            return
+
+        files = build_import_files(fresh or [])
+        if not files:
+            log(f"{name}: nothing importable after cleanup")
+            return
+
+        resp = api("POST", "/api/v1/command", body={
+            "name": "ManualImport",
+            "files": files,
+            "importMode": "move",
+        })
+        cmd_id = resp["id"]
+        log(f"{name}: submitted import of {len(files)} file(s), command {cmd_id}")
+
+        deadline = time.time() + IMPORT_POLL_SECONDS
+        status = "queued"
+        while time.time() < deadline:
+            time.sleep(2)
+            status = api("GET", f"/api/v1/command/{cmd_id}")["status"]
+            if status in ("completed", "failed"):
+                break
+        log(f"{name}: import command {cmd_id} -> {status}")
+
+
+    def main():
+        if not os.path.isdir(DOWNLOADS_DIR):
+            log(f"{DOWNLOADS_DIR} does not exist, nothing to do")
+            return
+        for entry in sorted(os.listdir(DOWNLOADS_DIR)):
+            if entry.startswith("_"):
+                continue  # our own quarantine dirs, or other reserved prefixes
+            folder = os.path.join(DOWNLOADS_DIR, entry)
+            if not os.path.isdir(folder):
+                continue
+            try:
+                process_folder(folder)
+            except Exception as e:  # best-effort: one bad folder shouldn't kill the run
+                log(f"{entry}: unexpected error: {e}")
+
+
+    if __name__ == "__main__":
+        main()
+        sys.exit(0)

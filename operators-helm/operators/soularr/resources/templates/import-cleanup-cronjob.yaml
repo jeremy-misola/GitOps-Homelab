@@ -1,0 +1,68 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: soularr-import-cleanup
+  namespace: {{ .Release.Namespace }}
+spec:
+  # soularr writes every retry for a stuck album into the same destination
+  # folder without clearing previous attempts, so a handful of failed
+  # candidates piles up several differently-named copies of every track.
+  # Lidarr's automatic import can't pick one file per track out of that mess
+  # and silently imports nothing, so the album just gets retried forever
+  # (see Travis Scott - UTOPIA / Tame Impala - Patience, 2026-09-14). This
+  # job periodically dedupes any polluted folder down to one file per track
+  # and triggers the import itself so albums actually leave Lidarr's
+  # missing list instead of being re-downloaded on a loop.
+  schedule: "*/20 * * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      activeDeadlineSeconds: 300
+      backoffLimit: 1
+      template:
+        spec:
+          restartPolicy: Never
+          # slskd-downloads is a node-local (local-path) PVC pinned to
+          # prod-worker-1 -- see the comment on slskd's defaultPodOptions.
+          nodeSelector:
+            kubernetes.io/hostname: prod-worker-1
+          # Files in /downloads are owned by uid/gid 568 (lidarr's fixed
+          # uid) -- same as soularr, so moves/renames keep working ownership.
+          securityContext:
+            runAsUser: 568
+            runAsGroup: 568
+            fsGroup: 568
+          containers:
+            - name: cleanup
+              image: python:3.12-alpine
+              command: ["python3", "/scripts/clean_and_import.py"]
+              env:
+                - name: LIDARR_URL
+                  value: http://lidarr:8686
+                - name: LIDARR_API_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: soularr-lidarr-credentials
+                      key: apiKey
+              volumeMounts:
+                - name: script
+                  mountPath: /scripts
+                - name: downloads
+                  mountPath: /downloads
+              resources:
+                requests:
+                  cpu: 25m
+                  memory: 64Mi
+                limits:
+                  cpu: 250m
+                  memory: 128Mi
+          volumes:
+            - name: script
+              configMap:
+                name: soularr-import-cleanup-script
+                defaultMode: 0555
+            - name: downloads
+              persistentVolumeClaim:
+                claimName: slskd-downloads
