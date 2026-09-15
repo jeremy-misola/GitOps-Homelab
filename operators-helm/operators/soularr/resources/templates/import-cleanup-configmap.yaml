@@ -59,20 +59,28 @@ data:
         return EXT_PREFERENCE.index(ext) if ext in EXT_PREFERENCE else len(EXT_PREFERENCE)
 
 
-    def folder_is_stale(folder):
-        """True if nothing in the folder has been touched recently (safe to act on)."""
+    def folder_is_stale(candidates):
+        """True if none of Lidarr's actually-matched candidates were touched
+        recently. Deliberately ignores files Lidarr doesn't recognize as a
+        track match -- soularr keeps dropping unrelated junk into these
+        same-named folders on every search cycle (generic titles like
+        "Antidote" collide across unrelated downloads), and that churn was
+        resetting the mtime clock forever, so the real file never got a
+        chance to be imported."""
         cutoff = time.time() - STALE_MINUTES * 60
         newest = 0
-        for root, _dirs, files in os.walk(folder):
-            for f in files:
-                try:
-                    newest = max(newest, os.path.getmtime(os.path.join(root, f)))
-                except OSError:
-                    pass
-        # An empty folder (e.g. already fully imported and moved out) has
-        # nothing to protect against -- treat it as stale so it's skipped
-        # quietly by process_folder() instead of logging a false "still
-        # being written to".
+        for c in candidates:
+            tracks = c.get("tracks") or []
+            if len(tracks) != 1 or c.get("rejections"):
+                continue  # not a real match for this album -- ignore its mtime
+            try:
+                newest = max(newest, os.path.getmtime(c["path"]))
+            except OSError:
+                pass
+        # No matched file at all (e.g. already fully imported and moved out)
+        # has nothing to protect against -- treat it as stale so it's
+        # skipped quietly by process_folder() instead of logging a false
+        # "still being written to".
         return newest < cutoff
 
 
@@ -134,9 +142,6 @@ data:
 
     def process_folder(folder):
         name = os.path.basename(folder)
-        if not folder_is_stale(folder):
-            log(f"{name}: skipping, still being written to")
-            return
 
         try:
             candidates = api("GET", "/api/v1/manualimport", params={"folder": folder})
@@ -146,6 +151,10 @@ data:
 
         if not candidates:
             return  # Lidarr doesn't recognize anything here -- not our problem
+
+        if not folder_is_stale(candidates):
+            log(f"{name}: skipping, still being written to")
+            return
 
         matched = [c for c in candidates if len(c.get("tracks") or []) == 1 and not c.get("rejections")]
         if not matched:
