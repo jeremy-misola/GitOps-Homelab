@@ -10,6 +10,19 @@ spec:
   hostnames:
     - blog{{ .Values.envSuffix }}.jeremymr.dev
   rules:
-  - backendRefs:
+  - filters:
+    # Ghost force-redirects http->https based on its `url` config, trusting
+    # X-Forwarded-Proto to decide if a request already arrived securely.
+    # Cloudflare's tunnel hands off to Envoy over plain HTTP, so Envoy's own
+    # XFP reflects that inner hop (http), not the original https browser
+    # connection -- Ghost then sees http, redirects to https, which arrives
+    # as http again: infinite redirect loop. Stamping it here restores the
+    # true client-facing scheme for this route only.
+    - type: RequestHeaderModifier
+      requestHeaderModifier:
+        set:
+        - name: X-Forwarded-Proto
+          value: https
+    backendRefs:
     - name: ghost
       port: 2368
