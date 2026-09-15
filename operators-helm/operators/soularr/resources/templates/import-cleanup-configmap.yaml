@@ -69,7 +69,11 @@ data:
                     newest = max(newest, os.path.getmtime(os.path.join(root, f)))
                 except OSError:
                     pass
-        return newest != 0 and newest < cutoff
+        # An empty folder (e.g. already fully imported and moved out) has
+        # nothing to protect against -- treat it as stale so it's skipped
+        # quietly by process_folder() instead of logging a false "still
+        # being written to".
+        return newest < cutoff
 
 
     def dedupe_folder(folder, candidates):

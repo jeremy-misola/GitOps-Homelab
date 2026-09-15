@@ -19,7 +19,10 @@ spec:
   failedJobsHistoryLimit: 3
   jobTemplate:
     spec:
-      activeDeadlineSeconds: 300
+      # A full pass over /downloads (51 folders as of 2026-09-15) took ~3.5m;
+      # give plenty of headroom as that backlog grows rather than risk the
+      # job getting killed mid-run.
+      activeDeadlineSeconds: 900
       backoffLimit: 1
       template:
         spec:
