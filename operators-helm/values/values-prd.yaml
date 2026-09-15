@@ -327,6 +327,16 @@ operators:
       enabled: true
       namespace: minecraft
 
+  - name: ghost
+    namespace: ghost
+    syncWave: 60
+    repoURL: https://bjw-s-labs.github.io/helm-charts
+    chart: app-template
+    targetRevision: 5.1.0
+    postResources:
+      enabled: true
+      templated: true
+
   - name: navidrome
     namespace: navidrome
     syncWave: 60

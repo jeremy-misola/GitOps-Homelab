@@ -1,0 +1,43 @@
+global:
+  fullnameOverride: ghost
+
+controllers:
+  main:
+    containers:
+      main:
+        image:
+          repository: ghost
+          tag: 5-alpine
+        env:
+          NODE_ENV: production
+          url: https://blog.jeremymr.dev
+          # SQLite instead of MySQL -- single container, single PVC, no extra
+          # StatefulSet/credentials to operate. Fine for a personal blog;
+          # revisit if traffic or write concurrency ever becomes a problem.
+          database__client: sqlite3
+          database__connection__filename: /var/lib/ghost/content/data/ghost.db
+          database__useNullAsDefault: "true"
+
+service:
+  main:
+    controller: main
+    ports:
+      http:
+        port: 2368
+
+persistence:
+  content:
+    type: persistentVolumeClaim
+    accessMode: ReadWriteOnce
+    storageClass: local-path
+    size: 5Gi
+    globalMounts:
+      - path: /var/lib/ghost/content
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 1000m
+    memory: 1Gi
