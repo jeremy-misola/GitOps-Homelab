@@ -55,6 +55,11 @@ persistence:
 initContainers:
   install-discord-rpc-plugin:
     image: curlimages/curl:8.11.1
+    # Navidrome's main container runs as root and creates /data/plugins itself
+    # with 0700 perms, so this container needs to run as root too or it can't
+    # write into that directory.
+    securityContext:
+      runAsUser: 0
     command:
       - /bin/sh
       - -c
