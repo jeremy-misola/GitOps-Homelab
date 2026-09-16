@@ -9,6 +9,14 @@ nodeSelector:
 
 env:
   TZ: America/Toronto
+  # Required so the Discord Rich Presence plugin can build public artwork/track
+  # links back to this instance.
+  ND_BASEURL: https://navidrome.jeremymr.dev
+  ND_PLUGINS_ENABLED: "true"
+  ND_PLUGINS_FOLDER: /data/plugins
+  # Auto-detect .ndp files dropped into the plugins folder without a manual
+  # "Rescan" click in Settings > Plugins.
+  ND_PLUGINS_AUTORELOAD: "true"
   ND_LASTFM_ENABLED: "true"
   # No API key/secret needed -- unlike Last.fm, ListenBrainz scrobbling only
   # needs each user's personal token, entered in Navidrome's own UI
@@ -36,6 +44,28 @@ persistence:
     storageClass: local-path
     accessMode: ReadWriteOnce
     size: 50Gi
+
+# Installs the Discord Rich Presence plugin (https://github.com/navidrome/discord-rich-presence-plugin)
+# into the persistent config volume on every pod start, so it survives restarts
+# without baking it into a custom image. Version is pinned for reproducibility --
+# bump the tag deliberately to pick up a new plugin release.
+# NOTE: the plugin itself (Client ID, Navidrome username, Discord token) still
+# needs to be configured per-user in Settings > Plugins > Discord Rich Presence
+# in the Navidrome UI -- that config lives in Navidrome's own DB, not here.
+initContainers:
+  install-discord-rpc-plugin:
+    image: curlimages/curl:8.11.1
+    command:
+      - /bin/sh
+      - -c
+      - |
+        set -euo pipefail
+        mkdir -p /data/plugins
+        curl -fsSL -o /data/plugins/discord-rich-presence.ndp \
+          https://github.com/navidrome/discord-rich-presence-plugin/releases/download/v2.0.0/discord-rich-presence.ndp
+    volumeMounts:
+      - name: config
+        mountPath: /data
 
 resources:
   requests:
